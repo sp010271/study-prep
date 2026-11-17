@@ -1,1919 +1,1540 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>私中衝刺模擬站｜淡江 × 薇閣入學備考系統</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-gradient: linear-gradient(135deg, #f4f7fb 0%, #e9f0f8 50%, #f7f9fc 100%);
-      --glass-bg: rgba(255, 255, 255, 0.88);
-      --glass-border: rgba(255, 255, 255, 0.96);
-      --glass-shadow: 0 12px 36px rgba(15, 23, 42, 0.06);
-      --text-main: #0f172a;
-      --text-sub: #475569;
-      --text-muted: #64748b;
-      --primary: #0f766e;
-      --primary-hover: #115e59;
-      --primary-soft: rgba(15, 118, 110, 0.1);
-      --accent: #2563eb;
-      --accent-soft: rgba(37, 99, 235, 0.1);
-      --purple: #7c3aed;
-      --purple-soft: rgba(124, 58, 237, 0.1);
-      --danger: #dc2626;
-      --danger-soft: rgba(220, 38, 38, 0.1);
-      --warning: #d97706;
-      --warning-soft: rgba(217, 119, 6, 0.14);
-      --radius-lg: 24px;
-      --radius-md: 16px;
-      --radius-sm: 12px;
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Inter", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
-      background: var(--bg-gradient);
-      color: var(--text-main);
-      min-height: 100vh;
-      line-height: 1.65;
-    }
-
-    .liquid-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
-      border-radius: var(--radius-lg);
-    }
-
-    .container-main {
-      max-width: 940px;
-      margin: 0 auto;
-      padding: 16px 14px 72px;
-    }
-
-    /* Portal Lobby */
-    #portal-view {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px 16px;
-    }
-
-    .portal-box {
-      width: 100%;
-      max-width: 460px;
-      padding: 36px 26px;
-      text-align: center;
-    }
-
-    .portal-badge {
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 18px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #0f766e 0%, #2563eb 100%);
-      color: #ffffff;
-      font-size: 32px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 10px 24px rgba(15, 118, 110, 0.25);
-    }
-
-    .portal-title {
-      font-size: 28px;
-      font-weight: 800;
-      margin: 0 0 8px;
-      letter-spacing: 0.5px;
-    }
-
-    .portal-sub {
-      font-size: 14px;
-      color: var(--text-sub);
-      margin: 0 0 20px;
-    }
-
-    /* Source Selector Bar on Portal Lobby */
-    .source-selector-box {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .source-pill-btn {
-      padding: 12px 8px;
-      border-radius: var(--radius-sm);
-      border: 1.5px solid #cbd5e1;
-      background: #f8fafc;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-sub);
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s ease;
-    }
-
-    .source-pill-btn.active {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
-    }
-
-    .portal-status-card {
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid rgba(203, 213, 225, 0.65);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 22px;
-      text-align: left;
-    }
-
-    .status-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      padding: 8px 0;
-    }
-
-    .status-row + .status-row {
-      border-top: 1px dashed rgba(203, 213, 225, 0.75);
-    }
-
-    .status-label {
-      color: var(--text-sub);
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .status-value {
-      font-weight: 700;
-      text-align: right;
-      font-size: 13px;
-      word-break: break-word;
-      max-width: 65%;
-    }
-
-    .btn-primary {
-      width: 100%;
-      padding: 16px 24px;
-      border: none;
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
-      color: #ffffff;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 8px 20px rgba(15, 118, 110, 0.25);
-      transition: transform 0.15s ease;
-    }
-
-    .btn-primary:active {
-      transform: scale(0.98);
-    }
-
-    .btn-secondary {
-      padding: 10px 14px;
-      border: 1px solid rgba(148, 163, 184, 0.45);
-      border-radius: var(--radius-sm);
-      background: rgba(255, 255, 255, 0.92);
-      color: var(--text-main);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-secondary:active {
-      background: #f1f5f9;
-    }
-
-    /* Toast Message Box (replaces alert/confirm) */
-    .toast-banner {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 200;
-      background: #0f172a;
-      color: #ffffff;
-      padding: 12px 20px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 600;
-      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.3);
-      max-width: 92vw;
-      text-align: center;
-      transition: opacity 0.2s ease;
-    }
-
-    /* Main Header & Stats */
-    .top-bar {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 18px;
-      margin-bottom: 14px;
-    }
-
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-mini-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, #0f766e, #2563eb);
-      color: #fff;
-      font-weight: 800;
-      font-size: 17px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .stat-card {
-      padding: 14px 10px;
-      text-align: center;
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-sub);
-      margin-bottom: 4px;
-    }
-
-    .stat-val {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    /* 15 Weeks Strip */
-    .week-strip {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 4px 2px 14px;
-      margin-bottom: 12px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .week-strip::-webkit-scrollbar {
-      height: 6px;
-    }
-
-    .week-strip::-webkit-scrollbar-track {
-      background: rgba(203, 213, 225, 0.25);
-      border-radius: 10px;
-    }
-
-    .week-strip::-webkit-scrollbar-thumb {
-      background: rgba(15, 118, 110, 0.4);
-      border-radius: 10px;
-    }
-
-    .week-pill {
-      flex: 0 0 auto;
-      padding: 9px 13px;
-      border-radius: 14px;
-      border: 1px solid rgba(203, 213, 225, 0.75);
-      background: rgba(255, 255, 255, 0.8);
-      color: var(--text-sub);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: 76px;
-    }
-
-    .week-pill.active {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-      box-shadow: 0 6px 14px rgba(15, 118, 110, 0.25);
-    }
-
-    .week-pill.done {
-      border-color: #10b981;
-    }
-
-    /* Step Tabs */
-    .step-tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .step-tab {
-      padding: 13px 8px;
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(203, 213, 225, 0.75);
-      background: rgba(255, 255, 255, 0.75);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-sub);
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .step-tab.active {
-      background: #ffffff;
-      color: var(--primary);
-      border-color: var(--primary);
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-    }
-
-    /* Teaching Library (Step 1) */
-    .sub-filter-bar {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .sub-pill {
-      padding: 11px 8px;
-      border-radius: 12px;
-      border: 1px solid rgba(203, 213, 225, 0.8);
-      background: rgba(255, 255, 255, 0.85);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-sub);
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .sub-pill.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    .lecture-item {
-      padding: 16px;
-      margin-bottom: 12px;
-      border-left: 4px solid var(--primary);
-    }
-
-    .lecture-item.dlc {
-      border-left-color: var(--purple);
-      background: rgba(250, 245, 255, 0.92);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 99px;
-      font-size: 12px;
-      font-weight: 700;
-      background: var(--primary-soft);
-      color: var(--primary);
-    }
-
-    .badge.dlc {
-      background: var(--purple-soft);
-      color: var(--purple);
-    }
-
-    .badge.diff-basic { background: #dcfce7; color: #166534; }
-    .badge.diff-mid { background: #dbeafe; color: #1e40af; }
-    .badge.diff-hard { background: #fee2e2; color: #991b1b; }
-
-    /* Sticky Exam HUD (Step 2) */
-    .exam-hud {
-      position: sticky;
-      top: 8px;
-      z-index: 40;
-      padding: 12px 14px;
-      margin-bottom: 16px;
-      background: rgba(255, 255, 255, 0.96);
-      border: 1px solid rgba(203, 213, 225, 0.95);
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-      border-radius: 18px;
-    }
-
-    .hud-top-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .timer-badge {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 18px;
-      font-weight: 800;
-      padding: 5px 12px;
-      border-radius: 10px;
-      background: var(--danger-soft);
-      color: var(--danger);
-    }
-
-    .exam-sub-filter {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-
-    .exam-sub-pill {
-      padding: 10px 6px;
-      border-radius: 12px;
-      border: 1.5px solid #cbd5e1;
-      background: #f8fafc;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text-sub);
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.15s ease;
-    }
-
-    .exam-sub-pill.active {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
-    }
-
-    .mini-grid {
-      display: grid;
-      grid-template-columns: repeat(10, 1fr);
-      gap: 4px;
-    }
-
-    @media (min-width: 680px) {
-      .mini-grid {
-        grid-template-columns: repeat(15, 1fr);
-      }
-    }
-
-    .mini-cell {
-      height: 28px;
-      border-radius: 7px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      color: var(--text-sub);
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-    }
-
-    .mini-cell.answered {
-      background: #10b981;
-      color: #ffffff;
-      border-color: #059669;
-    }
-
-    .mini-cell.flagged {
-      border: 2px solid #f59e0b;
-      box-shadow: 0 0 0 1px #f59e0b;
-    }
-
-    /* Question Cards */
-    .q-card {
-      padding: 20px 18px;
-      margin-bottom: 18px;
-      scroll-margin-top: 195px;
-    }
-
-    .q-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .q-stem {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      white-space: pre-line;
-      line-height: 1.8;
-    }
-
-    .reading-passage-box {
-      position: sticky;
-      top: 176px;
-      z-index: 20;
-      background: #f8fafc;
-      border: 1.5px solid #cbd5e1;
-      border-left: 4px solid var(--accent);
-      border-radius: 14px;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-    }
-
-    .reading-passage-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 6px;
-    }
-
-    .reading-passage-text {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-main);
-      line-height: 1.85;
-      white-space: pre-line;
-      max-height: 180px;
-      overflow-y: auto;
-    }
-
-    .reading-passage-text.collapsed {
-      max-height: 44px;
-      overflow: hidden;
-      opacity: 0.75;
-    }
-
-    .q-img-wrap {
-      margin: 12px 0 16px;
-      text-align: center;
-    }
-
-    .q-img-wrap img {
-      max-width: 100%;
-      max-height: 240px;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      cursor: zoom-in;
-      display: inline-block;
-    }
-
-    .options-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .option-row {
-      display: flex;
-      align-items: stretch;
-      gap: 8px;
-    }
-
-    .option-btn {
-      flex: 1;
-      min-height: 50px;
-      text-align: left;
-      padding: 13px 16px;
-      border-radius: var(--radius-sm);
-      border: 1.5px solid rgba(203, 213, 225, 0.9);
-      background: rgba(255, 255, 255, 0.96);
-      color: var(--text-main);
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .option-btn.selected {
-      border-color: var(--accent);
-      background: var(--accent-soft);
-      color: #1e3a8a;
-    }
-
-    .option-btn.eliminated {
-      text-decoration: line-through;
-      opacity: 0.45;
-      background: #f1f5f9;
-    }
-
-    .option-btn.correct {
-      border-color: #10b981;
-      background: rgba(16, 185, 129, 0.16);
-      color: #065f46;
-      opacity: 1;
-      text-decoration: none;
-    }
-
-    .option-btn.wrong {
-      border-color: var(--danger);
-      background: var(--danger-soft);
-      color: #991b1b;
-      opacity: 1;
-      text-decoration: none;
-    }
-
-    .elim-btn {
-      flex: 0 0 48px;
-      border-radius: var(--radius-sm);
-      border: 1px solid #cbd5e1;
-      background: #f8fafc;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .elim-btn.active {
-      background: #fee2e2;
-      color: var(--danger);
-      border-color: #fca5a5;
-    }
-
-    .flag-btn {
-      padding: 6px 10px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      color: var(--text-sub);
-    }
-
-    .flag-btn.active {
-      background: #fef3c7;
-      border-color: #f59e0b;
-      color: #b45309;
-    }
-
-    .listening-box {
-      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-      border: 1.5px solid #86efac;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .answer-compare-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-      margin-top: 12px;
-    }
-
-    @media (min-width: 560px) {
-      .answer-compare-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .compare-pill-wrong {
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: var(--danger-soft);
-      border: 1px solid rgba(220, 38, 38, 0.3);
-      color: #991b1b;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .compare-pill-correct {
-      padding: 10px 12px;
-      border-radius: 10px;
-      background: rgba(16, 185, 129, 0.14);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #065f46;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .hint-box {
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: var(--radius-sm);
-      background: var(--warning-soft);
-      color: #92400e;
-      font-size: 14px;
-      display: none;
-    }
-
-    .explain-box {
-      margin-top: 12px;
-      padding: 14px 16px;
-      border-radius: var(--radius-sm);
-      background: #f8fafc;
-      border-left: 4px solid var(--primary);
-      font-size: 14px;
-      color: var(--text-sub);
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      background: rgba(15, 23, 42, 0.65);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .scratchpad-box {
-      width: 100%;
-      max-width: 600px;
-      background: rgba(255, 255, 255, 0.96);
-      border-radius: 20px;
-      padding: 16px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-    }
-
-    #scratch-canvas {
-      width: 100%;
-      height: 310px;
-      border: 1.5px dashed #94a3b8;
-      border-radius: 12px;
-      background: #fffbeb;
-      touch-action: none;
-      cursor: crosshair;
-      display: block;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>私中衝刺模擬站</title>
+<style>
+:root {
+--bg-gradient: linear-gradient(135deg, #f4f7fb 0%, #e9f0f8 50%, #f7f9fc 100%);
+--glass-bg: rgba(255, 255, 255, 0.86);
+--glass-border: rgba(255, 255, 255, 0.96);
+--glass-shadow: 0 12px 36px rgba(15, 23, 42, 0.06);
+--text-main: #0f172a;
+--text-sub: #475569;
+--text-muted: #64748b;
+--primary: #0f766e;
+--primary-hover: #115e59;
+--primary-soft: rgba(15, 118, 110, 0.1);
+--accent: #2563eb;
+--accent-soft: rgba(37, 99, 235, 0.1);
+--purple: #7c3aed;
+--purple-soft: rgba(124, 58, 237, 0.1);
+--danger: #dc2626;
+--danger-soft: rgba(220, 38, 38, 0.1);
+--warning: #d97706;
+--warning-soft: rgba(217, 119, 6, 0.14);
+--radius-lg: 24px;
+--radius-md: 16px;
+--radius-sm: 12px;
+}
+* {
+box-sizing: border-box;
+-webkit-tap-highlight-color: transparent;
+}
+body {
+margin: 0;
+padding: 0;
+font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+background: var(--bg-gradient);
+color: var(--text-main);
+min-height: 100vh;
+line-height: 1.65;
+}
+.liquid-card {
+background: var(--glass-bg);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border: 1px solid var(--glass-border);
+box-shadow: var(--glass-shadow);
+border-radius: var(--radius-lg);
+}
+.container {
+max-width: 940px;
+margin: 0 auto;
+padding: 16px 14px 72px;
+}
+/* Portal Lobby */
+#portal-view {
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 24px 16px;
+}
+.portal-box {
+width: 100%;
+max-width: 460px;
+padding: 36px 26px;
+text-align: center;
+}
+.portal-badge {
+width: 72px;
+height: 72px;
+margin: 0 auto 18px;
+border-radius: 22px;
+background: linear-gradient(135deg, #0f766e 0%, #2563eb 100%);
+color: #ffffff;
+font-size: 32px;
+font-weight: 800;
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 10px 24px rgba(15, 118, 110, 0.25);
+}
+.portal-title {
+font-size: 28px;
+font-weight: 800;
+margin: 0 0 8px;
+letter-spacing: 0.5px;
+}
+.portal-sub {
+font-size: 14px;
+color: var(--text-sub);
+margin: 0 0 20px;
+}
+/* Source Selector Bar on Portal Lobby */
+.source-selector-box {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 8px;
+margin-bottom: 20px;
+}
+.source-pill-btn {
+padding: 12px 8px;
+border-radius: var(--radius-sm);
+border: 1.5px solid #cbd5e1;
+background: #f8fafc;
+font-size: 14px;
+font-weight: 700;
+color: var(--text-sub);
+cursor: pointer;
+text-align: center;
+transition: all 0.15s ease;
+}
+.source-pill-btn.active {
+background: var(--primary);
+color: #ffffff;
+border-color: var(--primary);
+box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+.portal-status-card {
+background: rgba(255, 255, 255, 0.92);
+border: 1px solid rgba(203, 213, 225, 0.65);
+border-radius: var(--radius-md);
+padding: 16px;
+margin-bottom: 22px;
+text-align: left;
+}
+.status-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+gap: 12px;
+font-size: 14px;
+padding: 8px 0;
+}
+.status-row + .status-row {
+border-top: 1px dashed rgba(203, 213, 225, 0.75);
+}
+.status-label {
+color: var(--text-sub);
+white-space: nowrap;
+flex-shrink: 0;
+}
+.status-value {
+font-weight: 700;
+text-align: right;
+font-size: 13px !important;
+white-space: normal !important;
+word-break: break-all;
+max-width: 62%;
+}
+.btn-primary {
+width: 100%;
+padding: 16px 24px;
+border: none;
+border-radius: var(--radius-md);
+background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+color: #ffffff;
+font-size: 17px;
+font-weight: 700;
+cursor: pointer;
+box-shadow: 0 8px 20px rgba(15, 118, 110, 0.25);
+transition: transform 0.15s ease;
+}
+.btn-primary:active {
+transform: scale(0.98);
+}
+.btn-secondary {
+padding: 10px 14px;
+border: 1px solid rgba(148, 163, 184, 0.45);
+border-radius: var(--radius-sm);
+background: rgba(255, 255, 255, 0.92);
+color: var(--text-main);
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+}
+.btn-secondary:active {
+background: #f1f5f9;
+}
+/* Main Header & Stats */
+.top-bar {
+display: flex;
+flex-wrap: wrap;
+justify-content: space-between;
+align-items: center;
+gap: 10px;
+padding: 14px 18px;
+margin-bottom: 14px;
+}
+.brand-group {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+.brand-mini-icon {
+width: 38px;
+height: 38px;
+border-radius: 11px;
+background: linear-gradient(135deg, #0f766e, #2563eb);
+color: #fff;
+font-weight: 800;
+font-size: 17px;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.stats-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 10px;
+margin-bottom: 14px;
+}
+.stat-card {
+padding: 14px 10px;
+text-align: center;
+}
+.stat-label {
+font-size: 12px;
+color: var(--text-sub);
+margin-bottom: 4px;
+}
+.stat-val {
+font-size: 20px;
+font-weight: 800;
+color: var(--primary);
+}
+/* 15 Weeks Strip */
+.week-strip {
+display: flex;
+gap: 8px;
+overflow-x: auto;
+padding: 4px 2px 14px;
+margin-bottom: 12px;
+-webkit-overflow-scrolling: touch;
+}
+.week-strip::-webkit-scrollbar {
+height: 6px;
+}
+.week-strip::-webkit-scrollbar-track {
+background: rgba(203, 213, 225, 0.25);
+border-radius: 10px;
+}
+.week-strip::-webkit-scrollbar-thumb {
+background: rgba(15, 118, 110, 0.4);
+border-radius: 10px;
+}
+.week-strip::-webkit-scrollbar-thumb:hover {
+background: rgba(15, 118, 110, 0.7);
+}
+.week-pill {
+flex: 0 0 auto;
+padding: 9px 13px;
+border-radius: 14px;
+border: 1px solid rgba(203, 213, 225, 0.75);
+background: rgba(255, 255, 255, 0.8);
+color: var(--text-sub);
+font-size: 13px;
+font-weight: 700;
+cursor: pointer;
+display: flex;
+flex-direction: column;
+align-items: center;
+min-width: 76px;
+}
+.week-pill.active {
+background: var(--primary);
+color: #ffffff;
+border-color: var(--primary);
+box-shadow: 0 6px 14px rgba(15, 118, 110, 0.25);
+}
+.week-pill.done {
+border-color: #10b981;
+}
+/* Step Tabs */
+.step-tabs {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 8px;
+margin-bottom: 16px;
+}
+.step-tab {
+padding: 13px 8px;
+border-radius: var(--radius-md);
+border: 1px solid rgba(203, 213, 225, 0.75);
+background: rgba(255, 255, 255, 0.75);
+font-size: 14px;
+font-weight: 700;
+color: var(--text-sub);
+cursor: pointer;
+text-align: center;
+}
+.step-tab.active {
+background: #ffffff;
+color: var(--primary);
+border-color: var(--primary);
+box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+/* Teaching Library (Step 1) */
+.sub-filter-bar {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 8px;
+margin-bottom: 14px;
+}
+.sub-pill {
+padding: 11px 8px;
+border-radius: 12px;
+border: 1px solid rgba(203, 213, 225, 0.8);
+background: rgba(255, 255, 255, 0.85);
+font-size: 14px;
+font-weight: 700;
+color: var(--text-sub);
+cursor: pointer;
+text-align: center;
+}
+.sub-pill.active {
+background: var(--accent);
+color: #fff;
+border-color: var(--accent);
+}
+.lecture-item {
+padding: 16px;
+margin-bottom: 12px;
+border-left: 4px solid var(--primary);
+}
+.lecture-item.dlc {
+border-left-color: var(--purple);
+background: rgba(250, 245, 255, 0.92);
+}
+.badge {
+display: inline-block;
+padding: 3px 10px;
+border-radius: 99px;
+font-size: 12px;
+font-weight: 700;
+background: var(--primary-soft);
+color: var(--primary);
+}
+.badge.dlc {
+background: var(--purple-soft);
+color: var(--purple);
+}
+.badge.diff-basic { background: #dcfce7; color: #166534; }
+.badge.diff-mid { background: #dbeafe; color: #1e40af; }
+.badge.diff-hard { background: #fee2e2; color: #991b1b; }
+/* Sticky Exam HUD (Step 2) */
+.exam-hud {
+position: sticky;
+top: 8px;
+z-index: 40;
+padding: 12px 14px;
+margin-bottom: 16px;
+background: rgba(255, 255, 255, 0.96);
+border: 1px solid rgba(203, 213, 225, 0.95);
+box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+border-radius: 18px;
+}
+.hud-top-row {
+display: flex;
+flex-wrap: wrap;
+justify-content: space-between;
+align-items: center;
+gap: 8px;
+margin-bottom: 10px;
+}
+.timer-badge {
+font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+font-size: 18px;
+font-weight: 800;
+padding: 5px 12px;
+border-radius: 10px;
+background: var(--danger-soft);
+color: var(--danger);
+}
+/* Subject Priority Filter Bar inside Step 2 */
+.exam-sub-filter {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 6px;
+margin-bottom: 12px;
+}
+.exam-sub-pill {
+padding: 10px 6px;
+border-radius: 12px;
+border: 1.5px solid #cbd5e1;
+background: #f8fafc;
+font-size: 14px;
+font-weight: 700;
+color: var(--text-sub);
+cursor: pointer;
+text-align: center;
+transition: all 0.15s ease;
+}
+.exam-sub-pill.active {
+background: var(--primary);
+color: #ffffff;
+border-color: var(--primary);
+box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
+}
+.mini-grid {
+display: grid;
+grid-template-columns: repeat(10, 1fr);
+gap: 4px;
+}
+@media (min-width: 680px) {
+.mini-grid {
+grid-template-columns: repeat(15, 1fr);
+}
+}
+.mini-cell {
+height: 28px;
+border-radius: 7px;
+border: 1px solid #cbd5e1;
+background: #ffffff;
+color: var(--text-sub);
+font-size: 11px;
+font-weight: 700;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 0;
+}
+.mini-cell.answered {
+background: #10b981;
+color: #ffffff;
+border-color: #059669;
+}
+.mini-cell.flagged {
+border: 2px solid #f59e0b;
+box-shadow: 0 0 0 1px #f59e0b;
+}
+/* Question Cards & Child-Friendly Reading / Option Controls */
+.q-card {
+padding: 20px 18px;
+margin-bottom: 18px;
+scroll-margin-top: 195px;
+}
+.q-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+flex-wrap: wrap;
+gap: 8px;
+margin-bottom: 12px;
+}
+.q-stem {
+font-size: 16px;
+font-weight: 700;
+margin-bottom: 16px;
+white-space: pre-line;
+line-height: 1.8;
+}
+/* Sticky/Collapsible Reading Passage Box */
+.reading-passage-box {
+position: sticky;
+top: 176px;
+z-index: 20;
+background: #f8fafc;
+border: 1.5px solid #cbd5e1;
+border-left: 4px solid var(--accent);
+border-radius: 14px;
+padding: 12px 14px;
+margin-bottom: 14px;
+box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+.reading-passage-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 12px;
+font-weight: 700;
+color: var(--accent);
+margin-bottom: 6px;
+}
+.reading-passage-text {
+font-size: 15px;
+font-weight: 600;
+color: var(--text-main);
+line-height: 1.85;
+white-space: pre-line;
+max-height: 180px;
+overflow-y: auto;
+}
+.reading-passage-text.collapsed {
+max-height: 44px;
+overflow: hidden;
+opacity: 0.75;
+}
+.q-img-wrap {
+margin: 12px 0 16px;
+text-align: center;
+}
+.q-img-wrap img {
+max-width: 100%;
+max-height: 240px;
+border-radius: 12px;
+border: 1px solid #cbd5e1;
+cursor: zoom-in;
+}
+.options-list {
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+.option-row {
+display: flex;
+align-items: stretch;
+gap: 8px;
+}
+.option-btn {
+flex: 1;
+min-height: 50px;
+text-align: left;
+padding: 13px 16px;
+border-radius: var(--radius-sm);
+border: 1.5px solid rgba(203, 213, 225, 0.9);
+background: rgba(255, 255, 255, 0.96);
+color: var(--text-main);
+font-size: 15px;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.15s ease;
+}
+.option-btn.selected {
+border-color: var(--accent);
+background: var(--accent-soft);
+color: #1e3a8a;
+}
+.option-btn.eliminated {
+text-decoration: line-through;
+opacity: 0.45;
+background: #f1f5f9;
+}
+.option-btn.correct {
+border-color: #10b981;
+background: rgba(16, 185, 129, 0.16);
+color: #065f46;
+opacity: 1;
+text-decoration: none;
+}
+.option-btn.wrong {
+border-color: var(--danger);
+background: var(--danger-soft);
+color: #991b1b;
+opacity: 1;
+text-decoration: none;
+}
+.elim-btn {
+flex: 0 0 48px;
+border-radius: var(--radius-sm);
+border: 1px solid #cbd5e1;
+background: #f8fafc;
+color: var(--text-muted);
+font-size: 13px;
+font-weight: 700;
+cursor: pointer;
+}
+.elim-btn.active {
+background: #fee2e2;
+color: var(--danger);
+border-color: #fca5a5;
+}
+.flag-btn {
+padding: 6px 10px;
+border-radius: 10px;
+border: 1px solid #cbd5e1;
+background: #fff;
+font-size: 12px;
+font-weight: 700;
+cursor: pointer;
+color: var(--text-sub);
+}
+.flag-btn.active {
+background: #fef3c7;
+border-color: #f59e0b;
+color: #b45309;
+}
+/* Listening Audio Player Box */
+.listening-box {
+background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+border: 1.5px solid #86efac;
+border-radius: 14px;
+padding: 14px 16px;
+margin-bottom: 16px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+}
+/* Post-Exam Answer Comparison Strip */
+.answer-compare-grid {
+display: grid;
+grid-template-columns: 1fr;
+gap: 8px;
+margin-top: 12px;
+}
+@media (min-width: 560px) {
+.answer-compare-grid {
+grid-template-columns: 1fr 1fr;
+}
+}
+.compare-pill-wrong {
+padding: 10px 12px;
+border-radius: 10px;
+background: var(--danger-soft);
+border: 1px solid rgba(220, 38, 38, 0.3);
+color: #991b1b;
+font-size: 13px;
+font-weight: 700;
+}
+.compare-pill-correct {
+padding: 10px 12px;
+border-radius: 10px;
+background: rgba(16, 185, 129, 0.14);
+border: 1px solid rgba(16, 185, 129, 0.4);
+color: #065f46;
+font-size: 13px;
+font-weight: 700;
+}
+.hint-box {
+margin-top: 12px;
+padding: 12px 14px;
+border-radius: var(--radius-sm);
+background: var(--warning-soft);
+color: #92400e;
+font-size: 14px;
+display: none;
+}
+.explain-box {
+margin-top: 12px;
+padding: 14px 16px;
+border-radius: var(--radius-sm);
+background: #f8fafc;
+border-left: 4px solid var(--primary);
+font-size: 14px;
+color: var(--text-sub);
+}
+/* Scratchpad Drawer & Lightbox Modal */
+.modal-overlay {
+position: fixed;
+inset: 0;
+z-index: 100;
+background: rgba(15, 23, 42, 0.65);
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 16px;
+}
+.scratchpad-box {
+width: 100%;
+max-width: 600px;
+background: rgba(255, 255, 255, 0.95);
+border-radius: 20px;
+padding: 16px;
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+}
+#scratch-canvas {
+width: 100%;
+height: 310px;
+border: 1.5px dashed #94a3b8;
+border-radius: 12px;
+background: #fffbeb;
+touch-action: none;
+cursor: crosshair;
+display: block;
+}
+.hidden {
+display: none !important;
+}
+</style>
 </head>
 <body>
-
-  <!-- Toast Notification Banner -->
-  <div id="toast-banner" class="toast-banner hidden"></div>
-
-  <!-- 1. Portal Entry Lobby -->
-  <div id="portal-view">
-    <div class="liquid-card portal-box">
-      <div class="portal-badge">勝</div>
-      <h1 class="portal-title">私中衝刺模擬站</h1>
-      <p class="portal-sub">淡江 × 薇閣入學備考系統（2026/11/16 – 2027/02/27）</p>
-
-      <!-- Dual-Track Source Selector -->
-      <div class="source-selector-box">
-        <button class="source-pill-btn active" id="src-btn-web" onclick="switchQuestionSource('web')">🌐 網路私中題庫</button>
-        <button class="source-pill-btn" id="src-btn-zhixin" onclick="switchQuestionSource('zhixin')">🏫 知欣加強班</button>
-      </div>
-
-      <div class="portal-status-card">
-        <div class="status-row">
-          <span class="status-label">目前推進週次</span>
-          <span class="status-value" id="portal-week-label" style="color:var(--primary);">第 1 週</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">累積通關進度</span>
-          <span class="status-value" id="portal-progress-label">0 / 15 週</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">待複習錯題數</span>
-          <span class="status-value" id="portal-wrong-label" style="color:var(--danger);">0 題</span>
-        </div>
-        <div class="status-row">
-          <span class="status-label">雲端題庫同步狀態</span>
-          <span class="status-value" id="dlc-status-label" style="color:var(--purple);">同步中...</span>
-        </div>
-      </div>
-
-      <button class="btn-primary" onclick="enterStudyStation()">
-        🚀 開始今日衝刺模擬 →
-      </button>
-
-      <div style="margin-top:12px;">
-        <button class="btn-secondary" style="width:100%;" onclick="syncCloudDLC(true)">
-          🔄 立即同步最新題庫
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 2. Main Study Station -->
-  <div id="app-view" class="container-main hidden">
-    <div class="liquid-card top-bar">
-      <div class="brand-group">
-        <div class="brand-mini-icon">勝</div>
-        <div>
-          <div style="font-weight:800;font-size:16px;">
-            <span id="active-source-badge" class="badge dlc" style="font-size:12px;margin-right:6px;">網路私中題庫</span>
-            <span id="app-title-text">淡江 × 薇閣入學備考系統</span>
-          </div>
-          <div id="week-date-range" style="font-size:12px;color:var(--text-sub);"></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn-secondary" onclick="returnToPortal()">返回首頁</button>
-      </div>
-    </div>
-
-    <div class="stats-grid">
-      <div class="liquid-card stat-card">
-        <div class="stat-label">距離 2/27 考試倒數</div>
-        <div class="stat-val" id="countdown-days">-- 天</div>
-      </div>
-      <div class="liquid-card stat-card">
-        <div class="stat-label">完成週次進度</div>
-        <div class="stat-val" id="completed-count">0 / 15</div>
-      </div>
-      <div class="liquid-card stat-card">
-        <div class="stat-label">累積已刷題數</div>
-        <div class="stat-val" id="solved-unique-count">0 題</div>
-      </div>
-    </div>
-
-    <!-- 15 Weeks Horizontal Strip -->
-    <div class="week-strip" id="week-strip"></div>
-
-    <!-- Current Week Header -->
-    <div class="liquid-card" style="padding:16px 18px;margin-bottom:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-        <div>
-          <span id="current-week-badge" class="badge" style="margin-bottom:4px;"></span>
-          <h2 id="current-week-title" style="margin:4px 0 0;font-size:19px;font-weight:800;"></h2>
-        </div>
-        <span id="week-pass-status" style="font-size:13px;font-weight:700;color:var(--text-sub);"></span>
-      </div>
-    </div>
-
-    <!-- 3 Steps Navigation Tabs -->
-    <div class="step-tabs">
-      <button class="step-tab active" id="tab-1" onclick="switchStep(1)">步驟一：教學庫</button>
-      <button class="step-tab" id="tab-2" onclick="switchStep(2)">步驟二：30題測驗</button>
-      <button class="step-tab" id="tab-3" onclick="switchStep(3)">步驟三：錯題本</button>
-    </div>
-
-    <!-- Step 1: Teaching Library (Clean Subject Tabs Directly, no extra summary card) -->
-    <div id="step-1-panel">
-      <div class="sub-filter-bar">
-        <button class="sub-pill active" id="lec-tab-chi" onclick="switchLectureSub('chi')">國文講義</button>
-        <button class="sub-pill" id="lec-tab-math" onclick="switchLectureSub('math')">數學講義</button>
-        <button class="sub-pill" id="lec-tab-eng" onclick="switchLectureSub('eng')">英文講義</button>
-      </div>
-
-      <div id="lecture-list-container"></div>
-
-      <!-- Warm-up Check -->
-      <div class="liquid-card" style="padding:18px;margin-top:18px;">
-        <div style="font-weight:800;font-size:16px;margin-bottom:12px;">
-          ✍️ 本科講義隨堂暖身檢核
-        </div>
-        <div id="warmup-container"></div>
-      </div>
-
-      <div style="margin-top:20px;text-align:center;">
-        <button class="btn-primary" style="max-width:360px;" onclick="switchStep(2)">
-          預習完成，進入 30 題實戰測驗 →
-        </button>
-      </div>
-    </div>
-
-    <!-- Step 2: 30-Question Timed Exam -->
-    <div id="step-2-panel" class="hidden">
-      <div class="exam-hud">
-        <div class="hud-top-row">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="timer-badge" id="quiz-timer">30:00</span>
-            <button class="btn-secondary" style="padding:6px 10px;" id="timer-toggle-btn" onclick="toggleTimer()">暫停</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <button class="btn-secondary" style="padding:6px 10px;background:#fffbeb;border-color:#f59e0b;color:#b45309;" onclick="openScratchpad()">✏️ 草稿紙</button>
-            <button class="btn-secondary" style="padding:6px 10px;" onclick="refreshNewQuestions()">🔄 換新題</button>
-            <button class="btn-primary" style="width:auto;padding:6px 14px;font-size:14px;background:linear-gradient(135deg, #059669 0%, #047857 100%);box-shadow:none;" onclick="handleQuizSubmitClick()">交卷批改</button>
-          </div>
-        </div>
-
-        <!-- Subject Priority Filter Bar -->
-        <div class="exam-sub-filter">
-          <button class="exam-sub-pill active" id="exam-sub-all" onclick="filterExamSub('all')">全卷 30 題</button>
-          <button class="exam-sub-pill" id="exam-sub-chi" onclick="filterExamSub('國文')">國文 10 題</button>
-          <button class="exam-sub-pill" id="exam-sub-math" onclick="filterExamSub('數學')">數學 10 題</button>
-          <button class="exam-sub-pill" id="exam-sub-eng" onclick="filterExamSub('英文')">英文 10 題</button>
-        </div>
-
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;display:flex;justify-content:space-between;">
-          <span>🟩 已作答 &nbsp; ⬜ 未作答 &nbsp; 🚩 不確定標記（點擊題號快速跳轉）</span>
-          <span id="answered-progress-text">0 / 30</span>
-        </div>
-        <div class="mini-grid" id="mini-answer-grid"></div>
-      </div>
-
-      <div id="quiz-questions-container"></div>
-
-      <div id="quiz-submit-area" style="margin-top:20px;text-align:center;">
-        <button class="btn-primary" id="bottom-submit-btn" style="max-width:340px;" onclick="handleQuizSubmitClick()">
-          ✅ 交卷並立即批改（共 30 題）
-        </button>
-      </div>
-
-      <div id="quiz-result-banner" class="liquid-card hidden" style="padding:22px;margin-top:18px;text-align:center;">
-        <div id="result-score-text" style="font-size:24px;font-weight:800;margin-bottom:8px;"></div>
-        <div id="result-feedback-text" style="font-size:14px;color:var(--text-sub);margin-bottom:16px;"></div>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <button class="btn-secondary" onclick="refreshNewQuestions()">🔄 再刷一回 30 題</button>
-          <button class="btn-primary" style="width:auto;padding:12px 22px;" onclick="switchStep(3)">前往錯題本複習 →</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3: Wrong Questions Review -->
-    <div id="step-3-panel" class="hidden">
-      <div id="wrong-book-container"></div>
-    </div>
-
-    <!-- Safe Two-Step Reset Footer -->
-    <div style="margin-top:42px;text-align:center;">
-      <button class="btn-secondary" id="reset-progress-btn" style="font-size:12px;color:var(--text-muted);" onclick="handleSafeReset()">
-        重置刷題紀錄（考前總重刷用）
-      </button>
-    </div>
-  </div>
-
-  <!-- Scratchpad Modal -->
-  <div id="scratchpad-modal" class="modal-overlay hidden">
-    <div class="scratchpad-box">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <strong style="font-size:16px;">✏️ 數學隨手計算草稿紙</strong>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-secondary" style="padding:6px 12px;" onclick="clearScratchpad()">清除畫布</button>
-          <button class="btn-secondary" style="padding:6px 12px;background:#0f766e;color:#fff;border:none;" onclick="closeScratchpad()">完成收起</button>
-        </div>
-      </div>
-      <canvas id="scratch-canvas"></canvas>
-    </div>
-  </div>
-
-  <!-- Image Lightbox Modal -->
-  <div id="img-lightbox" class="modal-overlay hidden" onclick="this.classList.add('hidden')">
-    <img id="lightbox-img" src="" alt="題目附圖" style="max-width:95%;max-height:90vh;border-radius:14px;background:#fff;padding:6px;" />
-  </div>
-
+<!-- 1. Minimalist One-Click Portal Entry Lobby -->
+<div id="portal-view">
+<div class="liquid-card portal-box">
+<div class="portal-badge">勝</div>
+<h1 class="portal-title">私中衝刺模擬站</h1>
+<p class="portal-sub">淡江 × 薇閣 15週入學考備考系統（2026/11/16 – 2027/02/27）</p>
+<!-- Source Repository Selector (Network vs Zhixin) -->
+<div class="source-selector-box">
+<button class="source-pill-btn active" id="src-btn-web" onclick="switchQuestionSource('web')">🌐 網路私中題庫</button>
+<button class="source-pill-btn" id="src-btn-zhixin" onclick="switchQuestionSource('zhixin')">🏫 知正加強班</button>
+</div>
+<div class="portal-status-card">
+<div class="status-row">
+<span class="status-label">目前推進週次</span>
+<span class="status-value" id="portal-week-label" style="color:var(--primary);">第 1 週</span>
+</div>
+<div class="status-row">
+<span class="status-label">累積通關進度</span>
+<span class="status-value" id="portal-progress-label">0 / 15 週</span>
+</div>
+<div class="status-row">
+<span class="status-label">待複習錯題數</span>
+<span class="status-value" id="portal-wrong-label" style="color:var(--danger);">0 題</span>
+</div>
+<div class="status-row">
+<span class="status-label">雲端題庫同步狀態</span>
+<span class="status-value" id="dlc-status-label" style="color:var(--purple);">同步中...</span>
+</div>
+</div>
+<button class="btn-primary" onclick="enterStudyStation()">
+🚀 開始今日衝刺模擬 →
+</button>
+<div style="margin-top:12px;">
+<button class="btn-secondary" style="width:100%;" onclick="syncCloudDLC(true)">
+🔄 立即同步最新題庫
+</button>
+</div>
+</div>
+</div>
+<!-- 2. Main Study Station -->
+<div id="app-view" class="container hidden">
+<div class="liquid-card top-bar">
+<div class="brand-group">
+<div class="brand-mini-icon">勝</div>
+<div>
+<div style="font-weight:800;font-size:16px;">
+<span id="active-source-badge" class="badge dlc" style="font-size:12px;margin-right:6px;">網路私中題庫</span>
+<span id="app-title-text">淡江 × 薇閣入學考備考系統</span>
+</div>
+<div id="week-date-range" style="font-size:12px;color:var(--text-sub);"></div>
+</div>
+</div>
+<div style="display:flex;gap:8px;">
+<button class="btn-secondary" onclick="returnToPortal()">返回首頁</button>
+</div>
+</div>
+<div class="stats-grid">
+<div class="liquid-card stat-card">
+<div class="stat-label">距離 2/27 考試倒數</div>
+<div class="stat-val" id="countdown-days">-- 天</div>
+</div>
+<div class="liquid-card stat-card">
+<div class="stat-label">完成週次進度</div>
+<div class="stat-val" id="completed-count">0 / 15</div>
+</div>
+<div class="liquid-card stat-card">
+<div class="stat-label">累積已刷新題</div>
+<div class="stat-val" id="solved-unique-count">0 題</div>
+</div>
+</div>
+<!-- 15 Weeks Strip -->
+<div class="week-strip" id="week-strip"></div>
+<!-- Current Week Header -->
+<div class="liquid-card" style="padding:16px 18px;margin-bottom:14px;">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+<div>
+<span id="current-week-badge" class="badge" style="margin-bottom:4px;"></span>
+<h2 id="current-week-title" style="margin:4px 0 0;font-size:19px;"></h2>
+</div>
+<span id="week-pass-status" style="font-size:13px;font-weight:700;color:var(--text-sub);"></span>
+</div>
+</div>
+<!-- 3 Steps Tabs -->
+<div class="step-tabs">
+<button class="step-tab active" id="tab-1" onclick="switchStep(1)">步驟一：教學庫</button>
+<button class="step-tab" id="tab-2" onclick="switchStep(2)">步驟二：30題測驗</button>
+<button class="step-tab" id="tab-3" onclick="switchStep(3)">步驟三：錯題本</button>
+</div>
+<!-- Step 1: Teaching Library (Dynamic from Cloud Sheet) -->
+<div id="step-1-panel">
+<div class="sub-filter-bar">
+<button class="sub-pill active" id="lec-tab-chi" onclick="switchLectureSub('chi')">國文講義</button>
+<button class="sub-pill" id="lec-tab-math" onclick="switchLectureSub('math')">數學講義</button>
+<button class="sub-pill" id="lec-tab-eng" onclick="switchLectureSub('eng')">英文講義</button>
+</div>
+<div id="lecture-list-container"></div>
+<!-- Warm-up Check -->
+<div class="liquid-card" style="padding:18px;margin-top:18px;">
+<div style="font-weight:800;font-size:16px;margin-bottom:12px;">
+✍️ 本科講義隨堂暖身檢核
+</div>
+<div id="warmup-container"></div>
+</div>
+<div style="margin-top:20px;text-align:center;">
+<button class="btn-primary" style="max-width:360px;" onclick="switchStep(2)">
+預習完成，進入 30 題實戰測驗 →
+</button>
+</div>
+</div>
+<!-- Step 2: 30-Question Timed Exam with Subject Priority Filter -->
+<div id="step-2-panel" class="hidden">
+<div class="exam-hud">
+<div class="hud-top-row">
+<div style="display:flex;align-items:center;gap:8px;">
+<span class="timer-badge" id="quiz-timer">30:00</span>
+<button class="btn-secondary" style="padding:6px 10px;" id="timer-toggle-btn" onclick="toggleTimer()">暫停</button>
+</div>
+<div style="display:flex;align-items:center;gap:6px;">
+<button class="btn-secondary" style="padding:6px 10px;background:#fffbeb;border-color:#f59e0b;color:#b45309;" onclick="openScratchpad()">✏️ 草稿紙</button>
+<button class="btn-secondary" style="padding:6px 10px;" onclick="refreshNewQuestions()">🔄 換新題</button>
+<button class="btn-primary" style="width:auto;padding:6px 14px;font-size:14px;background:linear-gradient(135deg, #059669 0%, #047857 100%);box-shadow:none;" onclick="submitQuiz()">交卷批改</button>
+</div>
+</div>
+<!-- Subject Priority Filter Bar -->
+<div class="exam-sub-filter">
+<button class="exam-sub-pill active" id="exam-sub-all" onclick="filterExamSub('all')">全卷 30 題</button>
+<button class="exam-sub-pill" id="exam-sub-chi" onclick="filterExamSub('\u570B\u6587')">國文 10 題</button>
+<button class="exam-sub-pill" id="exam-sub-math" onclick="filterExamSub('\u6578\u5B78')">數學 10 題</button>
+<button class="exam-sub-pill" id="exam-sub-eng" onclick="filterExamSub('\u82F1\u6587')">英文 10 題</button>
+</div>
+<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;display:flex;justify-content:space-between;">
+<span>🟩 已作答   ⬜ 未作答   🚩 不確定標記（點擊題號快速跳轉）</span>
+<span id="answered-progress-text">0 / 30</span>
+</div>
+<div class="mini-grid" id="mini-answer-grid"></div>
+</div>
+<div id="quiz-questions-container"></div>
+<div id="quiz-submit-area" style="margin-top:20px;text-align:center;">
+<button class="btn-primary" style="max-width:340px;" onclick="submitQuiz()">
+✅ 交卷並立即批改（共 30 題）
+</button>
+</div>
+<div id="quiz-result-banner" class="liquid-card hidden" style="padding:22px;margin-top:18px;text-align:center;">
+<div id="result-score-text" style="font-size:24px;font-weight:800;margin-bottom:8px;"></div>
+<div id="result-feedback-text" style="font-size:14px;color:var(--text-sub);margin-bottom:16px;"></div>
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+<button class="btn-secondary" onclick="refreshNewQuestions()">🔄 再刷一回 30 題</button>
+<button class="btn-primary" style="width:auto;padding:12px 22px;" onclick="switchStep(3)">前往錯題本複習 →</button>
+</div>
+</div>
+</div>
+<!-- Step 3: Wrong Questions Review -->
+<div id="step-3-panel" class="hidden">
+<div id="wrong-book-container"></div>
+</div>
+<!-- Safe Two-Step Reset Footer -->
+<div style="margin-top:42px;text-align:center;">
+<button class="btn-secondary" id="reset-progress-btn" style="font-size:12px;color:var(--text-muted);" onclick="handleSafeReset()">
+重置刷題紀錄（考前總重刷用）
+</button>
+</div>
+</div>
+<!-- Scratchpad Modal -->
+<div id="scratchpad-modal" class="modal-overlay hidden">
+<div class="scratchpad-box">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+<strong style="font-size:16px;">✏️ 數學隨手計算草稿紙</strong>
+<div style="display:flex;gap:8px;">
+<button class="btn-secondary" style="padding:6px 12px;" onclick="clearScratchpad()">清除畫布</button>
+<button class="btn-secondary" style="padding:6px 12px;background:#0f766e;color:#fff;border:none;" onclick="closeScratchpad()">完成收起</button>
+</div>
+</div>
+<canvas id="scratch-canvas"></canvas>
+</div>
+</div>
+<!-- Image Lightbox Modal -->
+<div id="img-lightbox" class="modal-overlay hidden" onclick="this.classList.add('hidden')">
+<img id="lightbox-img" src="" alt="Diagram" style="max-width:95%;max-height:90vh;border-radius:14px;background:#fff;padding:6px;" />
+</div>
 <script>
-  const STORAGE_KEY = "private_school_sprint_flagship_v21";
-  const SHEET_ID = "1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA";
-
-  const WEEKS_META = [
-    { w: 1, range: "2026/11/16 - 11/22", title: "基礎奠基週：字音字形與因倍數應用" },
-    { w: 2, range: "2026/11/23 - 11/29", title: "成語修辭與分數小數四則" },
-    { w: 3, range: "2026/11/30 - 12/06", title: "文言文入門與比例百分率" },
-    { w: 4, range: "2026/12/07 - 12/13", title: "句型重組與速率追趕問題" },
-    { w: 5, range: "2026/12/14 - 12/20", title: "國學常識與幾何圖形面積" },
-    { w: 6, range: "2026/12/21 - 12/27", title: "修辭技巧與雞兔同籠倒扣" },
-    { w: 7, range: "2026/12/28 - 2027/01/03", title: "詩詞欣賞與濃度混合問題" },
-    { w: 8, range: "2027/01/04 - 01/10", title: "應用文規範與工程合作問題" },
-    { w: 9, range: "2027/01/11 - 01/17", title: "文言寓言短篇與立體柱體體積" },
-    { w: 10, range: "2027/01/18 - 01/24", title: "白話閱讀推論與年齡植樹問題" },
-    { w: 11, range: "2027/01/25 - 01/31", title: "議論文論點與數列規律推理" },
-    { w: 12, range: "2027/02/01 - 02/07", title: "跨領域圖表與統計機率分析" },
-    { w: 13, range: "2027/02/08 - 02/14", title: "淡江薇閣歷屆綜合模擬一" },
-    { w: 14, range: "2027/02/15 - 02/21", title: "淡江薇閣歷屆綜合模擬二" },
-    { w: 15, range: "2027/02/22 - 02/27", title: "考前終極模擬與心態調適週" }
-  ];
-
-  // Built-in rich fallback samples so offline/sandboxed preview works seamlessly
-  const FALLBACK_DATA = {
-    dlcLectures: [
-      { sub: "國文", cat: "字音字形辨析", title: "私中必考易誤讀字音總整理", body: "1. 「供」應（ㄍㄨㄥ）／「供」奉（ㄍㄨㄥˋ）\n2. 載「歌」載舞（ㄗㄞˋ）／三年五「載」（ㄗㄞˇ）\n3. 強「迫」（ㄑㄧㄤˇ）／倔「強」（ㄐㄧㄤˋ）", img: "", isDLC: true },
-      { sub: "數學", cat: "因倍數與質數", title: "1～100 質數表與倍數判別速記", body: "1～100 共有 25 個質數，2 是唯一的偶數質數，1 不是質數也不是合數。\n• 3 的倍數：各位數字和為 3 的倍數\n• 11 的倍數：|奇數位數字和 - 偶數位數字和| 為 0 或 11 的倍數", img: "", isDLC: true },
-      { sub: "英文", cat: "文法核心陷阱", title: "使役動詞與感官動詞原形公式", body: "make / let / have + 受詞 + 原形動詞 (VR)\n例句：Mom made me clean my room.\n注意：help 後面可接原形動詞或 to V。", img: "", isDLC: true }
-    ],
-    dlcQuestions: [
-      { id: "FB_CHI_1", sub: "國文", diff: "基礎", type: "字音辨析", stem: "下列「」中的字，何組讀音完全相同？", passage: "", img: "", opts: ["「載」歌載舞／三年五「載」", "「供」不應求／提「供」協助", "「強」詞奪理／「強」顏歡笑", "「塞」翁失馬／敷衍「塞」責"], ans: 1, h1: "注意破音字在不同詞性下的讀音變化。", h2: "「供」應與提「供」皆讀作ㄍㄨㄥ。", exp: "「供不應求」與「提供」皆讀作 ㄍㄨㄥ；(A) ㄗㄞˋ／ㄗㄞˇ；(C) ㄑㄧㄤˇ／ㄑㄧㄤˊ；(D) ㄙㄞˋ／ㄙㄜˋ。", isDLC: true },
-      { id: "FB_MATH_1", sub: "數學", diff: "進階", type: "倍數判別", stem: "若五位數 32m58 除以 9 餘 1，則 m 可能是下列何數？", passage: "", img: "", opts: ["0", "1", "2", "3"], ans: 1, h1: "先將原數減去餘數 1，即為 9 的倍數。", h2: "32m57 為 9 的倍數，各位數字和 3+2+m+5+7 = 17+m 需為 9 的倍數。", exp: "32m58 - 1 = 32m57 為 9 的倍數，17 + m = 18，故 m = 1。", isDLC: true },
-      { id: "FB_ENG_1", sub: "英文", diff: "基礎", type: "核心文法", stem: "Mr. Jason, ______ our English teacher, is very friendly to every student.", passage: "", img: "", opts: ["is", "who", "he is", "（不填）"], ans: 3, h1: "觀察前後兩個逗號，這是同位語結構。", h2: "同位語直接補充說明前方名詞身分，句中已有主要動詞 is，不可再加動詞。", exp: "本句主要動詞為後方的 is，逗號中間的 our English teacher 為同位語，直接填入名詞片語即可，不需再加 be 動詞。", isDLC: true }
-    ],
-    zhixinLectures: [
-      { sub: "數學", cat: "知欣超優講義·第一單元", title: "11 的倍數判別法與 44 的倍數拆解", body: "判斷 44 的倍數時，因 44 = 4 × 11 且 (4, 11) = 1 互質：\n1. 先看末兩位是否為 4 的倍數\n2. 再用「奇數位和與偶數位和之差」判斷是否為 11 的倍數。", img: "", isDLC: true },
-      { sub: "數學", cat: "知欣超優講義·第二單元", title: "分數比大小三大秒殺招", body: "1. 通分母或通分子\n2. 真分數且分子分母差為定值時：數字越大，分數越大（如 89/100 > 63/71 > 8/9）\n3. 等值乘積式：正數時大×小＝小×大。", img: "", isDLC: true },
-      { sub: "英文", cat: "知欣超越班·Unit 3", title: "同位語與社交問候語 How do you do?", body: "1. 初次見面正式問候語「How do you do?」，標準回答必須原句照抄「How do you do?」。\n2. 連字號複合年齡形容詞：an eleven-year-old boy（year 不加 s）。", img: "", isDLC: true }
-    ],
-    zhixinQuestions: [
-      { id: "ZX_MATH_1", sub: "數學", diff: "挑戰", type: "質數推理", stem: "若 a、b、c 都是質數，且 a + 18 = b + 36 = c + 53，試求 a + b + c = ？", passage: "", img: "", opts: ["54", "58", "62", "66"], ans: 1, h1: "觀察 18、36 為偶數，53 為奇數，利用奇偶性突破！", h2: "質數中只有 2 是偶數，c + 53 必須為奇數，因此 c 只能是 2。", exp: "因 a+18 與 b+36 奇偶性相同，故 c 必為偶質數 2。53 + 2 = 55，得 b = 55 - 36 = 19，a = 55 - 18 = 37，總和 37 + 19 + 2 = 58。", isDLC: true },
-      { id: "ZX_ENG_1", sub: "英文", diff: "進階", type: "私中魔王陷阱", stem: "A: How do you do, Mr. Smith?\nB: ______________________", passage: "", img: "", opts: ["I'm fine, thank you.", "How do you do?", "Nice to meet you, too.", "I'm twelve years old."], ans: 1, h1: "How do you do? 不是問「你好嗎」，而是正式初次見面的問候語。", h2: "遇到 How do you do? 時，禮貌標準回答為原句照抄。", exp: "How do you do? 用於正式場合初次見面，標準回應同樣是 How do you do?。", isDLC: true }
-    ]
-  };
-
-  let currentSource = "web";
-
-  let state = {
-    currentWeek: 1,
-    currentStep: 1,
-    completedWeeks: [],
-    solvedIds: [],
-    wrongBook: [],
-    dlcLectures: [],
-    dlcQuestions: [],
-    zhixinLectures: [],
-    zhixinQuestions: [],
-    lastSyncTime: ""
-  };
-
-  let activeLectureSub = "chi";
-  let activeExamSubFilter = "all";
-  let activeQuestions = [];
-  let userAnswers = {};
-  let eliminatedMap = {};
-  let flaggedMap = {};
-  let collapsedPassageMap = {};
-  let quizSubmitted = false;
-  let submitConfirmPending = false;
-  let timerSeconds = 1800;
-  let timerInterval = null;
-  let timerRunning = false;
-  let resetConfirmStep = 0;
-  let toastTimeout = null;
-
-  function showToast(msg, duration = 3200) {
-    const el = document.getElementById("toast-banner");
-    if (!el) return;
-    el.textContent = msg;
-    el.classList.remove("hidden");
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => {
-      el.classList.add("hidden");
-    }, duration);
-  }
-
-  function loadState() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) state = Object.assign(state, JSON.parse(saved));
-    } catch (e) {}
-  }
-
-  function saveState() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {}
-    updatePortalSummary();
-  }
-
-  function makeContentId(sub, stem) {
-    const clean = (sub + "_" + String(stem || "").replace(/\s+/g, "").slice(0, 24));
-    let hash = 0;
-    for (let i = 0; i < clean.length; i++) {
-      hash = ((hash << 5) - hash) + clean.charCodeAt(i);
-      hash |= 0;
-    }
-    return "ID_" + Math.abs(hash).toString(36);
-  }
-
-  function normalizeImageUrl(url) {
-    if (!url) return "";
-    const trimmed = url.trim();
-    const m1 = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-    if (m1 && m1[1]) return `https://lh3.googleusercontent.com/d/${m1[1]}`;
-    const m2 = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-    if (m2 && m2[1] && trimmed.includes("drive.google.com")) {
-      return `https://lh3.googleusercontent.com/d/${m2[1]}`;
-    }
-    return trimmed;
-  }
-
-  function parseCSV(text) {
-    const rows = [];
-    let row = [];
-    let cur = "";
-    let inQuotes = false;
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i];
-      const next = text[i + 1];
-      if (inQuotes) {
-        if (ch === '"' && next === '"') {
-          cur += '"';
-          i++;
-        } else if (ch === '"') {
-          inQuotes = false;
-        } else {
-          cur += ch;
-        }
-      } else {
-        if (ch === '"') {
-          inQuotes = true;
-        } else if (ch === ",") {
-          row.push(cur.trim());
-          cur = "";
-        } else if (ch === "\r" && next === "\n") {
-          row.push(cur.trim());
-          rows.push(row);
-          row = [];
-          cur = "";
-          i++;
-        } else if (ch === "\n" || ch === "\r") {
-          row.push(cur.trim());
-          rows.push(row);
-          row = [];
-          cur = "";
-        } else {
-          cur += ch;
-        }
-      }
-    }
-    if (cur.length > 0 || row.length > 0) {
-      row.push(cur.trim());
-      rows.push(row);
-    }
-    return rows;
-  }
-
-  function buildSheetCsvUrl(sheetName, rangeA1, ts) {
-    const query = encodeURIComponent("SELECT *");
-    return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(sheetName)}&range=${rangeA1}&tq=${query}&_t=${ts}`;
-  }
-
-  async function syncCloudDLC(manual = false) {
-    const label = document.getElementById("dlc-status-label");
-    if (label) label.textContent = "同步中...";
-    const ts = Date.now();
-
-    const lecUrl = buildSheetCsvUrl("講義DLC", "A1:E2000", ts);
-    const qUrl = buildSheetCsvUrl("題庫DLC", "A1:M2000", ts);
-    const zLecUrl = buildSheetCsvUrl("知欣講義DLC", "A1:E2000", ts);
-    const zQUrl = buildSheetCsvUrl("知欣題庫DLC", "A1:M2000", ts);
-
-    try {
-      const [lecRes, qRes, zLecRes, zQRes] = await Promise.all([
-        fetch(lecUrl, { cache: "no-store" }),
-        fetch(qUrl, { cache: "no-store" }),
-        fetch(zLecUrl, { cache: "no-store" }).catch(() => null),
-        fetch(zQUrl, { cache: "no-store" }).catch(() => null)
-      ]);
-      if (!lecRes.ok || !qRes.ok) throw new Error("Fetch failed");
-      const [lecCsv, qCsv] = await Promise.all([lecRes.text(), qRes.text()]);
-
-      const parseLecs = (csvText) => {
-        const rows = parseCSV(csvText)
-          .slice(1)
-          .filter(r => r.length >= 3 && r[0] && r[0] !== "科目" && r[2]);
-        return rows.map(r => ({
-          sub: r[0],
-          cat: r[1] || "雲端擴充精華",
-          title: r[2],
-          body: r[3] || "",
-          img: normalizeImageUrl(r[4] || ""),
-          isDLC: true
-        }));
-      };
-
-      const parseQs = (csvText) => {
-        const rows = parseCSV(csvText)
-          .slice(1)
-          .filter(r => r.length >= 6 && r[0] && r[0] !== "科目" && r[3]);
-        const ansMap = { A: 0, B: 1, C: 2, D: 3 };
-        return rows.map(r => {
-          const ansIdx = ansMap[(r[9] || "A").toUpperCase()] ?? 0;
-          let rawStem = r[3];
-          let passageText = "";
-          if (rawStem.includes("||")) {
-            const parts = rawStem.split("||");
-            passageText = parts[0].trim();
-            rawStem = parts[1].trim();
-          }
-          return {
-            id: makeContentId(r[0], rawStem),
-            sub: r[0],
-            diff: r[1] || "進階",
-            type: r[2] || "雲端精選",
-            stem: rawStem,
-            passage: passageText,
-            img: normalizeImageUrl(r[4] || ""),
-            opts: [r[5] || "", r[6] || "", r[7] || "", r[8] || ""],
-            ans: ansIdx,
-            h1: r[10] || "請仔細比對題幹關鍵條件。",
-            h2: r[11] || "排除明顯錯誤選項後再判斷。",
-            exp: r[12] || "請參考正確答案解析。",
-            isDLC: true
-          };
-        });
-      };
-
-      const parsedLecs = parseLecs(lecCsv);
-      const parsedQs = parseQs(qCsv);
-
-      if (parsedLecs.length === 0 && parsedQs.length === 0) {
-        throw new Error("Empty sheet response");
-      }
-
-      state.dlcLectures = parsedLecs;
-      state.dlcQuestions = parsedQs;
-
-      if (zLecRes && zLecRes.ok) {
-        const zLecText = await zLecRes.text();
-        state.zhixinLectures = parseLecs(zLecText);
-      }
-      if (zQRes && zQRes.ok) {
-        const zQText = await zQRes.text();
-        state.zhixinQuestions = parseQs(zQText);
-      }
-
-      const now = new Date();
-      state.lastSyncTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-      saveState();
-
-      if (manual) {
-        showToast(`同步完成！網路題庫 ${state.dlcLectures.length} 講/${state.dlcQuestions.length} 題，知欣班 ${state.zhixinLectures.length} 講/${state.zhixinQuestions.length} 題。`, 4500);
-      }
-    } catch (err) {
-      // Load built-in fallback data if network/CORS is blocked in preview sandbox
-      if (state.dlcLectures.length === 0) state.dlcLectures = FALLBACK_DATA.dlcLectures;
-      if (state.dlcQuestions.length === 0) state.dlcQuestions = FALLBACK_DATA.dlcQuestions;
-      if (state.zhixinLectures.length === 0) state.zhixinLectures = FALLBACK_DATA.zhixinLectures;
-      if (state.zhixinQuestions.length === 0) state.zhixinQuestions = FALLBACK_DATA.zhixinQuestions;
-      saveState();
-      if (manual) {
-        showToast("已載入內建精選預覽題庫（部署至 GitHub Pages 後將自動連線雲端試算表）。", 4000);
-      }
-    }
-  }
-
-  function switchQuestionSource(src) {
-    currentSource = src;
-    document.getElementById("src-btn-web").classList.toggle("active", src === "web");
-    document.getElementById("src-btn-zhixin").classList.toggle("active", src === "zhixin");
-    updatePortalSummary();
-  }
-
-  function updatePortalSummary() {
-    document.getElementById("portal-week-label").textContent = `第 ${state.currentWeek} 週`;
-    document.getElementById("portal-progress-label").textContent = `${state.completedWeeks.length} / 15 週`;
-    document.getElementById("portal-wrong-label").textContent = `${state.wrongBook.length} 題`;
-    const dlcLabel = document.getElementById("dlc-status-label");
-
-    const activeLecs = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
-    const activeQs = currentSource === "web" ? state.dlcQuestions : state.zhixinQuestions;
-    const totalLec = activeLecs.length;
-    const totalQ = activeQs.length;
-    const timeStr = state.lastSyncTime ? ` (更新 ${state.lastSyncTime})` : "";
-
-    dlcLabel.textContent = `已同步 ${totalLec} 講義 / ${totalQ} 題${timeStr}`;
-  }
-
-  function enterStudyStation() {
-    document.getElementById("portal-view").classList.add("hidden");
-    document.getElementById("app-view").classList.remove("hidden");
-
-    const badge = document.getElementById("active-source-badge");
-    if (currentSource === "zhixin") {
-      badge.textContent = "知欣加強班題庫";
-      badge.style.background = "rgba(124, 58, 237, 0.15)";
-      badge.style.color = "#7c3aed";
-    } else {
-      badge.textContent = "網路私中題庫";
-      badge.style.background = "rgba(15, 118, 110, 0.15)";
-      badge.style.color = "#0f766e";
-    }
-
-    // Auto-select "數學講義" when switching to 知欣加強班 if 國文講義 has 0 items
-    const sourceList = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
-    const subNameMap = { chi: "國文", math: "數學", eng: "英文" };
-    if (sourceList.length > 0 && !sourceList.some(l => l.sub === subNameMap[activeLectureSub])) {
-      if (sourceList.some(l => l.sub === "數學")) activeLectureSub = "math";
-      else if (sourceList.some(l => l.sub === "英文")) activeLectureSub = "eng";
-      else activeLectureSub = "chi";
-      ["chi", "math", "eng"].forEach(k => {
-        document.getElementById(`lec-tab-${k}`).classList.toggle("active", k === activeLectureSub);
-      });
-    }
-
-    buildExam30();
-    renderAll();
-    switchStep(state.currentStep || 1);
-  }
-
-  function returnToPortal() {
-    stopTimer();
-    updatePortalSummary();
-    document.getElementById("app-view").classList.add("hidden");
-    document.getElementById("portal-view").classList.remove("hidden");
-  }
-
-  function calcDaysToExam() {
-    const examDate = new Date("2027-02-27T08:00:00+08:00");
-    const now = new Date();
-    const diff = Math.ceil((examDate - now) / (1000 * 60 * 60 * 24));
-    return diff > 0 ? diff : 0;
-  }
-
-  function renderAll() {
-    document.getElementById("countdown-days").textContent = `${calcDaysToExam()} 天`;
-    document.getElementById("completed-count").textContent = `${state.completedWeeks.length} / 15`;
-    document.getElementById("solved-unique-count").textContent = `${state.solvedIds.length} 題`;
-
-    const strip = document.getElementById("week-strip");
-    strip.innerHTML = "";
-    WEEKS_META.forEach(item => {
-      const btn = document.createElement("button");
-      const isDone = state.completedWeeks.includes(item.w);
-      btn.className = `week-pill ${item.w === state.currentWeek ? "active" : ""} ${isDone ? "done" : ""}`;
-      btn.innerHTML = `<span>W${item.w}</span><span style="font-size:11px;margin-top:2px;">${isDone ? "✅ 已過關" : "衝刺中"}</span>`;
-      btn.onclick = () => selectWeek(item.w);
-      strip.appendChild(btn);
-    });
-
-    const wObj = WEEKS_META.find(x => x.w === state.currentWeek) || WEEKS_META[0];
-    document.getElementById("week-date-range").textContent = wObj.range;
-    document.getElementById("current-week-badge").textContent = `第 ${wObj.w} 週進度`;
-    document.getElementById("current-week-title").textContent = wObj.title;
-    const passed = state.completedWeeks.includes(wObj.w);
-    document.getElementById("week-pass-status").textContent = passed ? "✅ 本週已達標" : "⏳ 尚未通關";
-    document.getElementById("week-pass-status").style.color = passed ? "#059669" : "var(--text-sub)";
-
-    renderLectures();
-    if (activeQuestions.length === 0) {
-      buildExam30();
-    }
-    renderWrongBook();
-  }
-
-  function selectWeek(w) {
-    state.currentWeek = w;
-    state.currentStep = 1;
-    saveState();
-    buildExam30();
-    renderAll();
-    switchStep(1);
-  }
-
-  function switchStep(step) {
-    state.currentStep = step;
-    saveState();
-    [1, 2, 3].forEach(i => {
-      document.getElementById(`tab-${i}`).classList.toggle("active", i === step);
-      document.getElementById(`step-${i}-panel`).classList.toggle("hidden", i !== step);
-    });
-    if (step === 2) {
-      if (!quizSubmitted && !timerRunning) startTimer();
-    } else {
-      stopTimer();
-    }
-    if (step === 3) renderWrongBook();
-  }
-
-  function switchLectureSub(subKey) {
-    activeLectureSub = subKey;
-    ["chi", "math", "eng"].forEach(k => {
-      document.getElementById(`lec-tab-${k}`).classList.toggle("active", k === subKey);
-    });
-    renderLectures();
-  }
-
-  function renderLectures() {
-    const subNameMap = { chi: "國文", math: "數學", eng: "英文" };
-    const targetSub = subNameMap[activeLectureSub];
-    const sourceList = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
-    const list = sourceList.filter(l => l.sub === targetSub);
-
-    const container = document.getElementById("lecture-list-container");
-    if (list.length === 0) {
-      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">本科暫無${currentSource === "zhixin" ? "知欣加強班" : "網路"}講義內容，請切換其他科目閱讀。</div>`;
-      document.getElementById("warmup-container").innerHTML = "";
-      return;
-    }
-
-    container.innerHTML = list.map(item => `
-      <div class="liquid-card lecture-item dlc">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <span class="badge dlc">☁️ ${currentSource === "zhixin" ? "知欣加強班" : "網路私中"} · ${item.cat}</span>
-        </div>
-        <div style="font-weight:800;font-size:15px;margin-bottom:4px;">${item.title}</div>
-        <div style="font-size:14px;color:var(--text-sub);white-space:pre-line;">${item.body}</div>
-        ${item.img ? `<div class="q-img-wrap"><img src="${item.img}" onerror="this.style.display='none'" onclick="zoomImg('${item.img}')" /></div>` : ""}
-      </div>
-    `).join("");
-
-    const wBox = document.getElementById("warmup-container");
-    const sampleLecs = list.slice(0, 3);
-    wBox.innerHTML = sampleLecs.map((l, idx) => `
-      <div style="padding:12px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:10px;background:#fff;">
-        <div style="font-weight:700;font-size:14px;margin-bottom:6px;">📑 重點核存 ${idx + 1}：${l.title}</div>
-        <div style="font-size:13px;color:var(--text-sub);margin-bottom:8px;">${l.body.slice(0, 48)}...</div>
-        <div style="font-size:12px;color:var(--primary);font-weight:700;">✅ 已完成本項瞭解與重點複習</div>
-      </div>
-    `).join("");
-  }
-
-  function shuffleArray(arr) {
-    const copy = arr.slice();
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-  }
-
-  function pickTenForSubject(subName) {
-    const sourcePool = currentSource === "web" ? state.dlcQuestions : state.zhixinQuestions;
-    const pool = sourcePool.filter(q => q.sub === subName);
-    const effectivePool = pool.length > 0 ? pool : state.dlcQuestions.filter(q => q.sub === subName);
-
-    const unseen = effectivePool.filter(q => !state.solvedIds.includes(q.id));
-    const seen = effectivePool.filter(q => state.solvedIds.includes(q.id));
-    const combined = [...shuffleArray(unseen), ...shuffleArray(seen)];
-    const chosen = combined.slice(0, 10);
-    return chosen.map(q => {
-      const correctText = q.opts[q.ans];
-      const shuffledOpts = shuffleArray(q.opts);
-      return Object.assign({}, q, {
-        opts: shuffledOpts,
-        ans: shuffledOpts.indexOf(correctText)
-      });
-    });
-  }
-
-  function buildExam30() {
-    const chi10 = pickTenForSubject("國文");
-    const math10 = pickTenForSubject("數學");
-    const eng10 = pickTenForSubject("英文");
-
-    activeQuestions = [...chi10, ...math10, ...eng10];
-    userAnswers = {};
-    eliminatedMap = {};
-    flaggedMap = {};
-    collapsedPassageMap = {};
-    quizSubmitted = false;
-    submitConfirmPending = false;
-    activeExamSubFilter = "all";
-
-    updateExamSubFilterUI("all");
-
-    const bottomBtn = document.getElementById("bottom-submit-btn");
-    if (bottomBtn) bottomBtn.textContent = `✅ 交卷並立即批改（共 ${activeQuestions.length} 題）`;
-
-    document.getElementById("quiz-submit-area").classList.remove("hidden");
-    document.getElementById("quiz-result-banner").classList.add("hidden");
-    renderMiniGrid();
-    renderQuizQuestions();
-  }
-
-  function updateExamSubFilterUI(sub) {
-    const mapKeys = { "all": "all", "國文": "chi", "數學": "math", "英文": "eng" };
-    ["all", "chi", "math", "eng"].forEach(k => {
-      const btn = document.getElementById(`exam-sub-${k}`);
-      if (btn) {
-        const targetVal = Object.keys(mapKeys).find(pk => mapKeys[pk] === k);
-        btn.classList.toggle("active", targetVal === sub);
-      }
-    });
-  }
-
-  function filterExamSub(sub) {
-    activeExamSubFilter = sub;
-    updateExamSubFilterUI(sub);
-    renderQuizQuestions();
-  }
-
-  function refreshNewQuestions() {
-    buildExam30();
-    resetTimer();
-    startTimer();
-    showToast("已重新抽取全新題組！");
-  }
-
-  function renderMiniGrid() {
-    const grid = document.getElementById("mini-answer-grid");
-    grid.innerHTML = "";
-    let answeredCount = 0;
-    activeQuestions.forEach((_, idx) => {
-      const hasAns = userAnswers[idx] !== undefined;
-      if (hasAns) answeredCount++;
-      const cell = document.createElement("button");
-      cell.className = `mini-cell ${hasAns ? "answered" : ""} ${flaggedMap[idx] ? "flagged" : ""}`;
-      cell.textContent = idx + 1;
-      cell.onclick = () => {
-        const el = document.getElementById(`q-card-${idx}`);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      };
-      grid.appendChild(cell);
-    });
-    document.getElementById("answered-progress-text").textContent = `${answeredCount} / ${activeQuestions.length}`;
-  }
-
-  function togglePassageCollapse(idx) {
-    collapsedPassageMap[idx] = !collapsedPassageMap[idx];
-    renderQuizQuestions();
-  }
-
-  function speakText(text) {
-    if (!('speechSynthesis' in window)) {
-      showToast("您的瀏覽器不支援語音朗讀功能");
-      return;
-    }
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
-  }
-
-  function renderQuizQuestions() {
-    const container = document.getElementById("quiz-questions-container");
-    container.innerHTML = "";
-    if (activeQuestions.length === 0) {
-      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;">尚無測驗題目，請先點擊首頁「立即同步最新題庫」。</div>`;
-      return;
-    }
-
-    let visibleCount = 0;
-    activeQuestions.forEach((q, idx) => {
-      const isVisible = (activeExamSubFilter === "all" || q.sub === activeExamSubFilter);
-      if (!isVisible) return;
-      visibleCount++;
-
-      const card = document.createElement("div");
-      card.className = "liquid-card q-card";
-      card.id = `q-card-${idx}`;
-
-      const diffCls = q.diff === "基礎" ? "diff-basic" : (q.diff === "挑戰" ? "diff-hard" : "diff-mid");
-      const elimSet = eliminatedMap[idx] || {};
-      const isCollapsed = !!collapsedPassageMap[idx];
-
-      let listeningHtml = "";
-      let passageHtml = "";
-
-      if (q.type === "聽力測驗" || q.passage) {
-        if (q.type === "聽力測驗" && q.passage) {
-          listeningHtml = `
-            <div class="listening-box">
-              <div>
-                <div style="font-weight:800;font-size:14px;color:#166534;">🔊 英文聽力測驗閱讀</div>
-                <div style="font-size:12px;color:#15803d;">聽力稿已自動隱藏，請點擊按鈕聆聽標準美音</div>
-              </div>
-              <button class="btn-primary" style="width:auto;padding:10px 16px;font-size:14px;" onclick="speakText(${JSON.stringify(q.passage)})">
-                🔊 播放聽力語音
-              </button>
-            </div>
-          `;
-          if (quizSubmitted) {
-            passageHtml = `
-              <div class="reading-passage-box" style="position:static;background:#f0fdf4;border-color:#bbf7d0;">
-                <div class="reading-passage-header" style="color:#166534;">📖 聽力稿原文對照</div>
-                <div class="reading-passage-text">${q.passage}</div>
-              </div>
-            `;
-          }
-        } else if (q.passage) {
-          passageHtml = `
-            <div class="reading-passage-box">
-              <div class="reading-passage-header">
-                <span>📖 閱讀文本（置頂對照區）</span>
-                <button class="btn-secondary" style="padding:3px 9px;font-size:11px;" onclick="togglePassageCollapse(${idx})">
-                  ${isCollapsed ? "展開全文" : "收合文章"}
-                </button>
-              </div>
-              <div class="reading-passage-text ${isCollapsed ? "collapsed" : ""}">${q.passage}</div>
-            </div>
-          `;
-        }
-      }
-
-      const optsHtml = q.opts.map((opt, oIdx) => {
-        let cls = "option-btn";
-        if (quizSubmitted) {
-          if (oIdx === q.ans) cls += " correct";
-          else if (userAnswers[idx] === oIdx) cls += " wrong";
-        } else {
-          if (userAnswers[idx] === oIdx) cls += " selected";
-          if (elimSet[oIdx]) cls += " eliminated";
-        }
-        return `
-          <div class="option-row">
-            <button class="${cls}" onclick="selectOption(${idx}, ${oIdx})">${String.fromCharCode(65 + oIdx)}. ${opt}</button>
-            ${!quizSubmitted ? `<button class="elim-btn ${elimSet[oIdx] ? "active" : ""}" title="消去法劃掉" onclick="toggleEliminate(${idx}, ${oIdx})">🚫</button>` : ""}
-          </div>
-        `;
-      }).join("");
-
-      const chosenLabel = userAnswers[idx] !== undefined
-        ? `${String.fromCharCode(65 + userAnswers[idx])}. ${q.opts[userAnswers[idx]]}`
-        : "未作答";
-      const correctLabel = `${String.fromCharCode(65 + q.ans)}. ${q.opts[q.ans]}`;
-
-      const postCompareHtml = quizSubmitted ? `
-        <div class="answer-compare-grid">
-          <div class="${userAnswers[idx] === q.ans ? "compare-pill-correct" : "compare-pill-wrong"}">
-            你的作答：${chosenLabel}
-          </div>
-          <div class="compare-pill-correct">
-            正確答案：${correctLabel}
-          </div>
-        </div>
-        <div class="explain-box"><strong>白話解析：</strong>${q.exp}</div>
-      ` : "";
-
-      card.innerHTML = `
-        <div class="q-header">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <strong style="font-size:15px;">第 ${idx + 1} 題</strong>
-            <span class="badge">${q.sub}</span>
-            <span class="badge ${diffCls}">${q.diff}</span>
-            <span class="badge" style="background:#f1f5f9;color:#475569;">${q.type}</span>
-          </div>
-          <div style="display:flex;gap:6px;">
-            <button class="flag-btn ${flaggedMap[idx] ? "active" : ""}" onclick="toggleFlag(${idx})">🚩 標記</button>
-            <button class="btn-secondary" style="padding:5px 10px;font-size:12px;" onclick="showHint(${idx})">💡 提示</button>
-          </div>
-        </div>
-        ${listeningHtml}
-        ${passageHtml}
-        <div class="q-stem">${q.stem}</div>
-        ${q.img ? `<div class="q-img-wrap"><img src="${q.img}" onerror="this.style.display='none'" onclick="zoomImg('${q.img}')" /></div>` : ""}
-        <div class="options-list">${optsHtml}</div>
-        <div class="hint-box" id="hint-${idx}" data-level="0"></div>
-        ${postCompareHtml}
-      `;
-      container.appendChild(card);
-    });
-
-    if (visibleCount === 0) {
-      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">此科目目前沒有題目。</div>`;
-    }
-  }
-
-  function selectOption(qIdx, oIdx) {
-    if (quizSubmitted) return;
-    userAnswers[qIdx] = oIdx;
-    renderMiniGrid();
-    renderQuizQuestions();
-  }
-
-  function toggleEliminate(qIdx, oIdx) {
-    if (quizSubmitted) return;
-    if (!eliminatedMap[qIdx]) eliminatedMap[qIdx] = {};
-    eliminatedMap[qIdx][oIdx] = !eliminatedMap[qIdx][oIdx];
-    renderQuizQuestions();
-  }
-
-  function toggleFlag(qIdx) {
-    flaggedMap[qIdx] = !flaggedMap[qIdx];
-    renderMiniGrid();
-    renderQuizQuestions();
-  }
-
-  function showHint(idx) {
-    const box = document.getElementById(`hint-${idx}`);
-    const q = activeQuestions[idx];
-    const lvl = parseInt(box.getAttribute("data-level") || "0", 10);
-    box.style.display = "block";
-    if (lvl === 0) {
-      box.innerHTML = `<strong>提示 1（思路引導）：</strong>${q.h1}`;
-      box.setAttribute("data-level", "1");
-    } else {
-      box.innerHTML = `<strong>提示 1：</strong>${q.h1}<br><strong>提示 2（關鍵步驟）：</strong>${q.h2}`;
-      box.setAttribute("data-level", "2");
-    }
-  }
-
-  // Two-step non-blocking submit confirmation (no confirm() dialog)
-  function handleQuizSubmitClick() {
-    if (quizSubmitted) return;
-    const unanswered = activeQuestions.length - Object.keys(userAnswers).length;
-    if (unanswered > 0 && !submitConfirmPending) {
-      submitConfirmPending = true;
-      showToast(`還有 ${unanswered} 題尚未作答！請再點擊一次「交卷批改」確認直接交卷。`, 4000);
-      setTimeout(() => { submitConfirmPending = false; }, 4500);
-      return;
-    }
-    executeSubmitQuiz();
-  }
-
-  function executeSubmitQuiz() {
-    stopTimer();
-    quizSubmitted = true;
-    submitConfirmPending = false;
-    activeExamSubFilter = "all";
-    updateExamSubFilterUI("all");
-
-    let correctCount = 0;
-    activeQuestions.forEach((q, idx) => {
-      if (!state.solvedIds.includes(q.id)) state.solvedIds.push(q.id);
-      if (userAnswers[idx] === q.ans) {
-        correctCount++;
-      } else {
-        const wrongEntry = Object.assign({}, q, {
-          chosenText: userAnswers[idx] !== undefined ? q.opts[userAnswers[idx]] : "未作答"
-        });
-        if (!state.wrongBook.some(w => w.id === q.id)) {
-          state.wrongBook.unshift(wrongEntry);
-        }
-      }
-    });
-
-    const totalQ = activeQuestions.length || 1;
-    const score = Math.round((correctCount / totalQ) * 100);
-    if (score >= 80 && !state.completedWeeks.includes(state.currentWeek)) {
-      state.completedWeeks.push(state.currentWeek);
-      if (state.currentWeek < 15) state.currentWeek += 1;
-    }
-
-    saveState();
-    renderAll();
-    renderQuizQuestions();
-
-    document.getElementById("quiz-submit-area").classList.add("hidden");
-    const banner = document.getElementById("quiz-result-banner");
-    banner.classList.remove("hidden");
-    document.getElementById("result-score-text").textContent = `本次得分：${score} 分（答對 ${correctCount} / ${totalQ} 題）`;
-    document.getElementById("result-feedback-text").textContent = score >= 80
-      ? "太棒了！達成 80 分通關標準，已自動解鎖並推進進度。"
-      : "尚未達 80 分通關門檻，建議先到「步驟三：錯題本」搞懂解析，再換新題挑戰一次！";
-    banner.scrollIntoView({ behavior: "smooth" });
-  }
-
-  function renderWrongBook() {
-    const box = document.getElementById("wrong-book-container");
-    if (state.wrongBook.length === 0) {
-      box.innerHTML = `<div class="liquid-card" style="padding:36px 20px;text-align:center;color:var(--text-sub);">
-        <div style="font-size:36px;margin-bottom:8px;">🎉</div>
-        <div style="font-weight:700;font-size:16px;">目前沒有待複習的錯題！</div>
-        <div style="font-size:13px;margin-top:4px;">繼續保持，前往步驟二挑戰更多新題吧。</div>
-      </div>`;
-      return;
-    }
-    box.innerHTML = state.wrongBook.map((q, idx) => `
-      <div class="liquid-card q-card">
-        <div class="q-header">
-          <span class="badge">${q.sub} · ${q.type}</span>
-          <button class="btn-secondary" style="padding:6px 12px;font-size:12px;color:#059669;border-color:#10b981;" onclick="markMastered(${idx})">✅ 我已完全搞懂（移除）</button>
-        </div>
-        ${q.passage ? `<div class="reading-passage-box" style="position:static;"><div class="reading-passage-text">${q.passage}</div></div>` : ""}
-        <div class="q-stem">${q.stem}</div>
-        ${q.img ? `<div class="q-img-wrap"><img src="${q.img}" onerror="this.style.display='none'" onclick="zoomImg('${q.img}')" /></div>` : ""}
-        <div class="answer-compare-grid">
-          <div class="compare-pill-wrong">你的作答：${q.chosenText || "未記錄"}</div>
-          <div class="compare-pill-correct">正確答案：${q.opts[q.ans]}</div>
-        </div>
-        <div class="explain-box"><strong>白話解析：</strong>${q.exp}</div>
-      </div>
-    `).join("");
-  }
-
-  function markMastered(idx) {
-    state.wrongBook.splice(idx, 1);
-    saveState();
-    renderAll();
-    showToast("已從錯題本移除！");
-  }
-
-  function handleSafeReset() {
-    const btn = document.getElementById("reset-progress-btn");
-    if (resetConfirmStep === 0) {
-      resetConfirmStep = 1;
-      btn.textContent = "⚠️ 再點一次確認清空所有進度與已刷題號";
-      btn.style.color = "var(--danger)";
-      btn.style.borderColor = "var(--danger)";
-      setTimeout(() => {
-        resetConfirmStep = 0;
-        btn.textContent = "重置刷題紀錄（考前總重刷用）";
-        btn.style.color = "var(--text-muted)";
-        btn.style.borderColor = "";
-      }, 4000);
-    } else {
-      state.currentWeek = 1;
-      state.completedWeeks = [];
-      state.solvedIds = [];
-      state.wrongBook = [];
-      saveState();
-      resetConfirmStep = 0;
-      btn.textContent = "重置刷題紀錄（考前總重刷用）";
-      btn.style.color = "var(--text-muted)";
-      btn.style.borderColor = "";
-      buildExam30();
-      renderAll();
-      showToast("已清空刷題紀錄，可重新開始總複習！");
-    }
-  }
-
-  let drawing = false;
-  function openScratchpad() {
-    const modal = document.getElementById("scratchpad-modal");
-    modal.classList.remove("hidden");
-    const canvas = document.getElementById("scratch-canvas");
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width || 560;
-    canvas.height = rect.height || 310;
-    const ctx = canvas.getContext("2d");
-    ctx.lineWidth = 2.5;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = "#0f172a";
-
-    const getPos = (e) => {
-      const r = canvas.getBoundingClientRect();
-      const t = e.touches ? e.touches[0] : e;
-      return { x: t.clientX - r.left, y: t.clientY - r.top };
-    };
-
-    canvas.onmousedown = canvas.ontouchstart = (e) => {
-      e.preventDefault();
-      drawing = true;
-      const p = getPos(e);
-      ctx.beginPath();
-      ctx.moveTo(p.x, p.y);
-    };
-    canvas.onmousemove = canvas.ontouchmove = (e) => {
-      if (!drawing) return;
-      e.preventDefault();
-      const p = getPos(e);
-      ctx.lineTo(p.x, p.y);
-      ctx.stroke();
-    };
-    canvas.onmouseup = canvas.ontouchend = () => { drawing = false; };
-  }
-
-  function clearScratchpad() {
-    const canvas = document.getElementById("scratch-canvas");
-    const ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  function closeScratchpad() {
-    document.getElementById("scratchpad-modal").classList.add("hidden");
-  }
-
-  function zoomImg(src) {
-    document.getElementById("lightbox-img").src = src;
-    document.getElementById("img-lightbox").classList.remove("hidden");
-  }
-
-  function formatTime(sec) {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-  }
-
-  function startTimer() {
-    if (timerRunning) return;
-    timerRunning = true;
-    document.getElementById("timer-toggle-btn").textContent = "暫停";
-    timerInterval = setInterval(() => {
-      if (timerSeconds > 0) {
-        timerSeconds--;
-        document.getElementById("quiz-timer").textContent = formatTime(timerSeconds);
-      } else {
-        stopTimer();
-        showToast("測驗時間到！系統已自動為您交卷批改。", 4000);
-        executeSubmitQuiz();
-      }
-    }, 1000);
-  }
-
-  function stopTimer() {
-    timerRunning = false;
-    clearInterval(timerInterval);
-    document.getElementById("timer-toggle-btn").textContent = "繼續";
-  }
-
-  function toggleTimer() {
-    if (timerRunning) stopTimer();
-    else startTimer();
-  }
-
-  function resetTimer() {
-    stopTimer();
-    timerSeconds = 1800;
-    document.getElementById("quiz-timer").textContent = formatTime(timerSeconds);
-  }
-
-  window.onload = function () {
-    loadState();
-    updatePortalSummary();
-    syncCloudDLC(false);
-  };
+const STORAGE_KEY = "private_school_sprint_flagship_v20";
+const SHEET_ID = "1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA";
+const WEEKS_META = [
+{ w: 1, range: "2026/11/16 - 11/22", title: "\u57fa\u790e\u5960\u57fa\u9031\uff1a\u5b57\u97f3\u5b57\u5f62\u8207\u56e0\u500d\u6578\u61c9\u7528" },
+{ w: 2, range: "2026/11/23 - 11/29", title: "\u6210\u8a9e\u4fee\u8fad\u8207\u5206\u6578\u5c0f\u6578\u56db\u5247" },
+{ w: 3, range: "2026/11/30 - 12/06", title: "\u6587\u8a00\u6587\u5165\u9580\u8207\u6bd4\u4f8b\u767e\u5206\u7387" },
+{ w: 4, range: "2026/12/07 - 12/13", title: "\u53e5\u578b\u91cd\u7d44\u8207\u901f\u7387\u8ffd\u8d95\u554f\u984c" },
+{ w: 5, range: "2026/12/14 - 12/20", title: "\u570b\u5B78\u5e38\u8b58\u8207\u5e7e\u4f55\u5716\u5f62\u9762\u7a4d" },
+{ w: 6, range: "2026/12/21 - 12/27", title: "\u4fee\u8fad\u6280\u5de7\u8207\u96de\u5154\u540c\u7c60\u5012\u6263" },
+{ w: 7, range: "2026/12/28 - 2027/01/03", title: "\u8a69\u8a5e\u6b23\u8cde\u8207\u6fc3\u5ea6\u6df7\u5408\u554f\u984c" },
+{ w: 8, range: "2027/01/04 - 01/10", title: "\u61c9\u7528\u6587\u898f\u7bc4\u8207\u5de5\u7a0b\u5408\u4f5c\u554f\u984c" },
+{ w: 9, range: "2027/01/11 - 01/17", title: "\u6587\u8a00\u5bd3\u8a00\u77ed\u7bc7\u8207\u7acb\u9ad4\u67f1\u9ad4\u9ad4\u7a4d" },
+{ w: 10, range: "2027/01/18 - 01/24", title: "\u767d\u8a71\u95b1\u8b80\u63a8\u8ad6\u8207\u5e74\u9f61\u690d\u6a39\u554f\u984c" },
+{ w: 11, range: "2027/01/25 - 01/31", title: "\u8b70\u8ad6\u6587\u8ad6\u9ede\u8207\u6578\u5217\u898f\u5f8b\u63a8\u7406" },
+{ w: 12, range: "2027/02/01 - 02/07", title: "\u8de8\u9818\u57df\u5716\u8868\u8207\u7d71\u8a08\u6a5f\u7387\u5206\u6790" },
+{ w: 13, range: "2027/02/08 - 02/14", title: "\u6de1\u6c5f\u8587\u95a3\u6b77\u5c46\u7d9c\u5408\u6a21\u64EC\u4e00" },
+{ w: 14, range: "2027/02/15 - 02/21", title: "\u6de1\u6c5f\u8587\u95a3\u6b77\u5c46\u7d9c\u5408\u6a21\u64EC\u4e8c" },
+{ w: 15, range: "2027/02/22 - 02/27", title: "\u8003\u524d\u7d42\u6975\u6a21\u64EC\u8207\u5fc3\u614b\u8abf\u9069\u9031" }
+];
+let currentSource = "web"; // 'web' or 'zhixin'
+let state = {
+currentWeek: 1,
+currentStep: 1,
+completedWeeks: [],
+solvedIds: [],
+wrongBook: [],
+dlcLectures: [],
+dlcQuestions: [],
+zhixinLectures: [],
+zhixinQuestions: [],
+lastSyncTime: ""
+};
+let activeLectureSub = "chi";
+let activeExamSubFilter = "all";
+let activeQuestions = [];
+let userAnswers = {};
+let eliminatedMap = {};
+let flaggedMap = {};
+let collapsedPassageMap = {};
+let quizSubmitted = false;
+let timerSeconds = 1800;
+let timerInterval = null;
+let timerRunning = false;
+let resetConfirmStep = 0;
+function loadState() {
+try {
+const saved = localStorage.getItem(STORAGE_KEY);
+if (saved) state = Object.assign(state, JSON.parse(saved));
+} catch (e) {}
+}
+function saveState() {
+try {
+localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+} catch (e) {}
+updatePortalSummary();
+}
+function makeContentId(sub, stem) {
+const clean = (sub + "" + String(stem || "").replace(/\s+/g, "").slice(0, 24));
+let hash = 0;
+for (let i = 0; i < clean.length; i++) {
+hash = ((hash << 5) - hash) + clean.charCodeAt(i);
+hash |= 0;
+}
+return "ID" + Math.abs(hash).toString(36);
+}
+function normalizeImageUrl(url) {
+if (!url) return "";
+const trimmed = url.trim();
+const m1 = trimmed.match(//file/d/([a-zA-Z0-9_-]+)/);
+if (m1 && m1[1]) return ⁠https://lh3.googleusercontent.com/d/${m1[1]}⁠;
+const m2 = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+if (m2 && m2[1] && trimmed.includes("drive.google.com")) {
+return ⁠https://lh3.googleusercontent.com/d/${m2[1]}⁠;
+}
+return trimmed;
+}
+function parseCSV(text) {
+const rows = [];
+let row = [];
+let cur = "";
+let inQuotes = false;
+for (let i = 0; i < text.length; i++) {
+const ch = text[i];
+const next = text[i + 1];
+if (inQuotes) {
+if (ch === '"' && next === '"') {
+cur += '"';
+i++;
+} else if (ch === '"') {
+inQuotes = false;
+} else {
+cur += ch;
+}
+} else {
+if (ch === '"') {
+inQuotes = true;
+} else if (ch === ",") {
+row.push(cur.trim());
+cur = "";
+} else if (ch === "\r" && next === "\n") {
+row.push(cur.trim());
+rows.push(row);
+row = [];
+cur = "";
+i++;
+} else if (ch === "\n" || ch === "\r") {
+row.push(cur.trim());
+rows.push(row);
+row = [];
+cur = "";
+} else {
+cur += ch;
+}
+}
+}
+if (cur.length > 0 || row.length > 0) {
+row.push(cur.trim());
+rows.push(row);
+}
+return rows;
+}
+// \u4F7F\u7528 headers=1 \u4E26\u6307\u5B9A\u5B8C\u6574\u7BC4\u570D A1:M2000\uFF0C\u5FB9\u5E95\u9632\u6B62 gviz \u81EA\u52D5\u63A8\u65B7\u622A\u65B7\u6700\u5F8C 20 \u984C\u7684\u554F\u984C
+function buildSheetCsvUrl(sheetName, rangeA1, ts) {
+const query = encodeURIComponent("SELECT *");
+return ⁠https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(sheetName)}&range=${rangeA1}&tq=${query}&_t=${ts}⁠;
+}
+async function syncCloudDLC(manual = false) {
+const label = document.getElementById("dlc-status-label");
+if (label) label.textContent = "\u540C\u6B65\u4E2D...";
+const ts = Date.now();
+const lecUrl = buildSheetCsvUrl("\u8B1B\u7FA9DLC", "A1:E2000", ts);
+const qUrl = buildSheetCsvUrl("\u984C\u5EABDLC", "A1:M2000", ts);
+const zLecUrl = buildSheetCsvUrl("\u77E5\u6B23\u8B1B\u7FA9DLC", "A1:E2000", ts);
+const zQUrl = buildSheetCsvUrl("\u77E5\u6B23\u984C\u5EABDLC", "A1:M2000", ts);
+try {
+const [lecRes, qRes, zLecRes, zQRes] = await Promise.all([
+fetch(lecUrl, { cache: "no-store" }),
+fetch(qUrl, { cache: "no-store" }),
+fetch(zLecUrl, { cache: "no-store" }).catch(() => null),
+fetch(zQUrl, { cache: "no-store" }).catch(() => null)
+]);
+if (!lecRes.ok || !qRes.ok) throw new Error("Fetch failed");
+const [lecCsv, qCsv] = await Promise.all([lecRes.text(), qRes.text()]);
+const parseLecs = (csvText) => {
+const rows = parseCSV(csvText)
+.slice(1)
+.filter(r => r.length >= 3 && r[0] && r[0] !== "\u79D1\u76EE" && r[2]);
+return rows.map(r => ({
+sub: r[0],
+cat: r[1] || "\u96F2\u7AEF\u64F4\u5145\u7CBE\u83EF",
+title: r[2],
+body: r[3] || "",
+img: normalizeImageUrl(r[4] || ""),
+isDLC: true
+}));
+};
+const parseQs = (csvText) => {
+const rows = parseCSV(csvText)
+.slice(1)
+.filter(r => r.length >= 6 && r[0] && r[0] !== "\u79D1\u76EE" && r[3]);
+const ansMap = { A: 0, B: 1, C: 2, D: 3 };
+return rows.map(r => {
+const ansIdx = ansMap[(r[9] || "A").toUpperCase()] ?? 0;
+let rawStem = r[3];
+let passageText = "";
+if (rawStem.includes("||")) {
+const parts = rawStem.split("||");
+passageText = parts[0].trim();
+rawStem = parts[1].trim();
+}
+return {
+id: makeContentId(r[0], rawStem),
+sub: r[0],
+diff: r[1] || "\u9032\u968E",
+type: r[2] || "\u96F2\u7AEF\u7CBE\u9078",
+stem: rawStem,
+passage: passageText,
+img: normalizeImageUrl(r[4] || ""),
+opts: [r[5] || "", r[6] || "", r[7] || "", r[8] || ""],
+ans: ansIdx,
+h1: r[10] || "\u8ACB\u4ED4\u7D30\u6BD4\u5C0D\u984C\u5E79\u95DC\u9375\u689D\u4EF6\u3002",
+h2: r[11] || "\u6392\u9664\u660E\u986F\u932F\u8AA4\u9078\u9805\u5F8C\u518D\u5224\u65B7\u3002",
+exp: r[12] || "\u8ACB\u53C3\u8003\u6B63\u78BA\u7B54\u6848\u89E3\u6790\u3002",
+isDLC: true
+};
+});
+};
+state.dlcLectures = parseLecs(lecCsv);
+state.dlcQuestions = parseQs(qCsv);
+if (zLecRes && zLecRes.ok) {
+const zLecText = await zLecRes.text();
+state.zhixinLectures = parseLecs(zLecText);
+}
+if (zQRes && zQRes.ok) {
+const zQText = await zQRes.text();
+state.zhixinQuestions = parseQs(zQText);
+}
+const now = new Date();
+state.lastSyncTime = ⁠${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}⁠;
+saveState();
+if (manual) {
+alert(⁠\u540C\u6B65\u5B8C\u6210\uff01\u8F09\u5165\u7DB2\u8DEF\u984C\u5EAB ${state.dlcLectures.length} \u8B1B/${state.dlcQuestions.length} \u984C\uff0C\u77E5\u6B23\u73ED ${state.zhixinLectures.length} \u8B1B/${state.zhixinQuestions.length} \u984C\u3002⁠);
+}
+} catch (err) {
+updatePortalSummary(true);
+if (manual) {
+alert("\u96F2\u7AEF\u8A66\u7B97\u8868\u540C\u6B65\u66AB\u6642\u7121\u6CD5\u9023\u7DDA\uff0c\u7CFB\u7D71\u5DF2\u81EA\u52D5\u555F\u7528\u672C\u6A5F\u5FEB\u53D6\u984C\u5EAB\uff01");
+}
+}
+}
+function switchQuestionSource(src) {
+currentSource = src;
+document.getElementById("src-btn-web").classList.toggle("active", src === "web");
+document.getElementById("src-btn-zhixin").classList.toggle("active", src === "zhixin");
+updatePortalSummary();
+}
+function updatePortalSummary(offline = false) {
+document.getElementById("portal-week-label").textContent = ⁠\u7B2C ${state.currentWeek} \u9031⁠;
+document.getElementById("portal-progress-label").textContent = ⁠${state.completedWeeks.length} / 15 \u9031⁠;
+document.getElementById("portal-wrong-label").textContent = ⁠${state.wrongBook.length} \u984C⁠;
+const dlcLabel = document.getElementById("dlc-status-label");
+const activeLecs = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
+const activeQs = currentSource === "web" ? state.dlcQuestions : state.zhixinQuestions;
+const totalLec = activeLecs.length;
+const totalQ = activeQs.length;
+const timeStr = state.lastSyncTime ? ⁠ (\u66F4\u65B0 ${state.lastSyncTime})⁠ : "";
+if (offline && activeQs.length === 0) {
+dlcLabel.textContent = "\u793A\u7BC4\u6A21\u5F0F";
+} else {
+dlcLabel.textContent = ⁠\u5DF2\u540C\u6B65 ${totalLec} \u8B1B\u7FA9 / ${totalQ} \u984C${timeStr}⁠;
+}
+}
+function enterStudyStation() {
+document.getElementById("portal-view").classList.add("hidden");
+document.getElementById("app-view").classList.remove("hidden");
+const badge = document.getElementById("active-source-badge");
+if (currentSource === "zhixin") {
+badge.textContent = "\u77E5\u6B23\u52A0\u5F37\u73ED\u984C\u5EAB";
+badge.style.background = "rgba(124, 58, 237, 0.15)";
+badge.style.color = "#7c3aed";
+} else {
+badge.textContent = "\u7DB2\u8DEF\u79C1\u4E2D\u984C\u5EAB";
+badge.style.background = "rgba(15, 118, 110, 0.15)";
+badge.style.color = "#0f766e";
+}
+// \u5207\u63DB\u8ECC\u9053\u6642\u81EA\u52D5\u9810\u8A2D\u9078\u53D6\u8A72\u8ECC\u9053\u6709\u8CC7\u6599\u7684\u7B2C\u4E00\u500B\u79D1\u76EE
+const sourceList = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
+const subNameMap = { chi: "\u570B\u6587", math: "\u6578\u5B78", eng: "\u82F1\u6587" };
+if (sourceList.length > 0 && !sourceList.some(l => l.sub === subNameMap[activeLectureSub])) {
+if (sourceList.some(l => l.sub === "\u6578\u5B78")) activeLectureSub = "math";
+else if (sourceList.some(l => l.sub === "\u82F1\u6587")) activeLectureSub = "eng";
+else activeLectureSub = "chi";
+["chi", "math", "eng"].forEach(k => {
+document.getElementById(⁠lec-tab-${k}⁠).classList.toggle("active", k === activeLectureSub);
+});
+}
+buildExam30();
+renderAll();
+switchStep(state.currentStep || 1);
+}
+function returnToPortal() {
+stopTimer();
+updatePortalSummary();
+document.getElementById("app-view").classList.add("hidden");
+document.getElementById("portal-view").classList.remove("hidden");
+}
+function calcDaysToExam() {
+const examDate = new Date("2027-02-27T08:00:00+08:00");
+const now = new Date();
+const diff = Math.ceil((examDate - now) / (1000 * 60 * 60 * 24));
+return diff > 0 ? diff : 0;
+}
+function renderAll() {
+document.getElementById("countdown-days").textContent = ⁠${calcDaysToExam()} \u5929⁠;
+document.getElementById("completed-count").textContent = ⁠${state.completedWeeks.length} / 15⁠;
+document.getElementById("solved-unique-count").textContent = ⁠${state.solvedIds.length} \u984C⁠;
+const strip = document.getElementById("week-strip");
+strip.innerHTML = "";
+WEEKS_META.forEach(item => {
+const btn = document.createElement("button");
+const isDone = state.completedWeeks.includes(item.w);
+btn.className = ⁠week-pill ${item.w === state.currentWeek ? "active" : ""} ${isDone ? "done" : ""}⁠;
+btn.innerHTML = ⁠<span>W${item.w}</span><span style="font-size:11px;margin-top:2px;">${isDone ? "\u2705 \u5DF2\u904E\u95DC" : "\u885D\u523A\u4E2D"}</span>⁠;
+btn.onclick = () => selectWeek(item.w);
+strip.appendChild(btn);
+});
+const wObj = WEEKS_META.find(x => x.w === state.currentWeek) || WEEKS_META[0];
+document.getElementById("week-date-range").textContent = wObj.range;
+document.getElementById("current-week-badge").textContent = ⁠\u7B2C ${wObj.w} \u9031\u9032\u5EA6⁠;
+document.getElementById("current-week-title").textContent = wObj.title;
+const passed = state.completedWeeks.includes(wObj.w);
+document.getElementById("week-pass-status").textContent = passed ? "\u2705 \u672C\u9031\u5DF2\u9054\u6A19" : "\u23F3 \u5C1A\u672A\u901A\u95DC";
+document.getElementById("week-pass-status").style.color = passed ? "#059669" : "var(--text-sub)";
+renderLectures();
+if (activeQuestions.length === 0) {
+buildExam30();
+}
+renderWrongBook();
+}
+function selectWeek(w) {
+state.currentWeek = w;
+state.currentStep = 1;
+saveState();
+buildExam30();
+renderAll();
+switchStep(1);
+}
+function switchStep(step) {
+state.currentStep = step;
+saveState();
+[1, 2, 3].forEach(i => {
+document.getElementById(⁠tab-${i}⁠).classList.toggle("active", i === step);
+document.getElementById(⁠step-${i}-panel⁠).classList.toggle("hidden", i !== step);
+});
+if (step === 2) {
+if (!quizSubmitted && !timerRunning) startTimer();
+} else {
+stopTimer();
+}
+if (step === 3) renderWrongBook();
+}
+function switchLectureSub(subKey) {
+activeLectureSub = subKey;
+["chi", "math", "eng"].forEach(k => {
+document.getElementById(⁠lec-tab-${k}⁠).classList.toggle("active", k === subKey);
+});
+renderLectures();
+}
+function renderLectures() {
+const subNameMap = { chi: "\u570B\u6587", math: "\u6578\u5B78", eng: "\u82F1\u6587" };
+const targetSub = subNameMap[activeLectureSub];
+const sourceList = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
+const list = sourceList.filter(l => l.sub === targetSub);
+const container = document.getElementById("lecture-list-container");
+if (list.length === 0) {
+container.innerHTML = ⁠<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">\u672C\u79D1\u66AB\u7121${currentSource === "zhixin" ? "\u77E5\u6B23\u52A0\u5F37\u73ED" : "\u7DB2\u8DEF"}\u8B1B\u7FA9\u5167\u5BB9\uFF0C\u8ACB\u5207\u63DB\u5176\u4ED6\u79D1\u76EE\u95B1\u8B80\u3002</div>⁠;
+document.getElementById("warmup-container").innerHTML = "";
+return;
+}
+container.innerHTML = list.map(item => ⁠<div class="liquid-card lecture-item dlc"> <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"> <span class="badge dlc">&#x2601;&#xFE0F; ${currentSource === "zhixin" ? "\u77E5\u6B23\u52A0\u5F37\u73ED" : "\u7DB2\u8DEF\u79C1\u4E2D"} &middot; ${item.cat}</span> </div> <div style="font-weight:800;font-size:15px;margin-bottom:4px;">${item.title}</div> <div style="font-size:14px;color:var(--text-sub);white-space:pre-line;">${item.body}</div> ${item.img ?⁠<div class="q-img-wrap"><img src="${item.img}" onclick="zoomImg('${item.img}')" /></div>⁠: ""} </div>⁠).join("");
+const wBox = document.getElementById("warmup-container");
+const sampleLecs = list.slice(0, 3);
+wBox.innerHTML = sampleLecs.map((l, idx) => ⁠<div style="padding:12px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:10px;background:#fff;"> <div style="font-weight:700;font-size:14px;margin-bottom:6px;">&#x1F4D1; \u91CD\u9EDE\u6838\u5B58 ${idx+1}\uFF1A${l.title}</div> <div style="font-size:13px;color:var(--text-sub);margin-bottom:8px;">${l.body.slice(0, 45)}...</div> <div style="font-size:12px;color:var(--primary);font-weight:700;">&#x2705; \u5DF2\u5B8C\u6210\u672C\u9805\u77AD\u89E3\u8207\u91CD\u9EDE\u8907\u7FD2</div> </div>⁠).join("");
+}
+function shuffleArray(arr) {
+const copy = arr.slice();
+for (let i = copy.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[copy[i], copy[j]] = [copy[j], copy[i]];
+}
+return copy;
+}
+function pickTenForSubject(subName) {
+const sourcePool = currentSource === "web" ? state.dlcQuestions : state.zhixinQuestions;
+const pool = sourcePool.filter(q => q.sub === subName);
+const effectivePool = pool.length > 0 ? pool : state.dlcQuestions.filter(q => q.sub === subName);
+const unseen = effectivePool.filter(q => !state.solvedIds.includes(q.id));
+const seen = effectivePool.filter(q => state.solvedIds.includes(q.id));
+const combined = [...shuffleArray(unseen), ...shuffleArray(seen)];
+const chosen = combined.slice(0, 10);
+return chosen.map(q => {
+const correctText = q.opts[q.ans];
+const shuffledOpts = shuffleArray(q.opts);
+return Object.assign({}, q, {
+opts: shuffledOpts,
+ans: shuffledOpts.indexOf(correctText)
+});
+});
+}
+function buildExam30() {
+const chi10 = pickTenForSubject("\u570B\u6587");
+const math10 = pickTenForSubject("\u6578\u5B78");
+const eng10 = pickTenForSubject("\u82F1\u6587");
+activeQuestions = [...chi10, ...math10, ...eng10];
+userAnswers = {};
+eliminatedMap = {};
+flaggedMap = {};
+collapsedPassageMap = {};
+quizSubmitted = false;
+activeExamSubFilter = "all";
+updateExamSubFilterUI("all");
+document.getElementById("quiz-submit-area").classList.remove("hidden");
+document.getElementById("quiz-result-banner").classList.add("hidden");
+renderMiniGrid();
+renderQuizQuestions();
+}
+function updateExamSubFilterUI(sub) {
+const mapKeys = { "all": "all", "\u570B\u6587": "chi", "\u6578\u5B78": "math", "\u82F1\u6587": "eng" };
+["all", "chi", "math", "eng"].forEach(k => {
+const btn = document.getElementById(⁠exam-sub-${k}⁠);
+if (btn) {
+const targetVal = Object.keys(mapKeys).find(pk => mapKeys[pk] === k);
+btn.classList.toggle("active", targetVal === sub);
+}
+});
+}
+function filterExamSub(sub) {
+activeExamSubFilter = sub;
+updateExamSubFilterUI(sub);
+renderQuizQuestions();
+}
+function refreshNewQuestions() {
+buildExam30();
+resetTimer();
+startTimer();
+}
+function renderMiniGrid() {
+const grid = document.getElementById("mini-answer-grid");
+grid.innerHTML = "";
+let answeredCount = 0;
+activeQuestions.forEach((_, idx) => {
+const hasAns = userAnswers[idx] !== undefined;
+if (hasAns) answeredCount++;
+const cell = document.createElement("button");
+cell.className = ⁠mini-cell ${hasAns ? "answered" : ""} ${flaggedMap[idx] ? "flagged" : ""}⁠;
+cell.textContent = idx + 1;
+cell.onclick = () => {
+const el = document.getElementById(⁠q-card-${idx}⁠);
+if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+grid.appendChild(cell);
+});
+document.getElementById("answered-progress-text").textContent = ⁠${answeredCount} / 30⁠;
+}
+function togglePassageCollapse(idx) {
+collapsedPassageMap[idx] = !collapsedPassageMap[idx];
+renderQuizQuestions();
+}
+function speakText(text) {
+if (!('speechSynthesis' in window)) {
+alert("\u60A8\u7684\u700F\u89BD\u5668\u4E0D\u652F\u63F4\u8A9E\u97F3\u6717\u8B80\u529F\u80FD");
+return;
+}
+window.speechSynthesis.cancel();
+const utterance = new SpeechSynthesisUtterance(text);
+utterance.lang = 'en-US';
+utterance.rate = 0.9;
+window.speechSynthesis.speak(utterance);
+}
+function renderQuizQuestions() {
+const container = document.getElementById("quiz-questions-container");
+container.innerHTML = "";
+if (activeQuestions.length === 0) {
+container.innerHTML = ⁠<div class="liquid-card" style="padding:24px;text-align:center;">\u5C1A\u7121\u6E2C\u9A57\u984C\u76EE\uFF0C\u8ACB\u5148\u9EDE\u64CA\u9996\u9801\u300C\u7ACB\u5373\u540C\u6B65\u6700\u65B0\u984C\u5EAB\u300D\u3002</div>⁠;
+return;
+}
+let visibleCount = 0;
+activeQuestions.forEach((q, idx) => {
+const isVisible = (activeExamSubFilter === "all" || q.sub === activeExamSubFilter);
+if (!isVisible) return;
+visibleCount++;
+const card = document.createElement("div");
+card.className = "liquid-card q-card";
+card.id = ⁠q-card-${idx}⁠;
+const diffCls = q.diff === "\u57FA\u790E" ? "diff-basic" : (q.diff === "\u6311\u6230" ? "diff-hard" : "diff-mid");
+const elimSet = eliminatedMap[idx] || {};
+const isCollapsed = !!collapsedPassageMap[idx];
+let listeningHtml = "";
+let passageHtml = "";
+if (q.type === "\u807D\u529B\u6E2C\u9593" || q.passage) {
+if (q.type === "\u807D\u529B\u6E2C\u9593" && q.passage) {
+listeningHtml = ⁠<div class="listening-box"> <div> <div style="font-weight:800;font-size:14px;color:#166534;">&#x1F50A; \u82F1\u6587\u807D\u529B\u6E2C\u9593\u95B1\u8B80</div> <div style="font-size:12px;color:#15803d;">\u807D\u529B\u7A3F\u5DF2\u81EA\u52D5\u96B1\u85CF\uff0C\u8ACB\u9EDE\u64CA\u6309\u9215\u6538\u807D\u6A19\u6E96\u7F8E\u97F3</div> </div> <button class="btn-primary" style="width:auto;padding:10px 16px;font-size:14px;" onclick="speakText(${JSON.stringify(q.passage)})"> &#x1F50A; \u64AD\u653E\u807D\u529B\u6B0C\u97f3 </button> </div>⁠;
+if (quizSubmitted) {
+passageHtml = ⁠<div class="reading-passage-box" style="position:static;background:#f0fdf4;border-color:#bbf7d0;"> <div class="reading-passage-header" style="color:#166534;">&#x1F4D6; \u807D\u529B\u7A3F\u539F\u6587\u5C0D\u7167</div> <div class="reading-passage-text">${q.passage}</div> </div>⁠;
+}
+} else if (q.passage) {
+passageHtml = ⁠<div class="reading-passage-box"> <div class="reading-passage-header"> <span>&#x1F4D6; \u95B1\u8B80\u6587\u672C\uff08\u7F6E\u9802\u5C0D\u7167\u5340\uff09</span> <button class="btn-secondary" style="padding:3px 9px;font-size:11px;" onclick="togglePassageCollapse(${idx})"> ${isCollapsed ? "\u5C55\u958B\u5168\u6587" : "\u6536\u5408\u6587\u7AE0"} </button> </div> <div class="reading-passage-text ${isCollapsed ? "collapsed" : ""}">${q.passage}</div> </div>⁠;
+}
+}
+const optsHtml = q.opts.map((opt, oIdx) => {
+let cls = "option-btn";
+if (quizSubmitted) {
+if (oIdx === q.ans) cls += " correct";
+else if (userAnswers[idx] === oIdx) cls += " wrong";
+} else {
+if (userAnswers[idx] === oIdx) cls += " selected";
+if (elimSet[oIdx]) cls += " eliminated";
+}
+return ⁠<div class="option-row"> <button class="${cls}" onclick="selectOption(${idx}, ${oIdx})">${String.fromCharCode(65 + oIdx)}. ${opt}</button> ${!quizSubmitted ?⁠<button class="elim-btn {elimSet[oIdx] ? "active" : ""}" title="\u6D88\u53BB\u6CD5\u5283\u6389" onclick="toggleEliminate({idx}, ${oIdx})">🚫</button>⁠: ""} </div>⁠;
+}).join("");
+const chosenLabel = userAnswers[idx] !== undefined
+? ⁠${String.fromCharCode(65 + userAnswers[idx])}. ${q.opts[userAnswers[idx]]}⁠
+: "\u672A\u4F5C\u7B54";
+const correctLabel = ⁠${String.fromCharCode(65 + q.ans)}. ${q.opts[q.ans]}⁠;
+const postCompareHtml = quizSubmitted ? ⁠<div class="answer-compare-grid"> <div class="${userAnswers[idx] === q.ans ? "compare-pill-correct" : "compare-pill-wrong"}"> \u4F60\u7684\u4F5C\u7B54\uff1A${chosenLabel} </div> <div class="compare-pill-correct"> \u6B63\u78BA\u7B54\u6848\uff1A${correctLabel} </div> </div> <div class="explain-box"><strong>\u767D\u8A71\u89E3\u6790\uff1A</strong>${q.exp}</div>⁠ : "";
+card.innerHTML = ⁠<div class="q-header"> <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"> <strong style="font-size:15px;">\u7B2C ${idx + 1} \u984C</strong> <span class="badge">${q.sub}</span> <span class="badge ${diffCls}">${q.diff}</span> <span class="badge" style="background:#f1f5f9;color:#475569;">${q.type}</span> </div> <div style="display:flex;gap:6px;"> <button class="flag-btn ${flaggedMap[idx] ? "active" : ""}" onclick="toggleFlag(${idx})">&#x1F6A9; \u6A19\u8A18</button> <button class="btn-secondary" style="padding:5px 10px;font-size:12px;" onclick="showHint(${idx})">&#x1F4A1; \u63D0\u793A</button> </div> </div> ${listeningHtml} ${passageHtml} <div class="q-stem">${q.stem}</div> ${q.img ?⁠<div class="q-img-wrap"><img src="${q.img}" onclick="zoomImg('${q.img}')" /></div>⁠: ""} <div class="options-list">${optsHtml}</div> <div class="hint-box" id="hint-${idx}" data-level="0"></div> ${postCompareHtml}⁠;
+container.appendChild(card);
+});
+if (visibleCount === 0) {
+container.innerHTML = ⁠<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">此科目目前沒有題目。</div>⁠;
+}
+}
+function selectOption(qIdx, oIdx) {
+if (quizSubmitted) return;
+userAnswers[qIdx] = oIdx;
+renderMiniGrid();
+renderQuizQuestions();
+}
+function toggleEliminate(qIdx, oIdx) {
+if (quizSubmitted) return;
+if (!eliminatedMap[qIdx]) eliminatedMap[qIdx] = {};
+eliminatedMap[qIdx][oIdx] = !eliminatedMap[qIdx][oIdx];
+renderQuizQuestions();
+}
+function toggleFlag(qIdx) {
+flaggedMap[qIdx] = !flaggedMap[qIdx];
+renderMiniGrid();
+renderQuizQuestions();
+}
+function showHint(idx) {
+const box = document.getElementById(⁠hint-${idx}⁠);
+const q = activeQuestions[idx];
+const lvl = parseInt(box.getAttribute("data-level") || "0", 10);
+box.style.display = "block";
+if (lvl === 0) {
+box.innerHTML = ⁠<strong>\u63D0\u793A 1\uFF08\u601D\u8DEF\u5F15\u5C0E\uFF09\uFF1A</strong>${q.h1}⁠;
+box.setAttribute("data-level", "1");
+} else {
+box.innerHTML = ⁠<strong>\u63D0\u793A 1\uFF1A</strong>${q.h1}<br><strong>\u63D0\u793A 2\uFF08\u95DC\u9375\u6B65\u9A5F\uFF09\uFF1A</strong>${q.h2}⁠;
+box.setAttribute("data-level", "2");
+}
+}
+function submitQuiz() {
+const unanswered = activeQuestions.length - Object.keys(userAnswers).length;
+const msg = unanswered > 0
+? ⁠\u9084\u6709 ${unanswered} \u984C\u5C1A\u672A\u4F5C\u7B54\u5594\uFF01\u78BA\u5B9A\u8981\u73FE\u5728\u4EA4\u5377\u55CE\uFF1F⁠
+: "\u5DF2\u5B8C\u6210\u5168\u90E8 30 \u984C\u4F5C\u7B54\uFF0C\u78BA\u5B9A\u8981\u73FE\u5728\u4EA4\u5377\u6279\u6539\u55CE\uFF1F";
+if (!confirm(msg)) return;
+stopTimer();
+quizSubmitted = true;
+activeExamSubFilter = "all";
+updateExamSubFilterUI("all");
+let correctCount = 0;
+activeQuestions.forEach((q, idx) => {
+if (!state.solvedIds.includes(q.id)) state.solvedIds.push(q.id);
+if (userAnswers[idx] === q.ans) {
+correctCount++;
+} else {
+const wrongEntry = Object.assign({}, q, {
+chosenText: userAnswers[idx] !== undefined ? q.opts[userAnswers[idx]] : "\u672A\u8A18\u9304"
+});
+if (!state.wrongBook.some(w => w.id === q.id)) {
+state.wrongBook.unshift(wrongEntry);
+}
+}
+});
+const score = Math.round((correctCount / activeQuestions.length) * 100);
+if (score >= 80 && !state.completedWeeks.includes(state.currentWeek)) {
+state.completedWeeks.push(state.currentWeek);
+if (state.currentWeek < 15) state.currentWeek += 1;
+}
+saveState();
+renderAll();
+renderQuizQuestions();
+document.getElementById("quiz-submit-area").classList.add("hidden");
+const banner = document.getElementById("quiz-result-banner");
+banner.classList.remove("hidden");
+document.getElementById("result-score-text").textContent = ⁠\u672C\u6B21\u5F97\u5206\uFF1A${score} \u5206\uff08\u7B54\u5C0D ${correctCount} / 30 \u984C\uff09⁠;
+document.getElementById("result-feedback-text").textContent = score >= 80
+? "\u592A\u68D2\u4E86\uFF01\u9054\u6210 80 \u5206\u901A\u95DC\u6A19\u6E96\uFF0C\u5DF2\u81EA\u52D5\u89E3\u9396\u4E26\u63A8\u9032\u9032\u5EA6\u3002"
+: "\u5C1A\u672A\u9054 80 \u5206\u901A\u95DC\u9580\u6ABB\uFF0C\u5EFA\u8B70\u5148\u5230\u300C\u6B65\u9A5F\u4E09\uFF1A\u932F\u984C\u672C\u300D\u641E\u61C2\u89E3\u6790\uFF0C\u518D\u63DB\u65B0\u984C\u6311\u6230\u4E00\u6B21\uFF01";
+banner.scrollIntoView({ behavior: "smooth" });
+}
+function renderWrongBook() {
+const box = document.getElementById("wrong-book-container");
+if (state.wrongBook.length === 0) {
+box.innerHTML = ⁠<div class="liquid-card" style="padding:36px 20px;text-align:center;color:var(--text-sub);"> <div style="font-size:36px;margin-bottom:8px;">&#x1F389;</div> <div style="font-weight:700;font-size:16px;">\u76EE\u524D\u6C92\u6709\u5F85\u8907\u7FD2\u7684\u932F\u984C\uff01</div> <div style="font-size:13px;margin-top:4px;">\u7E7C\u7E8C\u4FDD\u6301\uFF0C\u524D\u5F80\u6B65\u9A5F\u4E8C\u6311\u6230\u66F4\u591A\u65B0\u984C\u5427\u3002</div> </div>⁠;
+return;
+}
+box.innerHTML = state.wrongBook.map((q, idx) => ⁠<div class="liquid-card q-card"> <div class="q-header"> <span class="badge">${q.sub} &middot; ${q.type}</span> <button class="btn-secondary" style="padding:6px 12px;font-size:12px;color:#059669;border-color:#10b981;" onclick="markMastered(${idx})">&#x2705; \u6211\u5DF2\u5B8C\u5168\u641E\u61C2\uff08\u79FB\u9664\uff09</button> </div> ${q.passage ?⁠<div class="reading-passage-box" style="position:static;"><div class="reading-passage-text">${q.passage}</div></div>⁠: ""} <div class="q-stem">${q.stem}</div> ${q.img ?⁠<div class="q-img-wrap"><img src="${q.img}" onclick="zoomImg('${q.img}')" /></div>⁠: ""} <div class="answer-compare-grid"> <div class="compare-pill-wrong">\u4F60\u7684\u4F5C\u7B54\uff1A${q.chosenText || "\u672A\u8A18\u9304"}</div> <div class="compare-pill-correct">\u6B63\u78BA\u7B54\u6848\uff1A${q.opts[q.ans]}</div> </div> <div class="explain-box"><strong>\u767D\u8A71\u89E3\u6790\uff1A</strong>${q.exp}</div> </div>⁠).join("");
+}
+function markMastered(idx) {
+state.wrongBook.splice(idx, 1);
+saveState();
+renderAll();
+}
+function handleSafeReset() {
+const btn = document.getElementById("reset-progress-btn");
+if (resetConfirmStep === 0) {
+resetConfirmStep = 1;
+btn.textContent = "\u26A0\uFE0F \u518D\u9EDE\u4E00\u6B21\u78BA\u8A8D\u6E05\u7A7A\u6240\u6709\u9032\u5EA6\u8207\u5DF2\u5237\u984C\u865F";
+btn.style.color = "var(--danger)";
+btn.style.borderColor = "var(--danger)";
+setTimeout(() => {
+resetConfirmStep = 0;
+btn.textContent = "\u91CD\u7F6E\u5237\u984C\u7D00\u9304\uff08\u8003\u524D\u7E3D\u91CD\u5237\u7528\uff09";
+btn.style.color = "var(--text-muted)";
+btn.style.borderColor = "";
+}, 4000);
+} else {
+state.currentWeek = 1;
+state.completedWeeks = [];
+state.solvedIds = [];
+state.wrongBook = [];
+saveState();
+resetConfirmStep = 0;
+buildExam30();
+renderAll();
+alert("\u5DF2\u6E05\u7A7A\u5237\u984C\u7D00\u9304\uff0c\u53EF\u91CD\u65B0\u958B\u59CB\u7E3D\u8907\u7FD2\uff01");
+}
+}
+let drawing = false;
+function openScratchpad() {
+const modal = document.getElementById("scratchpad-modal");
+modal.classList.remove("hidden");
+const canvas = document.getElementById("scratch-canvas");
+const rect = canvas.getBoundingClientRect();
+canvas.width = rect.width;
+canvas.height = rect.height;
+const ctx = canvas.getContext("2d");
+ctx.lineWidth = 2.5;
+ctx.lineCap = "round";
+ctx.strokeStyle = "#0f172a";
+const getPos = (e) => {
+const r = canvas.getBoundingClientRect();
+const t = e.touches ? e.touches[0] : e;
+return { x: t.clientX - r.left, y: t.clientY - r.top };
+};
+canvas.onmousedown = canvas.ontouchstart = (e) => {
+e.preventDefault();
+drawing = true;
+const p = getPos(e);
+ctx.beginPath();
+ctx.moveTo(p.x, p.y);
+};
+canvas.onmousemove = canvas.ontouchmove = (e) => {
+if (!drawing) return;
+e.preventDefault();
+const p = getPos(e);
+ctx.lineTo(p.x, p.y);
+ctx.stroke();
+};
+canvas.onmouseup = canvas.ontouchend = () => { drawing = false; };
+}
+function clearScratchpad() {
+const canvas = document.getElementById("scratch-canvas");
+const ctx = canvas.getContext("2d");
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+function closeScratchpad() {
+document.getElementById("scratchpad-modal").classList.add("hidden");
+}
+function zoomImg(src) {
+document.getElementById("lightbox-img").src = src;
+document.getElementById("img-lightbox").classList.remove("hidden");
+}
+function formatTime(sec) {
+const m = Math.floor(sec / 60);
+const s = sec % 60;
+return ⁠${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}⁠;
+}
+function startTimer() {
+if (timerRunning) return;
+timerRunning = true;
+document.getElementById("timer-toggle-btn").textContent = "\u66AB\u505C";
+timerInterval = setInterval(() => {
+if (timerSeconds > 0) {
+timerSeconds--;
+document.getElementById("quiz-timer").textContent = formatTime(timerSeconds);
+} else {
+stopTimer();
+alert("\u6E2C\u9A57\u6642\u9593\u5230\uff01");
+}
+}, 1000);
+}
+function stopTimer() {
+timerRunning = false;
+clearInterval(timerInterval);
+document.getElementById("timer-toggle-btn").textContent = "\u7E7C\u7E8C";
+}
+function toggleTimer() {
+if (timerRunning) stopTimer();
+else startTimer();
+}
+function resetTimer() {
+stopTimer();
+timerSeconds = 1800;
+document.getElementById("quiz-timer").textContent = formatTime(timerSeconds);
+}
+loadState();
+updatePortalSummary();
+syncCloudDLC(false);
 </script>
 </body>
 </html>
