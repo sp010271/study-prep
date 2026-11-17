@@ -48,6 +48,14 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+    /* --- 自動修復題庫同步狀態文字被裁切的樣式 --- */
+.portal-status-card .status-value {
+  font-size: 13px !important;       /* 將字級稍微縮小，讓「180 講義」等較長文字可以完整呈現 */
+  white-space: normal !important;   /* 允許必要時自動換行，絕不被強制裁切 */
+  text-align: right;
+  word-break: break-all;
+  max-width: 65%;                   /* 限制最大寬度，確保版面平衡 */
+}
   </style>
 </head>
 <body class="antialiased selection:bg-indigo-200 selection:text-indigo-900">
