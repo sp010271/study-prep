@@ -100,7 +100,35 @@
     .portal-sub {
       font-size: 14px;
       color: var(--text-sub);
-      margin: 0 0 24px;
+      margin: 0 0 20px;
+    }
+
+    /* Source Selector Bar on Portal Lobby */
+    .source-selector-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .source-pill-btn {
+      padding: 12px 8px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid #cbd5e1;
+      background: #f8fafc;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-sub);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .source-pill-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
     }
 
     .portal-status-card {
@@ -227,7 +255,7 @@
       color: var(--primary);
     }
 
-    /* 15 Weeks Strip (With visible custom scrollbar) */
+    /* 15 Weeks Strip */
     .week-strip {
       display: flex;
       gap: 8px;
@@ -742,6 +770,12 @@
       <h1 class="portal-title">&#x79C1;&#x4E2D;&#x885D;&#x523A;&#x6A21;&#x64EC;&#x7AD9;</h1>
       <p class="portal-sub">&#x6DE1;&#x6C5F; &times; &#x8587;&#x95A3; 15&#x9031;&#x5165;&#x5B78;&#x8003;&#x5099;&#x8003;&#x7CFB;&#x7D71;&#xFF08;2026/11/16 &ndash; 2027/02/27&#xFF09;</p>
 
+      <!-- Source Repository Selector (Network vs Zhixin) -->
+      <div class="source-selector-box">
+        <button class="source-pill-btn active" id="src-btn-web" onclick="switchQuestionSource('web')">&#x1F310; &#x7DB2;&#x8DEF;&#x79C1;&#x4E2D;&#x984C;&#x5Eab;</button>
+        <button class="source-pill-btn" id="src-btn-zhixin" onclick="switchQuestionSource('zhixin')">&#x1F3EB; &#x77E5;&#x6B65;&#x52A0;&#x5F37;&#x73ED;</button>
+      </div>
+
       <div class="portal-status-card">
         <div class="status-row">
           <span class="status-label">&#x76EE;&#x524D;&#x63A8;&#x9032;&#x9031;&#x6B21;</span>
@@ -779,7 +813,10 @@
       <div class="brand-group">
         <div class="brand-mini-icon">&#x52DD;</div>
         <div>
-          <div style="font-weight:800;font-size:16px;">&#x79C1;&#x4E2D;&#x885D;&#x523A;&#x6A21;&#x64EC;&#x7AD9;</div>
+          <div style="font-weight:800;font-size:16px;">
+            <span id="active-source-badge" class="badge dlc" style="font-size:12px;margin-right:6px;">網路私中題庫</span>
+            <span id="app-title-text">&#x79C1;&#x4E2D;&#x885D;&#x523A;&#x6A21;&#x64EC;&#x7AD9;</span>
+          </div>
           <div id="week-date-range" style="font-size:12px;color:var(--text-sub);"></div>
         </div>
       </div>
@@ -803,7 +840,7 @@
       </div>
     </div>
 
-    <!-- 15 Weeks Strip (With visible custom scrollbar) -->
+    <!-- 15 Weeks Strip -->
     <div class="week-strip" id="week-strip"></div>
 
     <!-- Current Week Header -->
@@ -821,7 +858,7 @@
     <div class="step-tabs">
       <button class="step-tab active" id="tab-1" onclick="switchStep(1)">&#x6B65;&#x9A5F;&#x4E00;&#xFF1A;&#x6559;&#x5B78;&#x5EAB;</button>
       <button class="step-tab" id="tab-2" onclick="switchStep(2)">&#x6B65;&#x9A5F;&#x4E8C;&#xFF1A;30&#x984C;&#x6E2C;&#x9A57;</button>
-      <button class="step-tab" id="tab-3" onclick="switchStep(3)">&#x6B65;&#x9A5F;&#x4E09;&#xFF1A;&#x932F;&#x984C;&#x672C;</button>
+      <button class="step-tab" id="tab-3" onclick="switchStep(3)">&#x6B65;&#x9A5F;&#x4E8C;&#xFF1A;&#x932F;&#x984C;&#x672C;</button>
     </div>
 
     <!-- Step 1: Teaching Library (Dynamic from Cloud Sheet) -->
@@ -871,7 +908,7 @@
           </div>
         </div>
 
-        <!-- Subject Priority Filter Bar (Fully fixed active state toggling) -->
+        <!-- Subject Priority Filter Bar -->
         <div class="exam-sub-filter">
           <button class="exam-sub-pill active" id="exam-sub-all" onclick="filterExamSub('all')">&#x5168;&#x5377; 30 &#x984C;</button>
           <button class="exam-sub-pill" id="exam-sub-chi" onclick="filterExamSub('\u570B\u6587')">&#x570B;&#x6587; 10 &#x984C;</button>
@@ -937,7 +974,7 @@
   </div>
 
 <script>
-  const STORAGE_KEY = "private_school_sprint_flagship_v13";
+  const STORAGE_KEY = "private_school_sprint_flagship_v14";
   const SHEET_ID = "1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA";
 
   const WEEKS_META = [
@@ -958,6 +995,8 @@
     { w: 15, range: "2027/02/22 - 02/27", title: "\u8003\u524d\u7d42\u6975\u6a21\u64EC\u8207\u5fc3\u614b\u8abf\u9069\u9031" }
   ];
 
+  let currentSource = "web"; // 'web' or 'zhixin'
+
   let state = {
     currentWeek: 1,
     currentStep: 1,
@@ -966,6 +1005,8 @@
     wrongBook: [],
     dlcLectures: [],
     dlcQuestions: [],
+    zhixinLectures: [],
+    zhixinQuestions: [],
     lastSyncTime: ""
   };
 
@@ -1070,58 +1111,76 @@
     const ts = Date.now();
     const lecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u8B1B\u7FA9DLC")}&_t=${ts}`;
     const qUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u984C\u5EABDLC")}&_t=${ts}`;
+    const zLecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u77E5\u6B65\u8B1B\u7FA9DLC")}&_t=${ts}`;
+    const zQUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u77E5\u6B65\u984C\u5EABDLC")}&_t=${ts}`;
 
     try {
-      const [lecRes, qRes] = await Promise.all([fetch(lecUrl), fetch(qUrl)]);
+      const [lecRes, qRes, zLecRes, zQRes] = await Promise.all([
+        fetch(lecUrl), fetch(qUrl), fetch(zLecUrl).catch(() => null), fetch(zQUrl).catch(() => null)
+      ]);
       if (!lecRes.ok || !qRes.ok) throw new Error("Fetch failed");
       const [lecCsv, qCsv] = await Promise.all([lecRes.text(), qRes.text()]);
 
-      const lecRows = parseCSV(lecCsv).slice(1).filter(r => r.length >= 4 && r[0] && r[2]);
-      const parsedLecs = lecRows.map(r => ({
-        sub: r[0],
-        cat: r[1] || "\u96F2\u7AEF\u64F4\u5145\u7CBE\u83EF",
-        title: r[2],
-        body: r[3],
-        img: normalizeImageUrl(r[4] || ""),
-        isDLC: true
-      }));
-
-      const qRows = parseCSV(qCsv).slice(1).filter(r => r.length >= 10 && r[0] && r[3]);
-      const ansMap = { A: 0, B: 1, C: 2, D: 3 };
-      const parsedQs = qRows.map(r => {
-        const ansIdx = ansMap[(r[9] || "A").toUpperCase()] ?? 0;
-        let rawStem = r[3];
-        let passageText = "";
-        if (rawStem.includes("||")) {
-          const parts = rawStem.split("||");
-          passageText = parts[0].trim();
-          rawStem = parts[1].trim();
-        }
-        return {
-          id: makeContentId(r[0], rawStem),
+      const parseLecs = (csvText) => {
+        const rows = parseCSV(csvText).slice(1).filter(r => r.length >= 4 && r[0] && r[2]);
+        return rows.map(r => ({
           sub: r[0],
-          diff: r[1] || "\u9032\u968E",
-          type: r[2] || "\u96F2\u7AEF\u7CBE\u9078",
-          stem: rawStem,
-          passage: passageText,
+          cat: r[1] || "\u96F2\u7AEF\u64F4\u5145\u7CBE\u83EF",
+          title: r[2],
+          body: r[3],
           img: normalizeImageUrl(r[4] || ""),
-          opts: [r[5] || "", r[6] || "", r[7] || "", r[8] || ""],
-          ans: ansIdx,
-          h1: r[10] || "\u8ACB\u4ED4\u7D30\u6BD4\u5C0D\u984C\u5E79\u95DC\u9375\u689D\u4EF6\u3002",
-          h2: r[11] || "\u6392\u9664\u660E\u986F\u932F\u8AA4\u9078\u9805\u5F8C\u518D\u5224\u65B7\u3002",
-          exp: r[12] || "\u8ACB\u53C3\u8003\u6B63\u78BA\u7B54\u6848\u89E3\u6790\u3002",
           isDLC: true
-        };
-      });
+        }));
+      };
 
-      state.dlcLectures = parsedLecs;
-      state.dlcQuestions = parsedQs;
+      const parseQs = (csvText) => {
+        const rows = parseCSV(csvText).slice(1).filter(r => r.length >= 10 && r[0] && r[3]);
+        const ansMap = { A: 0, B: 1, C: 2, D: 3 };
+        return rows.map(r => {
+          const ansIdx = ansMap[(r[9] || "A").toUpperCase()] ?? 0;
+          let rawStem = r[3];
+          let passageText = "";
+          if (rawStem.includes("||")) {
+            const parts = rawStem.split("||");
+            passageText = parts[0].trim();
+            rawStem = parts[1].trim();
+          }
+          return {
+            id: makeContentId(r[0], rawStem),
+            sub: r[0],
+            diff: r[1] || "\u9032\u968E",
+            type: r[2] || "\u96F2\u7AEF\u7CBE\u9078",
+            stem: rawStem,
+            passage: passageText,
+            img: normalizeImageUrl(r[4] || ""),
+            opts: [r[5] || "", r[6] || "", r[7] || "", r[8] || ""],
+            ans: ansIdx,
+            h1: r[10] || "\u8ACB\u4ED4\u7D30\u6BD4\u5C0D\u984C\u5E79\u95DC\u9375\u689D\u4EF6\u3002",
+            h2: r[11] || "\u6392\u9664\u660E\u986F\u932F\u8AA4\u9078\u9805\u5F8C\u518D\u5224\u65B7\u3002",
+            exp: r[12] || "\u8ACB\u53C3\u8003\u6B63\u78BA\u7B54\u6848\u89E3\u6790\u3002",
+            isDLC: true
+          };
+        });
+      };
+
+      state.dlcLectures = parseLecs(lecCsv);
+      state.dlcQuestions = parseQs(qCsv);
+
+      if (zLecRes && zLecRes.ok) {
+        const zLecText = await zLecRes.text();
+        state.zhixinLectures = parseLecs(zLecText);
+      }
+      if (zQRes && zQRes.ok) {
+        const zQText = await zQRes.text();
+        state.zhixinQuestions = parseQs(zQText);
+      }
+
       const now = new Date();
       state.lastSyncTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
       saveState();
 
       if (manual) {
-        alert(`\u540C\u6B65\u5B8C\u6210\uff01\u5DF2\u8F09\u5165 ${parsedLecs.length} \u5247\u8B1B\u7FA9\u3001${parsedQs.length} \u984C\u984C\u5EAB\u3002`);
+        alert(`\u540C\u6B65\u5B8C\u6210\uff01\u8F09\u5165\u7DB2\u8DEF\u984C\u5EAB ${state.dlcLectures.length} 講/${state.dlcQuestions.length} 題，知欣班 ${state.zhixinLectures.length} 講/${state.zhixinQuestions.length} 題。`);
       }
     } catch (err) {
       updatePortalSummary(true);
@@ -1131,18 +1190,26 @@
     }
   }
 
+  function switchQuestionSource(src) {
+    currentSource = src;
+    document.getElementById("src-btn-web").classList.toggle("active", src === "web");
+    document.getElementById("src-btn-zhixin").classList.toggle("active", src === "zhixin");
+    updatePortalSummary();
+  }
+
   function updatePortalSummary(offline = false) {
     document.getElementById("portal-week-label").textContent = `\u7B2C ${state.currentWeek} \u9031`;
     document.getElementById("portal-progress-label").textContent = `${state.completedWeeks.length} / 15 \u9031`;
     document.getElementById("portal-wrong-label").textContent = `${state.wrongBook.length} \u984C`;
     const dlcLabel = document.getElementById("dlc-status-label");
     
-    // Dynamic query of actual total counts from state (fallback to 180 / 206 if not yet fetched)
-    const totalLec = state.dlcLectures.length > 0 ? state.dlcLectures.length : 180;
-    const totalQ = state.dlcQuestions.length > 0 ? state.dlcQuestions.length : 206;
+    const activeLecs = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
+    const activeQs = currentSource === "web" ? state.dlcQuestions : state.zhixinQuestions;
+    const totalLec = activeLecs.length > 0 ? activeLecs.length : (currentSource === "web" ? 180 : 0);
+    const totalQ = activeQs.length > 0 ? activeQs.length : (currentSource === "web" ? 206 : 0);
     const timeStr = state.lastSyncTime ? ` (\u66F4\u65B0 ${state.lastSyncTime})` : "";
 
-    if (offline && state.dlcQuestions.length === 0) {
+    if (offline && activeQs.length === 0) {
       dlcLabel.textContent = "\u793A\u7BC4\u6A21\u5F0F";
     } else {
       dlcLabel.textContent = `已同步 ${totalLec} 講義 / ${totalQ} 題${timeStr}`;
@@ -1152,6 +1219,18 @@
   function enterStudyStation() {
     document.getElementById("portal-view").classList.add("hidden");
     document.getElementById("app-view").classList.remove("hidden");
+    
+    const badge = document.getElementById("active-source-badge");
+    if (currentSource === "zhixin") {
+      badge.textContent = "知欣加強班題庫";
+      badge.style.background = "rgba(124, 58, 237, 0.15)";
+      badge.style.color = "#7c3aed";
+    } else {
+      badge.textContent = "網路私中題庫";
+      badge.style.background = "rgba(15, 118, 110, 0.15)";
+      badge.style.color = "#0f766e";
+    }
+
     renderAll();
     switchStep(state.currentStep || 1);
   }
@@ -1236,14 +1315,15 @@
   function renderLectures() {
     const subNameMap = { chi: "\u570B\u6587", math: "\u6578\u5B78", eng: "\u82F1\u6587" };
     const targetSub = subNameMap[activeLectureSub];
-    const list = state.dlcLectures.filter(l => l.sub === targetSub);
+    const sourceList = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
+    const list = sourceList.filter(l => l.sub === targetSub);
 
     document.getElementById("lecture-count-badge").textContent = `\u672C\u79D1\u5171 ${list.length} \u9805`;
-    document.getElementById("lecture-summary-header").textContent = `\u1F4DA; \u53F0\u7063\u6559\u80B2\u90E8\u8fad\u5178\u6821\u5C0D\u3001\u6DE1\u6C5F\u5075\u61BA\u6559\u6750（總講義 ${state.dlcLectures.length} 項）`;
+    document.getElementById("lecture-summary-header").textContent = `\u1F4DA; ${currentSource === "zhixin" ? "知欣加強班專屬講義庫" : "台灣教育部辭典校對、淡江偵憾教材"}（總講義 ${sourceList.length} 項）`;
 
     const container = document.getElementById("lecture-list-container");
     if (list.length === 0) {
-      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">\u66AB\u7121\u96F2\u7AEF\u8B1B\u7FA9\uff0c\u8ACB\u9ede\u64CA「立即同步最新題庫」按鈕載入。</div>`;
+      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">\u66AB\u7121${currentSource === "zhixin" ? "知欣加強班" : "網路"}講義內容，請於試算表「${currentSource === "zhixin" ? "知欣講義DLC" : "講義DLC"}」分頁新增。</div>`;
       document.getElementById("warmup-container").innerHTML = "";
       return;
     }
@@ -1251,7 +1331,7 @@
     container.innerHTML = list.map(item => `
       <div class="liquid-card lecture-item dlc">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <span class="badge dlc">&#x2601;&#xFE0F; \u96F2\u7AEF\u8B1B\u7FA9 &middot; ${item.cat}</span>
+          <span class="badge dlc">&#x2601;&#xFE0F; ${currentSource === "zhixin" ? "知欣加強班" : "網路私中"} &middot; ${item.cat}</span>
         </div>
         <div style="font-weight:800;font-size:15px;margin-bottom:4px;">${item.title}</div>
         <div style="font-size:14px;color:var(--text-sub);white-space:pre-line;">${item.body}</div>
@@ -1280,9 +1360,14 @@
   }
 
   function pickTenForSubject(subName) {
-    const pool = state.dlcQuestions.filter(q => q.sub === subName);
-    const unseen = pool.filter(q => !state.solvedIds.includes(q.id));
-    const seen = pool.filter(q => state.solvedIds.includes(q.id));
+    const sourcePool = currentSource === "web" ? state.dlcQuestions : state.zhixinQuestions;
+    const pool = sourcePool.filter(q => q.sub === subName);
+    
+    // Fallback to web pool if zhixin pool is empty
+    const effectivePool = pool.length > 0 ? pool : state.dlcQuestions.filter(q => q.sub === subName);
+
+    const unseen = effectivePool.filter(q => !state.solvedIds.includes(q.id));
+    const seen = effectivePool.filter(q => state.solvedIds.includes(q.id));
     const combined = [...shuffleArray(unseen), ...shuffleArray(seen)];
     const chosen = combined.slice(0, 10);
     return chosen.map(q => {
@@ -1573,7 +1658,7 @@
     document.getElementById("quiz-submit-area").classList.add("hidden");
     const banner = document.getElementById("quiz-result-banner");
     banner.classList.remove("hidden");
-    document.getElementById("result-score-text", `\u672C\u6B21\u5F97\u5206\uFF1A${score} \u5206\uff08\u7B54\u5C0D ${correctCount} / 30 \u984C\uff09`);
+    document.getElementById("result-score-text").textContent = `\u672C\u6B21\u5F97\u5206\uFF1A${score} \u5206\uff08\u7B54\u5C0D ${correctCount} / 30 \u984C\uff09`;
     document.getElementById("result-feedback-text").textContent = score >= 80
       ? "\u592A\u68D2\u4E86\uFF01\u9054\u6210 80 \u5206\u901A\u95DC\u6A19\u6E96\uFF0C\u5DF2\u81EA\u52D5\u89E3\u9396\u4E26\u63A8\u9032\u9032\u5EA6\u3002"
       : "\u5C1A\u672A\u9054 80 \u5206\u901A\u95DC\u9580\u6ABB\uFF0C\u5EFA\u8B70\u5148\u5230\u300C\u6B65\u9A5F\u4E09\uFF1A\u932F\u984C\u672C\u300D\u641E\u61C2\u89E3\u6790\uFF0C\u518D\u63DB\u65B0\u984C\u6311\u6230\u4E00\u6B21\uFF01";
