@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>&#x79C1;&#x4E2D;&#x885D;&#x523A;&#x6A21;&#x64EC;&#x7AD9;</title>
-  <style>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=DlTV3pkXZdBDxqeYFSEom5eXzTDXrRjee283Agj8lVSR85C02uTAiaDzss-qU2q1hjDcOwWAP8dfS-I-Epx7KPSBj236bS6kPHsBUVMs8mCFzp-DUg5eSLacTqOxJPvOVxKND1svJfw1Qgl0MP3eBDhmRSAZ6l5YqQFs_FNPoNUr7EkqKYXLOBLaWDx_rNx-QRdp9ee1cxZmNNDv3-Yvfy7MPdL9mWSY6OfsD87AyIqGvhfjb4kJVeFZAiwygz0mHRC1hG-aiUdhPM4cLr-gJ5FccyNtTg_UNMkH9jYZQHt1clCC8Uj3BR5YeRI_ehs1" charset="UTF-8"></script><style>
     :root {
       --bg-gradient: linear-gradient(135deg, #f4f7fb 0%, #e9f0f8 50%, #f7f9fc 100%);
       --glass-bg: rgba(255, 255, 255, 0.86);
@@ -861,15 +861,8 @@
       <button class="step-tab" id="tab-3" onclick="switchStep(3)">&#x6B65;&#x9A5F;&#x4E09;&#xFF1A;&#x932F;&#x984C;&#x672C;</button>
     </div>
 
-    <!-- Step 1: Teaching Library (Dynamic from Cloud Sheet) -->
+    <!-- Step 1: Teaching Library (Clean Subject Tabs Directly) -->
     <div id="step-1-panel">
-      <div class="liquid-card" style="padding:14px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-        <div style="font-size:13px;color:var(--text-sub);font-weight:600;" id="lecture-summary-header">
-          &#x1F4DA; &#x53F0;&#x7063;&#x6559;&#x80B2;&#x90E8;&#x8fad;&#x5178;&#x6821;&#x5C0D;&#x3001;&#x6DE1;&#x6C5F;&#x5075;&#x61BA;&#x6559;&#x6750;
-        </div>
-        <div id="lecture-count-badge" class="badge">&#x672C;&#x79D1;&#x5171; -- &#x9805;</div>
-      </div>
-
       <div class="sub-filter-bar">
         <button class="sub-pill active" id="lec-tab-chi" onclick="switchLectureSub('chi')">&#x570B;&#x6587;&#x8B1B;&#x7FA9;</button>
         <button class="sub-pill" id="lec-tab-math" onclick="switchLectureSub('math')">&#x6578;&#x5B78;&#x8B1B;&#x7FA9;</button>
@@ -974,7 +967,7 @@
   </div>
 
 <script>
-  const STORAGE_KEY = "private_school_sprint_flagship_v19";
+  const STORAGE_KEY = "private_school_sprint_flagship_v20";
   const SHEET_ID = "1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA";
 
   const WEEKS_META = [
@@ -1105,25 +1098,36 @@
     return rows;
   }
 
+  // \u4F7F\u7528 headers=1 \u4E26\u6307\u5B9A\u5B8C\u6574\u7BC4\u570D A1:M2000\uFF0C\u5FB9\u5E95\u9632\u6B62 gviz \u81EA\u52D5\u63A8\u65B7\u622A\u65B7\u6700\u5F8C 20 \u984C\u7684\u554F\u984C
+  function buildSheetCsvUrl(sheetName, rangeA1, ts) {
+    const query = encodeURIComponent("SELECT *");
+    return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(sheetName)}&range=${rangeA1}&tq=${query}&_t=${ts}`;
+  }
+
   async function syncCloudDLC(manual = false) {
     const label = document.getElementById("dlc-status-label");
     if (label) label.textContent = "\u540C\u6B65\u4E2D...";
     const ts = Date.now();
-    // 講義DLC / 題庫DLC / 知欣講義DLC / 知欣題庫DLC
-    const lecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u8B1B\u7FA9DLC")}&_t=${ts}`;
-    const qUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u984C\u5EABDLC")}&_t=${ts}`;
-    const zLecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u77E5\u6B23\u8B1B\u7FA9DLC")}&_t=${ts}`;
-    const zQUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u77E5\u6B23\u984C\u5EABDLC")}&_t=${ts}`;
+
+    const lecUrl = buildSheetCsvUrl("\u8B1B\u7FA9DLC", "A1:E2000", ts);
+    const qUrl = buildSheetCsvUrl("\u984C\u5EABDLC", "A1:M2000", ts);
+    const zLecUrl = buildSheetCsvUrl("\u77E5\u6B23\u8B1B\u7FA9DLC", "A1:E2000", ts);
+    const zQUrl = buildSheetCsvUrl("\u77E5\u6B23\u984C\u5EABDLC", "A1:M2000", ts);
 
     try {
       const [lecRes, qRes, zLecRes, zQRes] = await Promise.all([
-        fetch(lecUrl), fetch(qUrl), fetch(zLecUrl).catch(() => null), fetch(zQUrl).catch(() => null)
+        fetch(lecUrl, { cache: "no-store" }),
+        fetch(qUrl, { cache: "no-store" }),
+        fetch(zLecUrl, { cache: "no-store" }).catch(() => null),
+        fetch(zQUrl, { cache: "no-store" }).catch(() => null)
       ]);
       if (!lecRes.ok || !qRes.ok) throw new Error("Fetch failed");
       const [lecCsv, qCsv] = await Promise.all([lecRes.text(), qRes.text()]);
 
       const parseLecs = (csvText) => {
-        const rows = parseCSV(csvText).slice(1).filter(r => r.length >= 3 && r[0] && r[2]);
+        const rows = parseCSV(csvText)
+          .slice(1)
+          .filter(r => r.length >= 3 && r[0] && r[0] !== "\u79D1\u76EE" && r[2]);
         return rows.map(r => ({
           sub: r[0],
           cat: r[1] || "\u96F2\u7AEF\u64F4\u5145\u7CBE\u83EF",
@@ -1135,8 +1139,9 @@
       };
 
       const parseQs = (csvText) => {
-        // 放寬為 r.length >= 6，避免最後幾欄空白時整列被過濾掉（解決少 20 題的問題）
-        const rows = parseCSV(csvText).slice(1).filter(r => r.length >= 6 && r[0] && r[3]);
+        const rows = parseCSV(csvText)
+          .slice(1)
+          .filter(r => r.length >= 6 && r[0] && r[0] !== "\u79D1\u76EE" && r[3]);
         const ansMap = { A: 0, B: 1, C: 2, D: 3 };
         return rows.map(r => {
           const ansIdx = ansMap[(r[9] || "A").toUpperCase()] ?? 0;
@@ -1228,11 +1233,24 @@
       badge.style.background = "rgba(124, 58, 237, 0.15)";
       badge.style.color = "#7c3aed";
     } else {
-      badge.textContent = "\u7DB2\x8DEF\u79C1\u4E2D\u984C\u5EAB";
+      badge.textContent = "\u7DB2\u8DEF\u79C1\u4E2D\u984C\u5EAB";
       badge.style.background = "rgba(15, 118, 110, 0.15)";
       badge.style.color = "#0f766e";
     }
 
+    // \u5207\u63DB\u8ECC\u9053\u6642\u81EA\u52D5\u9810\u8A2D\u9078\u53D6\u8A72\u8ECC\u9053\u6709\u8CC7\u6599\u7684\u7B2C\u4E00\u500B\u79D1\u76EE
+    const sourceList = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
+    const subNameMap = { chi: "\u570B\u6587", math: "\u6578\u5B78", eng: "\u82F1\u6587" };
+    if (sourceList.length > 0 && !sourceList.some(l => l.sub === subNameMap[activeLectureSub])) {
+      if (sourceList.some(l => l.sub === "\u6578\u5B78")) activeLectureSub = "math";
+      else if (sourceList.some(l => l.sub === "\u82F1\u6587")) activeLectureSub = "eng";
+      else activeLectureSub = "chi";
+      ["chi", "math", "eng"].forEach(k => {
+        document.getElementById(`lec-tab-${k}`).classList.toggle("active", k === activeLectureSub);
+      });
+    }
+
+    buildExam30();
     renderAll();
     switchStep(state.currentStep || 1);
   }
@@ -1320,12 +1338,9 @@
     const sourceList = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
     const list = sourceList.filter(l => l.sub === targetSub);
 
-    document.getElementById("lecture-count-badge").textContent = `\u672C\u79D1\u5171 ${list.length} \u9805`;
-    document.getElementById("lecture-summary-header").textContent = `\u1F4DA; ${currentSource === "zhixin" ? "\u77E5\u6B23\u52A0\u5F37\u73ED\u5C08\u5C6C\u8B1B\u7FA9\u5EAB" : "\u53F0\u7063\u6559\u80B2\u90E8\u8fad\u5178\u6821\u5C0D\u3001\u6DE1\u6C5F\u5075\u61BA\u6559\u6750"}\uFF08\u7E3D\u8B1B\u7FA9 ${sourceList.length} \u9805\uFF09`;
-
     const container = document.getElementById("lecture-list-container");
     if (list.length === 0) {
-      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">\u66AB\u7121${currentSource === "zhixin" ? "\u77E5\u6B23\u52A0\u5F37\u73ED" : "\u7DB2\u8DEF"}\u8B1B\u7FA9\u5167\u5BB9\uFF0C\u8ACB\u65BC\u8A66\u7B97\u8868\u300C${currentSource === "zhixin" ? "\u77E5\u6B23\u8B1B\u7FA9DLC" : "\u8B1B\u7FA9DLC"}\u300D\u5206\u9801\u65B0\u589E\u3002</div>`;
+      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">\u672C\u79D1\u66AB\u7121${currentSource === "zhixin" ? "\u77E5\u6B23\u52A0\u5F37\u73ED" : "\u7DB2\u8DEF"}\u8B1B\u7FA9\u5167\u5BB9\uFF0C\u8ACB\u5207\u63DB\u5176\u4ED6\u79D1\u76EE\u95B1\u8B80\u3002</div>`;
       document.getElementById("warmup-container").innerHTML = "";
       return;
     }
