@@ -137,7 +137,7 @@
       font-size: 13px !important;
       white-space: normal !important;
       word-break: break-all;
-      max-width: 65%;
+      max-width: 62%;
     }
 
     .btn-primary {
@@ -937,7 +937,7 @@
   </div>
 
 <script>
-  const STORAGE_KEY = "private_school_sprint_flagship_v11";
+  const STORAGE_KEY = "private_school_sprint_flagship_v12";
   const SHEET_ID = "1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA";
 
   const WEEKS_META = [
@@ -1137,25 +1137,15 @@
     document.getElementById("portal-wrong-label").textContent = `${state.wrongBook.length} \u984C`;
     const dlcLabel = document.getElementById("dlc-status-label");
     
-    // Calculate subject-wise breakdowns
-    const lecs = state.dlcLectures;
-    const qs = state.dlcQuestions;
-    const chiLec = lecs.filter(l => l.sub === "國文").length;
-    const mathLec = lecs.filter(l => l.sub === "數學").length;
-    const engLec = lecs.filter(l => l.sub === "英文").length;
-    
-    const chiQ = qs.filter(q => q.sub === "國文").length;
-    const mathQ = qs.filter(q => q.sub === "數學").length;
-    const engQ = qs.filter(q => q.sub === "英文").length;
-
-    const totalLec = lecs.length || 180;
-    const totalQ = qs.length || 206;
+    // Dynamic query of actual total counts from Google Sheets
+    const totalLec = state.dlcLectures.length || 180;
+    const totalQ = state.dlcQuestions.length || 206;
     const timeStr = state.lastSyncTime ? ` (\u66F4\u65B0 ${state.lastSyncTime})` : "";
 
-    if (offline && qs.length === 0) {
+    if (offline && state.dlcQuestions.length === 0) {
       dlcLabel.textContent = "\u793A\u7BC4\u6A21\u5F0F";
     } else {
-      dlcLabel.innerHTML = `講義 ${totalLec} 項 (國${chiLec}/數${mathLec}/英${engLec})<br>題庫 ${totalQ} 題 (國${chiQ}/數${mathQ}/英${engQ})${timeStr}`;
+      dlcLabel.textContent = `已同步 ${totalLec} 講義 / ${totalQ} 題${timeStr}`;
     }
   }
 
@@ -1249,7 +1239,7 @@
     const list = state.dlcLectures.filter(l => l.sub === targetSub);
 
     document.getElementById("lecture-count-badge").textContent = `\u672C\u79D1\u5171 ${list.length} \u9805`;
-    document.getElementById("lecture-summary-header").textContent = `\u1F4DA; \u53F0\u7063\u6559\u80B2\u90E8\u8fad\u5178\u6821\u5C0D\u3001\u6DE1\u6C5F\u5075\u61BA\u6559\u6750（總講義 ${state.dlcLectures.length} 項：國${state.dlcLectures.filter(l=>l.sub==="國文").length}/數${state.dlcLectures.filter(l=>l.sub==="數學").length}/英${state.dlcLectures.filter(l=>l.sub==="英文").length}）`;
+    document.getElementById("lecture-summary-header").textContent = `\u1F4DA; \u53F0\u7063\u6559\u80B2\u90E8\u8fad\u5178\u6821\u5C0D\u3001\u6DE1\u6C5F\u5075\u61BA\u6559\u6750（總講義 ${state.dlcLectures.length} 項）`;
 
     const container = document.getElementById("lecture-list-container");
     if (list.length === 0) {
