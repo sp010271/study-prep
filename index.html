@@ -2,1610 +2,1825 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>&#x79C1;&#x4E2D;&#x885D;&#x523A;&#x6A21;&#x64EC;&#x7AD9;</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>私中衝刺模擬站｜淡江 × 薇閣 15週入學考備考系統</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #eff6ff 48%, #f0fdfa 100%);
-      --glass-bg: rgba(255, 255, 255, 0.82);
-      --glass-border: rgba(255, 255, 255, 0.95);
-      --glass-shadow: 0 12px 36px -6px rgba(15, 23, 42, 0.07), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+      --glass-bg: rgba(255, 255, 255, 0.78);
+      --glass-border: rgba(255, 255, 255, 0.65);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
-      background: var(--bg-gradient);
-      background-attachment: fixed;
-      color: #0f172a;
+      font-family: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 12% 18%, #e0f2fe 0%, transparent 45%),
+                  radial-gradient(circle at 88% 12%, #fef3c7 0%, transparent 40%),
+                  radial-gradient(circle at 50% 92%, #ede9fe 0%, transparent 50%),
+                  #f8fafc;
       min-height: 100vh;
+      color: #0f172a;
+      overflow-x: hidden;
     }
     .liquid-glass {
       background: var(--glass-bg);
-      backdrop-filter: blur(22px) saturate(165%);
-      -webkit-backdrop-filter: blur(22px) saturate(165%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border: 1px solid var(--glass-border);
-      box-shadow: var(--glass-shadow);
+      box-shadow: 0 12px 36px -8px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.85);
     }
-    .liquid-pill {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(226, 232, 240, 0.95);
+    .option-btn {
+      min-height: 52px;
+      transition: all 0.16s ease;
     }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    @keyframes pulseUrgent { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .timer-urgent { animation: pulseUrgent 1s infinite; }
+    .option-eliminated {
+      text-decoration: line-through;
+      opacity: 0.45;
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+    }
+    /* Custom subtle scrollbar for mini grid */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
-<body class="antialiased selection:bg-teal-100 selection:text-teal-950">
+<body class="antialiased selection:bg-indigo-200 selection:text-indigo-900">
 
-  <!-- Toast Banner -->
-  <div id="toast-box" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 -translate-y-3 w-[92%] max-w-md">
-    <div class="liquid-glass px-5 py-3 rounded-2xl text-sm font-bold text-slate-800 flex items-center justify-center gap-2 border border-teal-200 shadow-xl text-center">
-      <span id="toast-icon">&#x2728;</span>
-      <span id="toast-text"></span>
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden px-5 py-3 rounded-2xl bg-slate-900/95 text-white text-sm font-medium shadow-xl backdrop-blur-md transition-all"></div>
+
+  <!-- Image Lightbox Modal -->
+  <div id="lightboxModal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeLightbox()">
+    <div class="relative max-w-4xl w-full flex flex-col items-center" onclick="event.stopPropagation()">
+      <button onclick="closeLightbox()" class="self-end mb-2 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white text-sm font-semibold">✕ 關閉圖片</button>
+      <img id="lightboxImg" src="" alt="放大圖示" class="max-h-[82vh] w-auto rounded-2xl shadow-2xl bg-white p-2 object-contain" />
     </div>
   </div>
 
-  <!-- =================================================================== -->
-  <!-- VIEW 1: MINIMALIST RITUAL ENTRY PORTAL LOBBY                        -->
-  <!-- =================================================================== -->
-  <div id="portal-view" class="min-h-screen flex items-center justify-center px-4 py-10">
-    <div class="liquid-glass rounded-3xl w-full max-w-md p-8 sm:p-10 text-center space-y-6">
-      <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-teal-700 to-blue-600 text-white text-4xl font-black flex items-center justify-center shadow-lg shadow-teal-700/25">
-        &#x52DD;
-      </div>
-
-      <div class="space-y-2">
-        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-          &#x79C1;&#x4E2D;&#x885D;&#x523A;&#x6A21;&#x64EC;&#x7AD9;
-        </h1>
-        <p class="text-xs sm:text-sm text-slate-500 font-semibold">
-          &#x6DE1;&#x6C5F; &times; &#x8587;&#x95A3; 15&#x9031;&#x5165;&#x5B78;&#x8003;&#x5099;&#x8003;&#x7CFB;&#x7D71;&#xFF08;2026/11/16 &ndash; 2027/02/27&#xFF09;
-        </p>
-      </div>
-
-      <div class="bg-white/95 border border-slate-200/85 rounded-2xl p-4 text-left space-y-3 shadow-sm">
-        <div class="flex justify-between items-center text-sm">
-          <span class="text-slate-500 font-semibold">&#x76EE;&#x524D;&#x63A8;&#x9032;&#x9031;&#x6B21;</span>
-          <strong id="portal-week-label" class="text-teal-700 font-black">&#x7B2C; 1 &#x9031;</strong>
+  <!-- Scratchpad Modal (隨手計算草稿紙) -->
+  <div id="scratchpadModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col border border-slate-200">
+      <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">✏️</span>
+          <h3 class="font-bold text-slate-800 text-base sm:text-lg">隨手計算草稿紙</h3>
+          <span class="hidden sm:inline text-xs text-slate-500">（支援觸控、滑鼠與 Apple Pencil）</span>
         </div>
-        <div class="border-t border-dashed border-slate-200 pt-2.5 flex justify-between items-center text-sm">
-          <span class="text-slate-500 font-semibold">&#x7D2F;&#x7A4D;&#x901A;&#x95DC;&#x9032;&#x5EA6;</span>
-          <strong id="portal-passed-label" class="text-slate-800 font-black">0 / 15 &#x9031;</strong>
-        </div>
-        <div class="border-t border-dashed border-slate-200 pt-2.5 flex justify-between items-center text-sm">
-          <span class="text-slate-500 font-semibold">&#x7D2F;&#x7A4D;&#x5DF2;&#x5237;&#x984C;&#x6578;</span>
-          <strong id="portal-solved-label" class="text-blue-700 font-black">0 &#x984C;</strong>
-        </div>
-        <div class="border-t border-dashed border-slate-200 pt-2.5 flex justify-between items-center text-sm">
-          <span class="text-slate-500 font-semibold">&#x5F85;&#x8907;&#x7FD2;&#x932F;&#x984C;&#x6578;</span>
-          <strong id="portal-wrong-label" class="text-rose-600 font-black">0 &#x984C;</strong>
+        <div class="flex items-center gap-2">
+          <button onclick="setScratchColor('#0f172a')" class="w-7 h-7 rounded-full bg-slate-900 border-2 border-white shadow ring-1 ring-slate-300" title="黑筆"></button>
+          <button onclick="setScratchColor('#2563eb')" class="w-7 h-7 rounded-full bg-blue-600 border-2 border-white shadow ring-1 ring-slate-300" title="藍筆"></button>
+          <button onclick="setScratchColor('#dc2626')" class="w-7 h-7 rounded-full bg-red-600 border-2 border-white shadow ring-1 ring-slate-300" title="紅筆"></button>
+          <button onclick="clearScratchpad()" class="ml-1 px-3.5 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs sm:text-sm font-bold">🗑️ 清空畫布</button>
+          <button onclick="toggleScratchpad(false)" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs sm:text-sm font-bold">✕ 關閉</button>
         </div>
       </div>
-
-      <button onclick="enterStudyStation()" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white text-base sm:text-lg font-black shadow-lg shadow-teal-700/25 transition transform active:scale-[0.98] cursor-pointer">
-        &#x1F680; &#x958B;&#x59CB;&#x4ECA;&#x65E5;&#x885D;&#x523A;&#x6A21;&#x64EC; &rarr;
-      </button>
+      <div id="scratchCanvasWrap" class="relative w-full h-[58vh] sm:h-[62vh] bg-[#fffef9] touch-none cursor-crosshair">
+        <canvas id="scratchCanvas" class="block w-full h-full"></canvas>
+      </div>
     </div>
   </div>
 
-  <!-- =================================================================== -->
-  <!-- VIEW 2: MAIN STUDY STATION (90-ITEM LIBRARY + 30-QUESTION EXAM)     -->
-  <!-- =================================================================== -->
-  <div id="app-view" class="max-w-5xl mx-auto px-3 sm:px-6 pt-4 pb-24 hidden space-y-5">
-
-    <!-- Top Navigation Bar -->
-    <header class="liquid-glass rounded-3xl px-4 sm:px-6 py-3.5 flex flex-wrap justify-between items-center gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-700 to-blue-600 text-white font-black text-lg flex items-center justify-center shadow-sm">
-          &#x52DD;
-        </div>
-        <div>
-          <h1 class="font-black text-base sm:text-lg text-slate-900 leading-tight">&#x79C1;&#x4E2D;&#x885D;&#x523A;&#x6A21;&#x64EC;&#x7AD9;</h1>
-          <p id="header-date-range" class="text-xs text-slate-500 font-semibold"></p>
-        </div>
+  <!-- Two-Step Submit Confirmation Modal -->
+  <div id="submitConfirmModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 border border-slate-200">
+      <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-2xl font-bold mb-4">📝</div>
+      <h3 class="text-xl font-extrabold text-slate-900 mb-2">確定要交卷並批改嗎？</h3>
+      <p id="submitConfirmText" class="text-slate-600 text-sm leading-relaxed mb-6"></p>
+      <div class="flex gap-3">
+        <button onclick="closeSubmitModal()" class="flex-1 py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm">再檢查一下</button>
+        <button onclick="finalizeExam()" class="flex-1 py-3 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-200">確認交卷批改</button>
       </div>
-      <button onclick="returnToPortal()" class="liquid-pill hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition cursor-pointer">
-        &#x8FD4;&#x56DE;&#x9996;&#x9801;
-      </button>
-    </header>
+    </div>
+  </div>
 
-    <!-- 3 Key Metrics -->
-    <section class="grid grid-cols-3 gap-2.5 sm:gap-4">
-      <div class="liquid-glass rounded-2xl p-3.5 sm:p-4 text-center">
-        <div class="text-[11px] sm:text-xs text-slate-500 font-bold mb-1">&#x8DDD;&#x96E2; 2/27 &#x8003;&#x8A66;&#x5012;&#x6578;</div>
-        <div id="stat-countdown" class="text-lg sm:text-2xl font-black text-teal-700">-- &#x5929;</div>
-      </div>
-      <div class="liquid-glass rounded-2xl p-3.5 sm:p-4 text-center">
-        <div class="text-[11px] sm:text-xs text-slate-500 font-bold mb-1">&#x901A;&#x95DC;&#x9031;&#x6B21;&#x9032;&#x5EA6;</div>
-        <div id="stat-passed" class="text-lg sm:text-2xl font-black text-blue-600">0 / 15</div>
-      </div>
-      <div class="liquid-glass rounded-2xl p-3.5 sm:p-4 text-center">
-        <div class="text-[11px] sm:text-xs text-slate-500 font-bold mb-1">&#x7D2F;&#x7A4D;&#x5DF2;&#x5237;&#x65B0;&#x984C;</div>
-        <div id="stat-solved" class="text-lg sm:text-2xl font-black text-emerald-600">0 &#x984C;</div>
-      </div>
-    </section>
+  <!-- Main Container -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
-    <!-- 15-Week Horizontal Selector -->
-    <section class="liquid-glass rounded-3xl p-3 sm:p-4">
-      <div class="flex items-center justify-between px-1 mb-2">
-        <span class="text-xs font-extrabold text-slate-600">&#x1F4C5; 15&#x9031;&#x87BA;&#x65CB;&#x8AB2;&#x7A0B;&#x5C0E;&#x89BD;&#xFF08;2026/11/16 &ndash; 2027/02/27&#xFF09;</span>
-        <span class="text-[11px] text-slate-400 font-semibold">&#x5DE6;&#x53F3;&#x6ED1;&#x52D5;&#x5207;&#x63DB;</span>
-      </div>
-      <div id="week-strip" class="flex gap-2 overflow-x-auto no-scrollbar py-1"></div>
-    </section>
-
-    <!-- Current Week Header Card -->
-    <section class="liquid-glass rounded-3xl p-4 sm:p-6 flex flex-wrap justify-between items-center gap-3">
-      <div>
-        <span id="week-stage-pill" class="inline-block px-3 py-1 rounded-full text-xs font-black bg-teal-700/10 text-teal-800 mb-1.5"></span>
-        <h2 id="week-title-text" class="text-lg sm:text-2xl font-black text-slate-900"></h2>
-      </div>
-      <span id="week-pass-badge" class="text-xs sm:text-sm font-black px-3.5 py-1.5 rounded-xl bg-white/90 border border-slate-200"></span>
-    </section>
-
-    <!-- 3-Step Main Tabs -->
-    <section class="grid grid-cols-3 gap-2 sm:gap-3">
-      <button id="step-tab-1" onclick="switchStep(1)" class="p-3 sm:p-4 rounded-2xl border-2 border-teal-700 bg-white text-xs sm:text-sm font-black text-teal-800 shadow-sm transition cursor-pointer">
-        &#x6B65;&#x9A5F;&#x4E00;&#xFF1A;90&#x9805;&#x7CBE;&#x9078;&#x6559;&#x5B78;&#x5EAB;&#xFF08;&#x6BCF;&#x79D1;30&#x9805;&#xFF09;
-      </button>
-      <button id="step-tab-2" onclick="switchStep(2)" class="p-3 sm:p-4 rounded-2xl border border-slate-300/70 bg-white/75 text-xs sm:text-sm font-extrabold text-slate-600 transition cursor-pointer">
-        &#x6B65;&#x9A5F;&#x4E8C;&#xFF1A;30&#x984C;&#x5BE6;&#x6230;&#x6E2C;&#x9A57;&#xFF08;30&#x5206;&#x9418;&#x81E8;&#x5834;&#x8A08;&#x6642;&#xFF09;
-      </button>
-      <button id="step-tab-3" onclick="switchStep(3)" class="p-3 sm:p-4 rounded-2xl border border-slate-300/70 bg-white/75 text-xs sm:text-sm font-extrabold text-slate-600 transition cursor-pointer">
-        &#x6B65;&#x9A5F;&#x4E09;&#xFF1A;&#x932F;&#x984C;&#x8907;&#x7FD2;&#x672C;
-      </button>
-    </section>
-
-    <!-- ================================================================= -->
-    <!-- STEP 1 PANEL: 90-ITEM STRUCTURED TEACHING LIBRARY (30/SUBJECT)    -->
-    <!-- ================================================================= -->
-    <section id="step-panel-1" class="space-y-4">
-      <!-- 10-Minute Reading Guide & Checklist Bar -->
-      <div class="liquid-glass rounded-3xl p-4 sm:p-5 bg-gradient-to-r from-teal-50/90 via-white/95 to-blue-50/90 border border-teal-200/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-        <div class="space-y-1">
-          <div class="text-xs sm:text-sm font-black text-teal-950 flex items-center gap-1.5">
-            <span>&#x1F4DA;</span>
-            <span>&#x5EFA;&#x8B70;&#x7CBE;&#x8B80; 10 &#x5206;&#x9418;&#xFF5C;&#x672C;&#x9031;&#x6536;&#x9304; 90 &#x9805;&#x8003;&#x9EDE;&#xFF08;&#x570B;30 &#xFF0B; &#x6578;30 &#xFF0B; &#x82F1;30&#xFF09;</span>
+    <!-- ==================== VIEW 0: PORTAL ENTRY LOBBY ==================== -->
+    <section id="lobbyView" class="space-y-6">
+      <div class="liquid-glass rounded-3xl p-6 sm:p-10 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="flex items-start sm:items-center gap-4 sm:gap-5">
+            <!-- '勝' Victory Badge -->
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-600 text-white flex flex-col items-center justify-center shadow-xl shadow-orange-500/25 shrink-0 border-2 border-white/70">
+              <span class="text-3xl sm:text-4xl font-black leading-none tracking-tight">勝</span>
+              <span class="text-[10px] font-bold tracking-widest mt-1 opacity-95">私中必勝</span>
+            </div>
+            <div>
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-2">
+                <span>🎯 考前全真衝刺特訓</span>
+              </div>
+              <h1 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">私中衝刺模擬站</h1>
+              <p class="text-slate-600 text-sm sm:text-base font-medium mt-1">淡江 × 薇閣 15週入學考備考系統（2026/11/16 – 2027/02/27）</p>
+            </div>
           </div>
-          <p class="text-xs text-slate-600">
-            &#x6B65;&#x9A5F;&#x4E8C;&#x7684; 30 &#x984C;&#x5168;&#x771F;&#x6E2C;&#x9A57;&#x7686;&#x5F9E;&#x6B64; 90 &#x9805;&#x6559;&#x5B78;&#x5EAB;&#x4E2D;&#x62BD;&#x8003;&#x4E26;&#x884D;&#x751F;&#x8B8A;&#x5316;&#xFF08;10 &#x51FA; 3 &#x6A21;&#x5F0F;&#xFF09;&#x3002;
-          </p>
-        </div>
-        <div class="flex items-center gap-2 self-end md:self-center shrink-0">
-          <span id="study-timer-pill" class="font-mono text-xs font-black px-3 py-1.5 rounded-xl bg-white border border-teal-200 text-teal-800 shadow-sm">
-            &#x23F1;&#xFE0F; &#x7CBE;&#x8B80; 00:00
-          </span>
-          <span id="study-done-pill" class="text-xs font-black px-3 py-1.5 rounded-xl bg-teal-700 text-white">
-            0 / 3 &#x79D1;&#x5DF2;&#x8B80;
-          </span>
-        </div>
-      </div>
-
-      <!-- Subject Library Switcher Tabs -->
-      <div class="grid grid-cols-3 gap-2">
-        <button id="lib-tab-chi" onclick="switchLibSubject('chi')" class="py-3 px-2 sm:px-4 rounded-2xl border-2 border-teal-700 bg-white text-teal-800 text-xs sm:text-sm font-black shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5">
-          <span>&#x1F4D6; &#x570B;&#x6587;&#x8B1B;&#x7FA9;&#x5EAB; (30&#x9805;)</span>
-          <span id="lib-check-chi"></span>
-        </button>
-        <button id="lib-tab-math" onclick="switchLibSubject('math')" class="py-3 px-2 sm:px-4 rounded-2xl border border-slate-300/70 bg-white/80 text-slate-600 text-xs sm:text-sm font-extrabold transition cursor-pointer flex items-center justify-center gap-1.5">
-          <span>&#x1F4D0; &#x6578;&#x5B78;&#x8B1B;&#x7FA9;&#x5EAB; (30&#x9805;)</span>
-          <span id="lib-check-math"></span>
-        </button>
-        <button id="lib-tab-eng" onclick="switchLibSubject('eng')" class="py-3 px-2 sm:px-4 rounded-2xl border border-slate-300/70 bg-white/80 text-slate-600 text-xs sm:text-sm font-extrabold transition cursor-pointer flex items-center justify-center gap-1.5">
-          <span>&#x1F524; &#x82F1;&#x6587;&#x8B1B;&#x7FA9;&#x5EAB; (30&#x9805;)</span>
-          <span id="lib-check-eng"></span>
-        </button>
-      </div>
-
-      <!-- 30-Item Subject Library Body -->
-      <div id="library-body-container" class="space-y-4"></div>
-
-      <!-- Subject Completion Checklist & Enter 30-Question Exam CTA -->
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4">
-        <div class="text-xs sm:text-sm font-black text-slate-800 text-center">
-          &#x1F4CB; &#x7CBE;&#x8B80;&#x6AA2;&#x6838;&#x6E05;&#x55AE;&#xFF08;&#x52FE;&#x9078;&#x5B8C;&#x6210;&#x5F8C;&#x5373;&#x53EF;&#x9032;&#x5165; 30 &#x984C;&#x5168;&#x771F;&#x6E2C;&#x9A57;&#xFF09;
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          <label class="flex items-center justify-center gap-2 p-3 rounded-2xl bg-white/90 border border-slate-200 cursor-pointer text-xs sm:text-sm font-bold text-slate-800 hover:border-teal-500">
-            <input id="chk-read-chi" type="checkbox" onchange="toggleSubjectRead('chi')" class="w-4 h-4 accent-teal-700 cursor-pointer" />
-            <span>&#x6211;&#x5DF2;&#x7CBE;&#x8B80;&#x570B;&#x6587; 30 &#x9805;</span>
-          </label>
-          <label class="flex items-center justify-center gap-2 p-3 rounded-2xl bg-white/90 border border-slate-200 cursor-pointer text-xs sm:text-sm font-bold text-slate-800 hover:border-blue-500">
-            <input id="chk-read-math" type="checkbox" onchange="toggleSubjectRead('math')" class="w-4 h-4 accent-blue-600 cursor-pointer" />
-            <span>&#x6211;&#x5DF2;&#x7CBE;&#x8B80;&#x6578;&#x5B78; 30 &#x9805;</span>
-          </label>
-          <label class="flex items-center justify-center gap-2 p-3 rounded-2xl bg-white/90 border border-slate-200 cursor-pointer text-xs sm:text-sm font-bold text-slate-800 hover:border-amber-500">
-            <input id="chk-read-eng" type="checkbox" onchange="toggleSubjectRead('eng')" class="w-4 h-4 accent-amber-600 cursor-pointer" />
-            <span>&#x6211;&#x5DF2;&#x7CBE;&#x8B80;&#x82F1;&#x6587; 30 &#x9805;</span>
-          </label>
         </div>
 
-        <div class="text-center pt-1 space-y-2">
-          <button id="btn-enter-30q" onclick="handleEnterExam()" class="w-full sm:w-auto min-w-[280px] py-4 px-8 rounded-2xl bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-800 hover:to-teal-700 text-white text-sm sm:text-base font-black shadow-lg shadow-teal-700/25 transition cursor-pointer">
-            &#x9032;&#x5165;&#x672C;&#x9031; 30 &#x984C;&#x5168;&#x771F;&#x6E2C;&#x9A57; &rarr;
+        <!-- Status Card -->
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="bg-white/85 rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <div class="text-xs font-semibold text-slate-500">📅 目前推進週次</div>
+            <div id="statCurrentWeek" class="text-xl font-black text-slate-900 mt-1">第 1 週 / 共 15 週</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">倒數衝刺節奏推進中</div>
+          </div>
+          <div class="bg-white/85 rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <div class="text-xs font-semibold text-slate-500">🏆 累積通關進度</div>
+            <div id="statPassedWeeks" class="text-xl font-black text-emerald-600 mt-1">0 / 15 週</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">每次完賽自動推進進度</div>
+          </div>
+          <div class="bg-white/85 rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <div class="text-xs font-semibold text-slate-500">📌 待複習錯題數</div>
+            <div id="statWrongCount" class="text-xl font-black text-rose-600 mt-1">0 題</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">精準消滅弱點題型</div>
+          </div>
+          <div class="bg-white/85 rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+            <div class="text-xs font-semibold text-slate-500">☁️ 雲端題庫同步狀態</div>
+            <div id="statSyncStatus" class="text-base sm:text-lg font-extrabold text-indigo-700 mt-1.5 whitespace-nowrap overflow-hidden text-ellipsis">正在連線雲端題庫...</div>
+            <div id="statSyncSub" class="text-[11px] text-slate-400 mt-0.5 whitespace-nowrap">雙工作表即時讀取</div>
+          </div>
+        </div>
+
+        <!-- Primary Action Buttons -->
+        <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+          <button onclick="enterWorkspace('step1')" class="flex-1 py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-600 hover:from-indigo-700 hover:to-sky-700 text-white font-extrabold text-base sm:text-lg shadow-xl shadow-indigo-500/25 transition-all active:scale-[0.99] text-center">
+            🚀 開始今日衝刺模擬 →
           </button>
-          <div>
-            <button onclick="switchStep(2)" class="text-xs text-slate-400 hover:text-slate-600 underline cursor-pointer">
-              &#x5DF2;&#x719F;&#x6089;&#x5168;&#x90E8;&#x89C0;&#x5FF5;&#xFF0C;&#x76F4;&#x63A5;&#x958B;&#x59CB;&#x8A08;&#x6642;&#x6E2C;&#x9A57;
+          <button id="syncNowBtn" onclick="syncCloudData(true)" class="py-4 px-6 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-bold text-sm sm:text-base shadow-sm transition-all active:scale-[0.99] whitespace-nowrap">
+            🔄 立即同步最新題庫
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Step Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button onclick="enterWorkspace('step1')" class="liquid-glass rounded-2xl p-5 text-left hover:border-indigo-300 transition-all group">
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-2.5 py-1 rounded-lg bg-sky-100 text-sky-800 text-xs font-extrabold">STEP 1</span>
+            <span class="text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+          <h2 class="font-extrabold text-slate-900 text-lg">讀取雲端講義 DLC</h2>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">國語文、數學、英文核心考點精講與隨堂暖身檢核。</p>
+        </button>
+
+        <button onclick="enterWorkspace('step2')" class="liquid-glass rounded-2xl p-5 text-left hover:border-indigo-300 transition-all group">
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-extrabold">STEP 2</span>
+            <span class="text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+          <h2 class="font-extrabold text-slate-900 text-lg">30 題限時全真模擬</h2>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">國10＋數10＋英10 黃金配比，附隨手計算草稿紙與長文防疲勞閱讀框。</p>
+        </button>
+
+        <button onclick="enterWorkspace('step3')" class="liquid-glass rounded-2xl p-5 text-left hover:border-indigo-300 transition-all group">
+          <div class="flex items-center justify-between mb-2">
+            <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 text-xs font-extrabold">STEP 3</span>
+            <span class="text-slate-400 group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+          <h2 class="font-extrabold text-slate-900 text-lg">錯題精準複習本</h2>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">紅綠並排對照解析，逐題攻克盲點直到完全搞懂。</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== WORKSPACE WRAPPER (STEPS 1–3) ==================== -->
+    <section id="workspaceView" class="hidden space-y-6">
+      <!-- Top Navigation Bar -->
+      <header class="liquid-glass rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+        <button onclick="returnToLobby()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold flex items-center gap-1.5">
+          ← 返回大廳
+        </button>
+
+        <nav class="flex items-center gap-1.5 sm:gap-2 bg-slate-100/90 p-1 rounded-xl">
+          <button id="navStep1" onclick="switchStep('step1')" class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-extrabold transition-all">
+            1. 雲端講義
+          </button>
+          <button id="navStep2" onclick="switchStep('step2')" class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-extrabold transition-all">
+            2. 30題模考
+          </button>
+          <button id="navStep3" onclick="switchStep('step3')" class="px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-extrabold transition-all flex items-center gap-1">
+            3. 錯題本 <span id="navWrongBadge" class="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[11px]">0</span>
+          </button>
+        </nav>
+
+        <div id="miniSyncBadge" class="hidden md:block text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100 whitespace-nowrap">
+          已同步
+        </div>
+      </header>
+
+      <!-- ==================== STEP 1: TEACHING LIBRARY ==================== -->
+      <div id="step1Content" class="space-y-6">
+        <div class="liquid-glass rounded-3xl p-5 sm:p-7">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 pb-5">
+            <div>
+              <span class="text-xs font-extrabold text-sky-600 tracking-wider uppercase">STEP 1 · 考前觀念掃描</span>
+              <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">雲端重點講義 DLC</h2>
+            </div>
+            <!-- Subject Tabs -->
+            <div class="flex gap-2 bg-slate-100 p-1.5 rounded-2xl self-start sm:self-auto">
+              <button onclick="selectLectureSubject('國文')" id="lecTab_國文" class="px-4 py-2 rounded-xl text-sm font-extrabold transition-all">國文講義</button>
+              <button onclick="selectLectureSubject('數學')" id="lecTab_數學" class="px-4 py-2 rounded-xl text-sm font-extrabold transition-all">數學講義</button>
+              <button onclick="selectLectureSubject('英文')" id="lecTab_英文" class="px-4 py-2 rounded-xl text-sm font-extrabold transition-all">英文講義</button>
+            </div>
+          </div>
+
+          <!-- Lectures List -->
+          <div id="lectureListContainer" class="mt-6 space-y-4"></div>
+
+          <!-- Interactive Warm-up Check Questions (3 per subject) -->
+          <div class="mt-8 pt-6 border-t border-slate-200/80">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">⚡ 隨堂暖身檢核（3 題即時練）</h3>
+                <p class="text-xs text-slate-500">讀完講義立刻小試身手，點擊選項立即查看解析</p>
+              </div>
+              <button onclick="renderWarmupQuestions(true)" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700">🔄 換 3 題暖身</button>
+            </div>
+            <div id="warmupContainer" class="space-y-4"></div>
+          </div>
+
+          <!-- CTA to Step 2 -->
+          <div class="mt-8 pt-5 border-t border-slate-200/80 flex justify-end">
+            <button onclick="switchStep('step2')" class="w-full sm:w-auto px-7 py-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-base shadow-lg shadow-indigo-200 transition-all">
+              觀念複習完畢，進入 30 題全真模擬考 →
             </button>
           </div>
         </div>
       </div>
+
+      <!-- ==================== STEP 2: 30-QUESTION MOCK EXAM ==================== -->
+      <div id="step2Content" class="hidden space-y-5">
+        <!-- Sticky Exam HUD -->
+        <div id="examHud" class="sticky top-2 z-30 liquid-glass rounded-2xl p-3 sm:p-4 border border-indigo-200/80 shadow-lg">
+          <div class="flex flex-wrap items-center justify-between gap-2.5">
+            <!-- Timer & Pause -->
+            <div class="flex items-center gap-2">
+              <div class="px-3.5 py-2 rounded-xl bg-slate-900 text-white font-mono font-extrabold text-base sm:text-lg flex items-center gap-2">
+                <span>⏱️</span>
+                <span id="examTimerDisplay">30:00</span>
+              </div>
+              <button id="pauseBtn" onclick="toggleExamPause()" class="px-3 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs sm:text-sm font-bold">
+                ⏸️ 暫停
+              </button>
+            </div>
+
+            <!-- Tools: Scratchpad & New Set -->
+            <div class="flex items-center gap-2">
+              <button onclick="toggleScratchpad(true)" class="px-3.5 py-2 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-900 text-xs sm:text-sm font-extrabold">
+                ✏️ 草稿紙
+              </button>
+              <button onclick="startNewExam(true)" class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs sm:text-sm font-bold">
+                🔄 換新題
+              </button>
+              <button id="hudSubmitBtn" onclick="promptSubmitExam()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold shadow-sm">
+                交卷批改
+              </button>
+            </div>
+          </div>
+
+          <!-- Clickable 1–30 Mini Answer Grid -->
+          <div class="mt-3 pt-2.5 border-t border-slate-200/70">
+            <div class="flex items-center justify-between text-[11px] text-slate-500 mb-1.5">
+              <span>題號快速跳轉（綠底＝已作答｜橘框＝已標記🚩）</span>
+              <span id="answeredProgressText" class="font-bold text-slate-700">已答 0 / 30 題</span>
+            </div>
+            <div id="miniAnswerGrid" class="grid grid-cols-10 sm:grid-cols-15 gap-1.5"></div>
+          </div>
+        </div>
+
+        <!-- Paused Overlay Notice -->
+        <div id="examPausedBanner" class="hidden liquid-glass rounded-3xl p-10 text-center border-2 border-amber-300">
+          <div class="text-4xl mb-3">⏸️</div>
+          <h3 class="text-xl font-black text-slate-900">測驗計時已暫停</h3>
+          <p class="text-sm text-slate-600 mt-1 mb-5">休息一下喝口水，準備好隨時繼續衝刺！</p>
+          <button onclick="toggleExamPause()" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm">▶️ 繼續作答</button>
+        </div>
+
+        <!-- Active Question Card -->
+        <div id="examQuestionArea" class="space-y-4">
+          <!-- Sticky/Collapsible Reading Box (auto-shown for long passages) -->
+          <div id="readingPassageBox" class="hidden sticky top-[138px] sm:top-[132px] z-20 bg-amber-50/95 backdrop-blur-md border-2 border-amber-300/90 rounded-2xl p-4 shadow-md">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <span class="text-xs font-extrabold text-amber-900 bg-amber-200/80 px-2.5 py-1 rounded-lg">📖 長篇閱讀題組防疲勞閱讀框</span>
+              <button id="togglePassageBtn" onclick="toggleReadingPassage()" class="px-3 py-1 rounded-lg bg-white hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-extrabold">
+                收合文章
+              </button>
+            </div>
+            <div id="readingPassageBody" class="text-sm sm:text-base text-slate-800 leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto pr-1"></div>
+          </div>
+
+          <!-- Question Main Card -->
+          <div id="currentQuestionCard" class="liquid-glass rounded-3xl p-5 sm:p-8"></div>
+        </div>
+
+        <!-- Post-Exam Results & Side-by-Side Comparison View -->
+        <div id="examResultArea" class="hidden space-y-6"></div>
+      </div>
+
+      <!-- ==================== STEP 3: WRONG-ANSWER NOTEBOOK ==================== -->
+      <div id="step3Content" class="hidden space-y-6">
+        <div class="liquid-glass rounded-3xl p-5 sm:p-7">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-5">
+            <div>
+              <span class="text-xs font-extrabold text-rose-600 tracking-wider uppercase">STEP 3 · 弱點精準掃除</span>
+              <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">專屬錯題複習本</h2>
+              <p class="text-xs sm:text-sm text-slate-500 mt-1">每次模考答錯的題目皆會自動收錄於此，徹底弄懂後即可點擊移除。</p>
+            </div>
+            <div id="wrongFilterTabs" class="flex gap-1.5 bg-slate-100 p-1 rounded-xl self-start">
+              <button onclick="setWrongFilter('ALL')" id="wf_ALL" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-white text-slate-900 shadow-sm">全部</button>
+              <button onclick="setWrongFilter('國文')" id="wf_國文" class="px-3 py-1.5 rounded-lg text-xs font-extrabold text-slate-600">國文</button>
+              <button onclick="setWrongFilter('數學')" id="wf_數學" class="px-3 py-1.5 rounded-lg text-xs font-extrabold text-slate-600">數學</button>
+              <button onclick="setWrongFilter('英文')" id="wf_英文" class="px-3 py-1.5 rounded-lg text-xs font-extrabold text-slate-600">英文</button>
+            </div>
+          </div>
+
+          <div id="wrongNotebookList" class="mt-6 space-y-4"></div>
+        </div>
+      </div>
+
+      <!-- Footer with Two-Click Safe Reset -->
+      <footer class="pt-4 pb-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 border-t border-slate-200/70">
+        <div>私中衝刺模擬站 · 淡江 × 薇閣 15週入學考備考系統</div>
+        <div>
+          <button id="safeResetBtn" onclick="handleSafeReset()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-slate-600 hover:text-rose-700 font-bold transition-all">
+            🗑️ 重置所有作答與錯題紀錄
+          </button>
+        </div>
+      </footer>
     </section>
-
-    <!-- ================================================================= -->
-    <!-- STEP 2 PANEL: 30-QUESTION FULL MOCK EXAM (30 MINUTES TIMED)       -->
-    <!-- ================================================================= -->
-    <section id="step-panel-2" class="hidden space-y-4">
-      <!-- Sticky Timer & Subject Filter Bar -->
-      <div class="liquid-glass rounded-3xl p-4 flex flex-col lg:flex-row justify-between items-center gap-3 sticky top-3 z-30 shadow-md">
-        <div class="flex flex-wrap items-center justify-center gap-2.5">
-          <span id="exam-timer-clock" class="font-mono text-xl font-black px-4 py-1.5 rounded-xl bg-rose-50 text-rose-600 border border-rose-200">
-            30:00
-          </span>
-          <button id="exam-timer-btn" onclick="toggleExamTimer()" class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold cursor-pointer">
-            &#x66AB;&#x505C;&#x8A08;&#x6642;
-          </button>
-          <span id="exam-answered-counter" class="text-xs font-black px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700">
-            &#x5DF2;&#x4F5C;&#x7B54; 0 / 30 &#x984C;
-          </span>
-        </div>
-
-        <div class="flex flex-wrap items-center justify-center gap-1.5">
-          <button id="flt-ALL" onclick="setExamFilter('ALL')" class="px-3 py-1.5 rounded-xl text-xs font-black bg-teal-700 text-white cursor-pointer">
-            &#x5168;&#x90E8; 30 &#x984C;
-          </button>
-          <button id="flt-CHI" onclick="setExamFilter('CHI')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/90 text-slate-700 border border-slate-200 cursor-pointer">
-            &#x570B;&#x6587; (1-10)
-          </button>
-          <button id="flt-MATH" onclick="setExamFilter('MATH')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/90 text-slate-700 border border-slate-200 cursor-pointer">
-            &#x6578;&#x5B78; (11-20)
-          </button>
-          <button id="flt-ENG" onclick="setExamFilter('ENG')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white/90 text-slate-700 border border-slate-200 cursor-pointer">
-            &#x82F1;&#x6587; (21-30)
-          </button>
-          <button onclick="refreshExamQuestions()" class="px-3 py-1.5 rounded-xl text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 cursor-pointer">
-            &#x1F504; &#x63DB;&#x65B0;&#x984C;&#x91CD;&#x5237;&#x672C;&#x9031;
-          </button>
-        </div>
-      </div>
-
-      <!-- Difficulty Legend -->
-      <div class="flex flex-wrap items-center justify-between gap-2 px-2 text-xs text-slate-500 font-semibold">
-        <span>&#x96E3;&#x5EA6;&#x914D;&#x7F6E;&#xFF1A;&#x6BCF;&#x79D1; 4 &#x57FA;&#x790E;&#x984C; &#xFF0B; 4 &#x9032;&#x968E;&#x984C; &#xFF0B; 2 &#x6311;&#x6230;&#x984C;&#xFF08;&#x5168;&#x5377;&#x5171; 30 &#x984C;&#xFF09;</span>
-        <span>&#x9047;&#x5230;&#x5361;&#x95DC;&#x53EF;&#x9EDE;&#x300C;&#x1F4A1; &#x63D0;&#x793A;&#x300D;&#x7372;&#x5F97;&#x5169;&#x6BB5;&#x5F0F;&#x601D;&#x8DEF;&#x5F15;&#x5C0E;</span>
-      </div>
-
-      <!-- 30 Questions Container -->
-      <div id="exam-questions-list" class="space-y-4"></div>
-
-      <!-- Submit Button -->
-      <div id="exam-submit-box" class="liquid-glass rounded-3xl p-6 text-center space-y-3">
-        <p class="text-xs sm:text-sm text-slate-600 font-medium">
-          &#x8ACB;&#x78BA;&#x8A8D;&#x5DF2;&#x5B8C;&#x6210;&#x6240;&#x6709; 30 &#x984C;&#x4F5C;&#x7B54;&#xFF0C;&#x4EA4;&#x5377;&#x5F8C;&#x7CFB;&#x7D71;&#x5C07;&#x7ACB;&#x5373;&#x6279;&#x6539;&#x4E26;&#x532F;&#x5165;&#x932F;&#x984C;&#x672C;&#x3002;
-        </p>
-        <button onclick="submitFullExam()" class="w-full max-w-md py-4 px-6 rounded-2xl bg-gradient-to-r from-teal-700 to-emerald-600 hover:from-teal-800 hover:to-emerald-700 text-white text-base sm:text-lg font-black shadow-lg transition cursor-pointer">
-          &#x2705; &#x4EA4;&#x5377;&#x4E26;&#x7ACB;&#x5373;&#x6279;&#x6539;&#xFF08;&#x5168;&#x5377; 30 &#x984C;&#xFF09;
-        </button>
-      </div>
-
-      <!-- Exam Result Scoreboard -->
-      <div id="exam-result-card" class="liquid-glass rounded-3xl p-6 sm:p-8 hidden border-2 border-teal-300 space-y-5">
-        <div class="text-center space-y-2">
-          <span class="inline-block px-3.5 py-1 rounded-full bg-teal-100 text-teal-900 text-xs font-black">&#x1F389; 30 &#x984C;&#x5168;&#x771F;&#x6A21;&#x64EC;&#x6210;&#x7E3E;&#x55AE;</span>
-          <div id="res-total-score" class="text-3xl sm:text-4xl font-black text-slate-900"></div>
-          <p id="res-feedback-msg" class="text-sm sm:text-base text-slate-600 font-semibold"></p>
-        </div>
-
-        <div id="res-subject-breakdown" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
-
-        <div class="flex flex-wrap justify-center gap-3 pt-2">
-          <button onclick="refreshExamQuestions()" class="px-5 py-3 rounded-2xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-sm font-bold cursor-pointer">
-            &#x1F504; &#x63DB;&#x65B0;&#x984C;&#x518D;&#x6230;&#x4E00;&#x56DE;
-          </button>
-          <button onclick="switchStep(3)" class="px-6 py-3 rounded-2xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-black shadow cursor-pointer">
-            &#x524D;&#x5F80;&#x932F;&#x984C;&#x8907;&#x7FD2;&#x672C; &rarr;
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================================================================= -->
-    <!-- STEP 3 PANEL: WRONG-QUESTION BOOK                                 -->
-    <!-- ================================================================= -->
-    <section id="step-panel-3" class="hidden space-y-4">
-      <div id="wrong-book-list" class="space-y-4"></div>
-    </section>
-
   </div>
 
-<script>
-// ============================================================================
-// 1. PURE 7-BIT ASCII 15-WEEK CURRICULUM & 90-ITEM KNOWLEDGE ENGINE
-// ============================================================================
-const STORAGE_KEY = "private_school_sprint_30q_flagship_v1";
-
-const WEEK_SYLLABUS = [
-  { w: 1, range: "2026/11/16 - 11/22", stage: "\u7B2C\u4E00\u968E\u6BB5\uFF1A\u57FA\u790E\u5960\u57FA", title: "\u5B57\u97F3\u5B57\u5F62\u8FA8\u6790 \u00D7 \u56E0\u500D\u6578\u61C9\u7528 \u00D7 \u73FE\u5728\u6642\u614B", theme: "w1" },
-  { w: 2, range: "2026/11/23 - 11/29", stage: "\u7B2C\u4E00\u968E\u6BB5\uFF1A\u57FA\u790E\u5960\u57FA", title: "\u6210\u8A9E\u8912\u8CB6\u8FA8\u6790 \u00D7 \u5206\u6578\u56DB\u5247\u9084\u539F \u00D7 \u53EF\u6578\u4E0D\u53EF\u6578\u91CF\u8A5E", theme: "w2" },
-  { w: 3, range: "2026/11/30 - 12/06", stage: "\u7B2C\u4E00\u968E\u6BB5\uFF1A\u57FA\u790E\u5960\u57FA", title: "\u6587\u8A00\u865B\u8A5E\u5165\u9580 \u00D7 \u6210\u672C\u6298\u6263\u6BD4\u4F8B \u00D7 \u904E\u53BB\u7C21\u55AE\u5F0F", theme: "w3" },
-  { w: 4, range: "2026/12/07 - 12/13", stage: "\u7B2C\u4E00\u968E\u6BB5\uFF1A\u57FA\u790E\u5960\u57FA", title: "\u8907\u53E5\u95DC\u806F\u908F\u8F2F \u00D7 \u76F8\u9047\u8FFD\u8D95\u901F\u7387 \u00D7 \u6BD4\u8F03\u7D1A\u6700\u9AD8\u7D1A", theme: "w4" },
-  { w: 5, range: "2026/12/14 - 12/20", stage: "\u7B2C\u4E00\u968E\u6BB5\uFF1A\u57FA\u790E\u5960\u57FA", title: "\u570B\u5B78\u5E74\u9F61\u7BC0\u6176 \u00D7 \u5713\u8207\u6247\u5F62\u9762\u7A4D \u00D7 \u672A\u4F86\u5F0F\u8207If\u53E5", theme: "w5" },
-  { w: 6, range: "2026/12/21 - 12/27", stage: "\u7B2C\u4E8C\u968E\u6BB5\uFF1A\u8CC7\u512A\u9032\u968E", title: "\u4FEE\u8FAD\u6280\u5DE7\u5224\u8B58 \u00D7 \u96DE\u5154\u540C\u7C60\u5012\u6263 \u00D7 \u4ECB\u7CFB\u8A5Ein/on/at", theme: "w6" },
-  { w: 7, range: "2026/12/28 - 2027/01/03", stage: "\u7B2C\u4E8C\u968E\u6BB5\uFF1A\u8CC7\u512A\u9032\u968E", title: "\u8A69\u8A5E\u683C\u5F8B\u8CDE\u6790 \u00D7 \u98DF\u9E7D\u6C34\u6FC3\u5EA6\u6DF7\u5408 \u00D7 \u4E0D\u5B9A\u8A5E\u52D5\u540D\u8A5E", theme: "w7" },
-  { w: 8, range: "2027/01/04 - 01/10", stage: "\u7B2C\u4E8C\u968E\u6BB5\uFF1A\u8CC7\u512A\u9032\u968E", title: "\u66F8\u4FE1\u984C\u8FAD\u79AE\u5100 \u00D7 \u5DE5\u7A0B\u5408\u4F5C\u6548\u7387 \u00D7 \u9023\u63A5\u8A5E\u8FA8\u6790", theme: "w8" },
-  { w: 9, range: "2027/01/11 - 01/17", stage: "\u7B2C\u4E8C\u968E\u6BB5\uFF1A\u8CC7\u512A\u9032\u968E", title: "\u5148\u79E6\u5BD3\u8A00\u77ED\u7BC7 \u00D7 \u7ACB\u9AD4\u67F1\u9AD4\u8868\u9762\u7A4D \u00D7 \u611F\u5B98\u9023\u7E74\u52D5\u8A5E", theme: "w9" },
-  { w: 10, range: "2027/01/18 - 01/24", stage: "\u7B2C\u4E8C\u968E\u6BB5\uFF1A\u8CC7\u512A\u9032\u968E", title: "\u767D\u8A71\u95B1\u8B80\u63A8\u8AD6 \u00D7 \u5E74\u9F61\u690D\u6A39\u9593\u9694 \u00D7 \u7591\u554F\u8A5E\u53E5\u578B", theme: "w10" },
-  { w: 11, range: "2027/01/25 - 01/31", stage: "\u7B2C\u4E09\u968E\u6BB5\uFF1A\u7E3D\u8907\u7FD2\u885D\u523A", title: "\u8B70\u8AD6\u6587\u8AD6\u9EDE\u64DA \u00D7 \u7B49\u5DEE\u6578\u5217\u898F\u5F8B \u00D7 \u88AB\u52D5\u8A9E\u614B\u5165\u9580", theme: "w11" },
-  { w: 12, range: "2027/02/01 - 02/07", stage: "\u7B2C\u4E09\u968E\u6BB5\uFF1A\u7E3D\u8907\u7FD2\u885D\u523A", title: "\u5716\u8868\u6587\u672C\u89E3\u8B80 \u00D7 \u7D71\u8A08\u5E73\u5747\u5713\u5F62\u5716 \u00D7 \u95DC\u4FC2\u4EE3\u540D\u8A5E", theme: "w12" },
-  { w: 13, range: "2027/02/08 - 02/14", stage: "\u7B2C\u4E09\u968E\u6BB5\uFF1A\u7E3D\u8907\u7FD2\u885D\u523A", title: "\u96D9\u6821\u7D9C\u5408\u6A21\u64EC (I) \u00D7 \u908F\u8F2F\u63A8\u7406 \u00D7 \u514B\u6F0F\u5B57\u7CBE\u7DF4", theme: "w13" },
-  { w: 14, range: "2027/02/15 - 02/21", stage: "\u7B2C\u4E09\u968E\u6BB5\uFF1A\u7E3D\u8907\u7FD2\u885D\u523A", title: "\u96D9\u6821\u7D9C\u5408\u6A21\u64EC (II) \u00D7 \u8DE8\u55AE\u5143\u61C9\u7528 \u00D7 \u9577\u7BC7\u95B1\u8B80\u6E2C\u9A57", theme: "w14" },
-  { w: 15, range: "2027/02/22 - 02/27", stage: "\u7B2C\u4E09\u968E\u6BB5\uFF1A\u7E3D\u8907\u7FD2\u885D\u523A", title: "\u8003\u524D\u7D42\u6975\u6A21\u64EC \u00D7 \u9AD8\u983B\u6613\u932F\u7E3D\u6AA2\u95B1 \u00D7 \u61C9\u8003\u7B56\u7565", theme: "w15" }
-];
-
-// Master Chinese 30-Item Core Pool (12 Homophones/Characters + 12 Idioms/Rhetoric/Classics + 6 Classical Passages/Words)
-const CHI_30_ITEMS = {
-  modA: [
-    ["\u8F09", "\u3117\u311E\u02C7\uFF08\u5E74\u3001\u53C8\u4E14\uFF09\uFF1A\u4E09\u5E74\u4E94\u8F09\u3001\u8F09\u6B4C\u8F09\u821E", "\u3117\u311E\u02CB\uFF08\u627F\u88DD\u3001\u8A18\u9304\uFF09\uFF1A\u6EFF\u8F09\u800C\u6B78\u3001\u520A\u8F09"],
-    ["\u4F9B", "\u310D\u3128\u02CA\uFF08\u63D0\u4F9B\u3001\u4F9B\u61C9\uFF09\uFF1A\u4F9B\u4E0D\u61C9\u6C42\u3001\u63D0\u4F9B", "\u310D\u3128\u02CB\uFF08\u796D\u5949\u3001\u53E3\u4F9B\uFF09\uFF1A\u4F9B\u5949\u7956\u5148\u3001\u62DB\u4F9B"],
-    ["\u53EA", "\u3113\u02C7\uFF08\u50C5\u50C5\u3001\u55AE\u4E00\uFF09\uFF1A\u53EA\u8981\u3001\u53EA\u8EAB\u5B64\u5F71", "\u3113\uFF08\u91CF\u8A5E\uFF09\uFF1A\u4E00\u53EA\u8239\u3001\u5F62\u55AE\u5F71\u53EA"],
-    ["\u6A21", "\u3107\u311C\u02CA\uFF08\u5F62\u72C0\u6A23\u5B50\uFF09\uFF1A\u6A21\u6A23\u3001\u4E00\u6A21\u4E00\u6A23", "\u3107\u311B\u02CA\uFF08\u6A19\u6E96\u3001\u4EFF\u6548\uFF09\uFF1A\u6A21\u7BC4\u3001\u6A21\u4EFF"],
-    ["\u77AD", "\u310C\u3127\u3120\u02CB\uFF08\u9060\u770B\uFF09\uFF1A\u77AD\u671B\u3001\u77AD\u5982\u6307\u638C", "\u310C\u3127\u3120\u02C7\uFF08\u660E\u767D\uFF09\uFF1A\u4E00\u76EE\u77AD\u7136\u3001\u660E\u77AD"],
-    ["\u7981", "\u3110\u3127\u3123\u02CB\uFF08\u5236\u6B62\uFF09\uFF1A\u7981\u6B62\u3001\u4EE4\u884C\u7981\u6B62", "\u3110\u3127\u3123\uFF08\u5FCD\u53D7\uFF09\uFF1A\u60C5\u4E0D\u81EA\u7981\u3001\u5F31\u4E0D\u7981\u98A8"],
-    ["\u5275", "\u3114\u3124\u02CB\uFF08\u958B\u59CB\u3001\u5EFA\u7ACB\uFF09\uFF1A\u5275\u9020\u3001\u5275\u65B0", "\u3114\u3124\uFF08\u50B7\u5BB3\uFF09\uFF1A\u91CD\u5275\u3001\u5275\u50B7"],
-    ["\u5C4F", "\u3105\u3127\u3125\u02CA\uFF08\u906E\u64CB\u3001\u969C\u58C1\uFF09\uFF1A\u5C4F\u98A8\u3001\u5C4F\u969C", "\u3105\u3127\u3125\u02C7\uFF08\u6291\u5236\u3001\u6452\u68C4\uFF09\uFF1A\u5C4F\u6C23\u51DD\u795E\u3001\u5C4F\u9664"],
-    ["\u518D\u63A5\u518D\u53B2", "\u6B63\u78BA\u5B57\u5F62\uFF1A\u5382\u90E8\u300C\u53B2\u300D\uFF08\u78E8\u5200\u77F3\uFF09", "\u6613\u932F\u8AA4\u5BEB\u70BA\u300C\u52F5\u300D\u6216\u300C\u53B2\u5BB3\u300D"],
-    ["\u76EE\u4E0D\u6687\u7D66", "\u6B63\u78BA\u5B57\u5F62\uFF1A\u65E5\u90E8\u300C\u6687\u300D\uFF08\u7A7A\u9592\uFF09", "\u6613\u932F\u8AA4\u5BEB\u70BA\u7389\u90E8\u300C\u7455\u300D\uFF08\u7455\u75B5\uFF09"],
-    ["\u6ADB\u98A8\u6C90\u96E8", "\u6B63\u78BA\u5B57\u5F62\uFF1A\u6728\u90E8\u300C\u6ADB\u300D\uFF08\u68B3\u982D\uFF09", "\u6BD4\u55BB\u5954\u6CE2\u52DE\u788C\u3001\u4E0D\u907F\u98A8\u96E8"],
-    ["\u58A8\u5B88\u6210\u898F", "\u6B63\u78BA\u5B57\u5F62\uFF1A\u300C\u58A8\u300D\uFF08\u58A8\u5B50\u5B88\u57CE\uFF09", "\u6613\u932F\u8AA4\u5BEB\u70BA\u300C\u9ED8\u5B88\u6210\u898F\u300D"]
-  ],
-  modB: [
-    ["\u5225\u51FA\u5FC3\u88C1", "\u8912\u7FA9\uFF1A\u69CB\u601D\u7368\u5275\uFF0C\u8207\u773E\u4E0D\u540C\u3002\u9069\u7528\u65BC\u6587\u7AE0\u6216\u8A2D\u8A08\u69CB\u601D\u65B0\u7A4E\u3002"],
-    ["\u4E0D\u520A\u4E4B\u8AD6", "\u8912\u7FA9\uFF1A\u4E0D\u53EF\u66F4\u6539\u7684\u7CBE\u95E2\u8A00\u8AD6\uFF08\u520A\u70BA\u524A\u9664\u4FEE\u6539\uFF09\uFF0C\u975E\u4E0D\u80FD\u520A\u767B\u7684\u58DE\u6587\u7AE0\u3002"],
-    ["\u5DEE\u5F37\u4EBA\u610F", "\u8912\u7FA9\uFF1A\u52C9\u5F37\u9084\u80FD\u4F7F\u4EBA\u6EFF\u610F\uFF08\u5DEE\u8B80\u3114\u311B\uFF0C\u7565\u5FAE\u3001\u5C1A\u4E14\uFF09\uFF0C\u975E\u4EE4\u4EBA\u5931\u671B\u3002"],
-    ["\u50BE\u5DE2\u800C\u51FA", "\u8CB6\u7FA9/\u4E2D\u6027\uFF1A\u5168\u90E8\u51FA\u52D5\uFF08\u591A\u6307\u76DC\u8CCA\u6216\u5168\u9AD4\u51FA\u52D5\uFF09\uFF0C\u4E0D\u5B9C\u5F62\u5BB9\u5B78\u751F\u6253\u6383\u6559\u5BA4\u3002"],
-    ["\u6B21\u6587\u5B57", "\u8CB6\u7FA9\uFF1A\u5C08\u6307\u6587\u7AE0\u5BEB\u5F97\u5F88\u5DEE\u3001\u6C92\u6709\u689D\u7406\u3002"],
-    ["\u9996\u7576\u5176\u885D", "\u4E2D\u6027\uFF1A\u6BD4\u55BB\u6700\u5148\u53D7\u5230\u885D\u64CA\u6216\u707D\u5BB3\uFF0C\u975E\u6307\u885D\u5728\u6700\u524D\u9762\u7684\u82F1\u96C4\u3002"],
-    ["\u8F49\u5316\uFF08\u64EC\u4EBA\uFF09", "\u8CE6\u4E88\u7269\u54C1\u4EBA\u985E\u7684\u52D5\u4F5C\u6216\u60C5\u611F\uFF0C\u4F8B\uFF1A\u300C\u6625\u98A8\u6EAB\u67D4\u5730\u8F15\u64AB\u8457\u5927\u5730\uFF0C\u559A\u9192\u6C89\u7761\u7684\u82B1\u8349\u3002\u300D"],
-    ["\u8A87\u98FE\u4FEE\u8FAD", "\u8A87\u5927\u6216\u7E2E\u5C0F\u4E8B\u7269\u7279\u5FB5\uFF0C\u4F8B\uFF1A\u300C\u767D\u9AEE\u4E09\u5343\u4E08\uFF0C\u7DE3\u6101\u4F3C\u500B\u9577\u300D\u3001\u300C\u4E00\u65E5\u4E0D\u898B\uFF0C\u5982\u9694\u4E09\u79CB\u300D\u3002"],
-    ["\u5E74\u9F61\u4EE3\u7A31\u5E8F\u5217", "\u5F31\u51A0\uFF0820\u6B72\uFF09&rarr; \u800C\u7ACB\uFF0830\u6B72\uFF09&rarr; \u4E0D\u60D1\uFF0840\u6B72\uFF09&rarr; \u77E5\u5929\u547D\uFF0850\u6B72\uFF09&rarr; \u8033\u9806\uFF0860\u6B72\uFF09\u3002"],
-    ["\u674F\u6797 vs. \u674F\u58C7", "\u300C\u674F\u6797\u300D\u6307\u91AB\u754C\uFF08\u8CC0\u8A3A\u6240\u958B\u696D\u7528\u674F\u6797\u6625\u6696\uFF09\uFF1B\u300C\u674F\u58C7\u300D\u6307\u6559\u80B2\u754C\uFF08\u8B9A\u8001\u5E2B\u7528\u6625\u98A8\u5316\u96E8\uFF09\u3002"],
-    ["\u66F8\u4FE1\u555F\u5C01\u8A5E", "\u5C0D\u5E2B\u9577\u7528\u300C\u921E\u555F\u300D\uFF08\u7D55\u4E0D\u53EF\u7528\u656C\u555F\uFF09\uFF1B\u5C0D\u5E73\u8F29\u540C\u5B78\u7528\u300C\u5927\u555F\u300D\u6216\u300C\u60E0\u555F\u300D\u3002"],
-    ["\u8FD1\u9AD4\u8A69\u683C\u5F8B", "\u7D55\u53E5 4 \u53E5\uFF08\u4E0D\u8981\u6C42\u5C0D\u4ED7\uFF09\uFF1B\u5F8B\u8A69 8 \u53E5\uFF08\u4E2D\u9593\u9837\u806F\u3001\u9838\u806F\u5FC5\u9808\u5C0D\u4ED7\uFF09\u3002"]
-  ],
-  modC: [
-    ["\u5F17\uFF08\u5426\u5B9A\u526F\u8A5E\uFF09", "\u610F\u70BA\u300C\u4E0D\u300D\u3002\u4F8B\uFF1A\u300C\u5176\u4EBA\u5F17\u80FD\u61C9\u4E5F\u300D\uFF08\u90A3\u500B\u8CE3\u77DB\u76FE\u7684\u4EBA\u4E0D\u80FD\u56DE\u7B54\uFF09\u3002"],
-    ["\u907D\u5951\u5176\u821F", "\u300C\u907D\u300D\u70BA\u7ACB\u523B\u3001\u300C\u5951\u300D\u70BA\u7528\u5200\u523B\u8A18\u865F\u3002\u51FA\u81EA\u300C\u523B\u821F\u6C42\u528D\u300D\uFF0C\u8AF7\u523A\u62D8\u6CE5\u4E0D\u77E5\u8B8A\u901A\u3002"],
-    ["\u543E\u5FD8\u6301\u5EA6", "\u300C\u5EA6\u300D\u4F5C\u540D\u8A5E\uFF0C\u6307\u4E8B\u5148\u91CF\u597D\u7684\u8173\u5BF8\u7E69\u5B50\u3002\u51FA\u81EA\u300C\u912D\u4EBA\u8CB7\u5C65\u300D\uFF0C\u8AF7\u523A\u8FF7\u4FE1\u6559\u689D\u3002"],
-    ["\u63E0\u82D7\u800C\u69C1\u77E3", "\u300C\u63E0\u300D\u70BA\u5F80\u4E0A\u62D4\u9AD8\uFF0C\u300C\u69C1\u300D\u70BA\u67AF\u840E\u4E7E\u67AF\u3002\u544A\u8AA1\u4EBA\u505A\u4E8B\u8981\u5FAA\u5E8F\u6F38\u9032\uFF0C\u4E0D\u53EF\u6025\u65BC\u6C42\u6210\u3002"],
-    ["\u7AF6\u8D70\u53D6\u4E4B", "\u300C\u7AF6\u300D\u70BA\u722D\u76F8\uFF0C\u300C\u8D70\u300D\u5728\u53E4\u6587\u4E2D\u662F\u300C\u5954\u8DD1\u300D\u3002\u51FA\u81EA\u738B\u620E\u89C0\u5BDF\u9053\u908A\u82E6\u674E\u6A39\u3002"],
-    ["\u4E09\u4EBA\u884C\u5FC5\u6709\u6211\u5E2B", "\u300C\u64C7\u5176\u5584\u8005\u800C\u5F9E\u4E4B\uFF0C\u5176\u4E0D\u5584\u8005\u800C\u6539\u4E4B\u300D\uFF1A\u898B\u8CE2\u601D\u9F4A\u3001\u898B\u4E0D\u8CE2\u800C\u5167\u81EA\u7701\u3002"]
-  ]
-};
-
-// Master Math 30-Item Core Pool (8 Formulas + 10 Models + 6 Geometry/Sequences + 6 Pitfalls)
-const MATH_30_ITEMS = {
-  modA: [
-    ["1. \u540C\u9918\u554F\u984C\u516C\u5F0F", "\u7E3D\u6578 = \u6700\u5C0F\u516C\u500D\u6578\u7684\u500D\u6578 + \u5171\u540C\u9918\u6578"],
-    ["2. \u540C\u7F3A\u554F\u984C\u516C\u5F0F", "\u7E3D\u6578 = \u6700\u5C0F\u516C\u500D\u6578\u7684\u500D\u6578 - \u5171\u540C\u4E0D\u8DB3\u6578"],
-    ["3. \u57FA\u6E96\u91CF\u8207\u6BD4\u8F03\u91CF", "\u57FA\u6E96\u91CF = \u90E8\u5206\u91CF &divide; \u5C0D\u61C9\u5206\u7387\uFF1B\u6BCD\u5B50\u548C = \u57FA\u6E96\u91CF &times; (1 + \u6BD4\u503C)"],
-    ["4. \u5546\u696D\u52A0\u6210\u8207\u6298\u6263", "\u5B9A\u50F9 = \u6210\u672C &times; (1 + \u52A0\u6210\u7387)\uFF1B\u552E\u50F9 = \u5B9A\u50F9 &times; \u6298\u6263\u7387"],
-    ["5. \u76F8\u9047\u8207\u8FFD\u8D95\u901F\u7387", "\u76F8\u9047\u6642\u9593 = \u7E3D\u8DDD\u96E2 &divide; \u901F\u7387\u548C\uFF1B\u8FFD\u8D95\u6642\u9593 = \u8DDD\u96E2\u5DEE &divide; \u901F\u7387\u5DEE"],
-    ["6. \u98DF\u9E7D\u6C34\u6FC3\u5EA6\u516C\u5F0F", "\u6FC3\u5EA6 = \u6EB6\u8CEA\u91CD &divide; \u6EB6\u6DB2\u7E3D\u91CD &times; 100%\uFF08\u52A0\u6C34\u7A00\u91CB\u6642\u6EB6\u8CEA\u4E0D\u8B8A\uFF09"],
-    ["7. \u5DE5\u7A0B\u5408\u4F5C\u6548\u7387", "\u5168\u90E8\u5DE5\u7A0B\u8A2D\u70BA 1\uFF0C\u5408\u4F5C\u5B8C\u5DE5\u5929\u6578 = 1 &divide; (\u7532\u6548\u7387 + \u4E59\u6548\u7387)"],
-    ["8. \u7B49\u5DEE\u6578\u5217\u516C\u5F0F", "\u7B2C n \u9805 = \u9996\u9805 + (n - 1) &times; \u516C\u5DEE\uFF1B\u7E3D\u548C = (\u9996\u9805 + \u672B\u9805) &times; \u9805\u6578 &divide; 2"]
-  ],
-  modB: [
-    "\u3010\u6A21\u578B 1\uFF1A\u516C\u8ECA\u540C\u6642\u767C\u8ECA\u3011\u7532\u8ECA\u6BCF 15 \u5206\u3001\u4E59\u8ECA\u6BCF 20 \u5206\u767C\u8ECA\uFF0C8:00 \u540C\u6642\u767C\u8ECA\u5F8C \u2192 \u6C42 [15,20]=60 \u5206\uFF0C9:00 \u518D\u540C\u6642\u767C\u8ECA\u3002",
-    "\u3010\u6A21\u578B 2\uFF1A\u9577\u65B9\u5F62\u88C1\u6B63\u65B9\u5F62\u3011\u9577 36\u3001\u5BEC 24 \u88C1\u6210\u6700\u5927\u6B63\u65B9\u5F62 \u2192 \u908A\u9577 = (36,24)=12\uFF0C\u500B\u6578 = (36&divide;12)&times;(24&divide;12) = 6 \u500B\u3002",
-    "\u3010\u6A21\u578B 3\uFF1A\u5206\u6578\u9084\u539F\u6C42\u5168\u90E8\u3011\u7528\u6389 3/8 \u5269 35 \u516C\u5347 \u2192 35 &divide; (1 - 3/8) = 35 &divide; (5/8) = 56 \u516C\u5347\u3002",
-    "\u3010\u6A21\u578B 4\uFF1A\u52A0\u6210\u518D\u6253\u6298\u3011\u6210\u672C 500 \u5143\u52A0\u56DB\u6210\u518D\u6253\u516B\u6298 \u2192 500 &times; 1.4 &times; 0.8 = 560 \u5143\uFF0C\u6DE8\u8CFA 60 \u5143\u3002",
-    "\u3010\u6A21\u578B 5\uFF1A\u76F8\u5411\u76F8\u9047\u554F\u984C\u3011\u76F8\u8DDD 220 \u516C\u91CC\uFF0C\u6642\u901F 50 \u8207 60 \u76F8\u5411\u800C\u884C \u2192 220 &divide; (50+60) = 2 \u5C0F\u6642\u76F8\u9047\u3002",
-    "\u3010\u6A21\u578B 6\uFF1A\u540C\u5411\u8FFD\u8D95\u554F\u984C\u3011\u5F1F\u6642\u901F 60 \u5148\u8D70 5 \u5206\uFF0C\u54E5\u6642\u901F 90 \u8FFD\u8D95 \u2192 (60&times;5) &divide; (90-60) = 10 \u5206\u9418\u8FFD\u4E0A\u3002",
-    "\u3010\u6A21\u578B 7\uFF1A\u7AF6\u8CFD\u5012\u6263\u5047\u8A2D\u6CD5\u301125 \u984C\u7B54\u5C0D\u5F97 4 \u5206\u3001\u7B54\u932F\u6263 2 \u5206\uFF0C\u5F97 76 \u5206 \u2192 \u932F (100-76)&divide;(4+2) = 4 \u984C\uFF0C\u5C0D 21 \u984C\u3002",
-    "\u3010\u6A21\u578B 8\uFF1A\u98DF\u9E7D\u6C34\u52A0\u6C34\u7A00\u91CB\u301120% \u9E7D\u6C34 300 \u514B\u52A0\u6C34 100 \u514B \u2192 \u9E7D\u91CD 60 \u514B\u4E0D\u8B8A\uFF0C\u65B0\u6FC3\u5EA6 = 60 &divide; 400 = 15%\u3002",
-    "\u3010\u6A21\u578B 9\uFF1A\u5DE5\u7A0B\u5408\u4F5C\u554F\u984C\u3011\u7532\u7368\u505A 10 \u5929\u3001\u4E59\u7368\u505A 15 \u5929 \u2192 \u5408\u4F5C\u6BCF\u65E5\u505A 1/10 + 1/15 = 1/6\uFF0C\u5171\u9700 6 \u5929\u5B8C\u5DE5\u3002",
-    "\u3010\u6A21\u578B 10\uFF1A\u5E74\u9F61\u5DEE\u4E0D\u8B8A\u3011\u7238 42 \u6B72\u3001\u5B50 12 \u6B72\uFF0C\u5E7E\u5E74\u5F8C\u7238\u662F\u5B50 3 \u500D \u2192 \u5E74\u9F61\u5DEE 30 &divide; (3-1) = 15 \u6B72\uFF0C15 - 12 = 3 \u5E74\u5F8C\u3002"
-  ],
-  modC: [
-    "\u53E3\u8A23 1\uFF1A\u6B63\u65B9\u5F62\u5167\u5169\u500B 1/4 \u5713\u91CD\u758A\u7684\u8449\u5B50\u9762\u7A4D = \u534A\u5713 - \u6B63\u65B9\u5F62 \u2248 0.57 &times; \u534A\u5F91&sup2;\u3002",
-    "\u53E3\u8A23 2\uFF1A\u6B63\u65B9\u9AD4\u9802\u9EDE\u89D2\u843D\u6316\u6389\u5C0F\u6B63\u65B9\u9AD4\uFF0C\u8868\u9762\u7A4D\u4E0D\u8B8A\uFF1B\u9762\u4E2D\u592E\u6316\u6D1E\u8868\u9762\u7A4D\u589E\u52A0 4 \u500B\u5074\u9762\u3002",
-    "\u53E3\u8A23 3\uFF1A\u5169\u7AEF\u90FD\u7A2E\u6A39\uFF1A\u6A39\u68F5\u6578 = \u9593\u9694\u6578 + 1\uFF1B\u5C01\u9589\u5713\u5F62\u6C60\u5858\u7A2E\u6A39\uFF1A\u6A39\u68F5\u6578 = \u9593\u9694\u6578\u3002",
-    "\u53E3\u8A23 4\uFF1A\u6BD4\u4F8B\u5C3A 1 : 50,000 \u4EE3\u8868\u5730\u5716 1 \u516C\u5206 = \u5BE6\u969B 50,000 \u516C\u5206 = 500 \u516C\u5C3A = 0.5 \u516C\u91CC\u3002",
-    "\u53E3\u8A23 5\uFF1A\u9031\u671F\u898F\u5F8B\u554F\u984C\uFF1A\u7E3D\u6578 &divide; \u9031\u671F = \u7D44\u6578 \u2026 \u9918\u6578\uFF0C\u6574\u9664\u6642\u70BA\u8A72\u7D44\u6700\u5F8C\u4E00\u500B\u3002",
-    "\u53E3\u8A23 6\uFF1A\u82E5\u7532\u7684 3 \u500D\u7B49\u65BC\u4E59\u7684 4 \u500D\uFF0C\u5247 \u7532 : \u4E59 = 4 : 3\uFF08\u53CD\u6BD4\u4F8B\u4EA4\u63DB\uFF09\u3002"
-  ],
-  modD: [
-    "\u26A0 \u9677\u9631 1\uFF1A1 \u65E2\u4E0D\u662F\u8CEA\u6578\u4E5F\u4E0D\u662F\u5408\u6578\uFF0C\u6700\u5C0F\u7684\u8CEA\u6578\u662F 2\uFF08\u4E5F\u662F\u552F\u4E00\u5076\u8CEA\u6578\uFF09\u3002",
-    "\u26A0 \u9677\u9631 2\uFF1A\u5E73\u5747\u901F\u7387\u5FC5\u9808\u7528\u300C\u7E3D\u8DDD\u96E2 &divide; \u7E3D\u6642\u9593\u300D\uFF0C\u7D55\u4E0D\u53EF\u5C07\u5169\u901F\u7387\u76F8\u52A0\u9664\u4EE5 2\u3002",
-    "\u26A0 \u9677\u9631 3\uFF1A\u5148\u6F32 20% \u518D\u6253 8 \u6298\uFF0C\u6700\u5F8C\u552E\u50F9\u70BA\u539F\u50F9\u7684 1.2 &times; 0.8 = 96%\uFF0C\u6BD4\u539F\u50F9\u4FBF\u5B9C 4%\u3002",
-    "\u26A0 \u9677\u9631 4\uFF1A\u8A08\u7B97\u6247\u5F62\u5468\u9577\u6642\uFF0C\u9664\u4E86\u5F27\u9577\u4E4B\u5916\uFF0C\u5343\u842C\u5225\u5FD8\u8A18\u52A0\u4E0A\u300C\u5169\u689D\u534A\u5F91\u300D\u3002",
-    "\u26A0 \u9677\u9631 5\uFF1A\u76F4\u5F91\u8207\u534A\u5F91\u63DB\u7B97\u6AA2\u67E5\uFF0C\u984C\u76EE\u7D66\u76F4\u5F91\u6642\u8981\u5148\u9664\u4EE5 2 \u624D\u80FD\u4EE3\u5165\u5713\u9762\u7A4D\u516C\u5F0F\u3002",
-    "\u26A0 \u9677\u9631 6\uFF1A\u5206\u6578\u61C9\u7528\u984C\u8981\u5206\u6E05\u300C\u7528\u6389 3/8\u300D\u8207\u300C\u5269\u4E0B 5/8\u300D\uFF0C\u9664\u6CD5\u9084\u539F\u6642\u8981\u5C0D\u61C9\u6B63\u78BA\u5206\u7387\u3002"
-  ]
-};
-
-// Master English 30-Item Core Pool (15 Vocab/Phrases + 10 Grammar Rules + 5 Reading/Cloze Guides)
-const ENG_30_ITEMS = {
-  modA: [
-    ["1. diligent (adj.)", "\u52E4\u596E\u7684\u3001\u7528\u529F\u7684", "Tom is a diligent student who reviews notes every night."],
-    ["2. convenient (adj.)", "\u65B9\u4FBF\u7684\u3001\u4FBF\u5229\u7684", "It is convenient for us to take the MRT to Taipei."],
-    ["3. restaurant (n.)", "\u9910\u5EF3", "We had a delicious seafood dinner at a famous restaurant."],
-    ["4. dictionary (n.)", "\u5B57\u5178", "You can look up new words in an English dictionary."],
-    ["5. library (n.)", "\u5716\u66F8\u9928", "Books in the school library can be borrowed for two weeks."],
-    ["6. umbrella (n.)", "\u96E8\u5098", "Bring an umbrella with you because it is going to rain."],
-    ["7. look up (phr.)", "\u67E5\u8A62\uFF08\u55AE\u5B57\u6216\u8CC7\u6599\uFF09", "Please look it up in the dictionary if you don't know it."],
-    ["8. take place (phr.)", "\u8209\u884C\u3001\u767C\u751F\uFF08\u7121\u88AB\u52D5\uFF09", "The school sports day will take place next Friday."],
-    ["9. environment (n.)", "\u74B0\u5883", "Everyone should work together to protect our environment."],
-    ["10. experience (n./v.)", "\u7D93\u9A57\u3001\u9AD4\u9A57", "Volunteering at the hospital was a special experience for me."],
-    ["11. temperature (n.)", "\u6E29\u5EA6\u3001\u9AD4\u6E29", "The temperature drops quickly at night in winter."],
-    ["12. celebrate (v.)", "\u6176\u795D", "How will your family celebrate your grandfather's birthday?"],
-    ["13. delicious (adj.)", "\u7F8E\u5473\u7684", "Mom made a delicious chocolate cake yesterday."],
-    ["14. borrow ... from (phr.)", "\u5411\u2026\u501F\u5165", "I borrowed three storybooks from the city library."],
-    ["15. be famous for (phr.)", "\u4EE5\u2026\u805E\u540D", "Tamsui is famous for its beautiful sunset and iron eggs."]
-  ],
-  modB: [
-    ["1. \u73FE\u5728\u7C21\u55AE\u5F0F", "\u95DC\u9375\u5B57 usually, often, seldom, every day\uFF1B\u4E09\u55AE\u52D5\u8A5E\u52A0 s/es\u3002"],
-    ["2. \u73FE\u5728\u9032\u884C\u5F0F", "\u95DC\u9375\u5B57 now, right now, Look!, Listen!\uFF1B\u53E5\u578B be + V-ing\u3002"],
-    ["3. \u904E\u53BB\u7C21\u55AE\u5F0F", "\u95DC\u9375\u5B57 yesterday, last night, ago\uFF1B\u719F\u8A18 go-went, buy-bought, teach-taught\u3002"],
-    ["4. \u53EF\u6578\u8207\u4E0D\u53EF\u6578\u91CF\u8A5E", "many / a few + \u8907\u6578\u53EF\u6578\u540D\u8A5E\uFF1Bmuch / a little + \u4E0D\u53EF\u6578\u540D\u8A5E\u3002"],
-    ["5. \u5F62\u5BB9\u8A5E\u6BD4\u8F03\u7D1A\u6700\u9AD8\u7D1A", "\u5169\u8005\u6BD4\u7528 -er / more + than\uFF1B\u4E09\u8005\u4EE5\u4E0A\u7528 the + -est / most + in/of\u3002"],
-    ["6. \u540C\u985E\u6BD4\u8F03\u4EE3\u540D\u8A5E", "\u4EE3\u66FF\u524D\u8FF0\u55AE\u6578\u540D\u8A5E\u7528 that\uFF0C\u8907\u6578\u540D\u8A5E\u7528 those\uFF08\u5982 the weather ... than that in...\uFF09\u3002"],
-    ["7. \u689D\u4EF6\u53E5 If \u4E3B\u5C07\u5F9E\u73FE", "If \u5F15\u5C0E\u7684\u689D\u4EF6\u5B50\u53E5\u7528\u73FE\u5728\u5F0F\u4EE3\u66FF\u672A\u4F86\u5F0F\uFF0C\u4E3B\u8981\u5B50\u53E5\u7528 will + V\u3002"],
-    ["8. \u4E0D\u5B9A\u8A5E vs. \u52D5\u540D\u8A5E", "enjoy, practice, finish, mind + V-ing\uFF1Bwant, plan, decide, hope + to V\u3002"],
-    ["9. \u9023\u63A5\u8A5E\u4E0D\u4E26\u7528\u539F\u5247", "Although \u8207 but \u4E0D\u53EF\u540C\u53E5\u51FA\u73FE\uFF1Bbecause \u8207 so \u4EA6\u4E0D\u53EF\u540C\u6642\u4F7F\u7528\u3002"],
-    ["10. \u88AB\u52D5\u8A9E\u614B\u8207\u95DC\u4EE3", "\u88AB\u52D5\u7528 be + p.p.\uFF1B\u5148\u884C\u8A5E\u540C\u6642\u6709\u4EBA\u8207\u52D5\u7269\u6642\uFF0C\u95DC\u4EE3\u53EA\u80FD\u7528 that\u3002"]
-  ],
-  modC: [
-    "\u8F49\u6298\u8A5E However\uFF08\u7136\u800C\uFF09\uFF1A\u51FA\u73FE\u5728\u95B1\u8B80\u6E2C\u9A57\u4E2D\u6642\uFF0C\u5F8C\u9762\u901A\u5E38\u662F\u63A8\u7FFB\u523B\u677F\u5370\u8C61\u7684\u771F\u6B63\u91CD\u9EDE\u3002",
-    "\u6642\u9593\u4ECB\u7CFB\u8A5E\u53E3\u8A23\uFF1A\u9EDE\u7528 at\uFF08at 7:00\uFF09\u3001\u65E5\u7528 on\uFF08on Sunday / on May 1st\uFF09\u3001\u6708\u5B63\u5E74\u7528 in\uFF08in summer / in 2026\uFF09\u3002",
-    "\u7591\u554F\u8A5E\u8FA8\u6790\uFF1AHow often \u554F\u983B\u7387\uFF08Twice a week\uFF09\u3001How long \u554F\u6642\u9593\u9577\u77ED\uFF08For two hours\uFF09\u3001How far \u554F\u8DDD\u96E2\u3002",
-    "\u82B1\u8CBB\u52D5\u8A5E\u4E09\u5144\u5F1F\uFF1A\u4EBA + spend + \u6642\u9593/\u9322 + V-ing\uFF1BIt + takes + \u4EBA + \u6642\u9593 + to V\uFF1B\u7269 + costs + \u4EBA + \u9322\u3002",
-    "\u77ED\u6587\u7CBE\u8B80\u793A\u7BC4\uFF1AMany people think bats are blind. However, all bats can see, and most use echoes to find insects at night."
-  ]
-};
-
-// Warmup questions per subject (3 items per subject, derived from the 30-item library)
-const WARMUP_BANK = {
-  chi: [
-    { q: "1. \u4E0B\u5217\u54EA\u4E00\u7D44\u300C \u300D\u5167\u5B57\u7684\u8B80\u97F3\u5B8C\u5168\u76F8\u540C\uFF1F", opts: ["\u4E09\u5E74\u4E94\u300C\u8F09\u300D\uFF0F\u6EFF\u300C\u8F09\u300D\u800C\u6B78", "\u300C\u53EA\u300D\u8981\uFF0F\u300C\u53EA\u300D\u8EAB\u5B64\u5F71", "\u300C\u6A21\u300D\u6A23\uFF0F\u300C\u6A21\u300D\u7BC4"], ans: 1, exp: "\u300C\u53EA\u8981\u300D\u8207\u300C\u53EA\u8EAB\u5B64\u5F71\u300D\u7684\u53EA\u7686\u8B80 \u3113\u02C7\u3002" },
-    { q: "2. \u4E0B\u5217\u54EA\u4E00\u500B\u6210\u8A9E\u5C6C\u65BC\u300C\u8912\u7FA9\u6210\u8A9E\u300D\uFF1F", opts: ["\u4E0D\u520A\u4E4B\u8AD6", "\u6B21\u6587\u5B57", "\u50BE\u5DE2\u800C\u51FA"], ans: 0, exp: "\u300C\u4E0D\u520A\u4E4B\u8AD6\u300D\u8B9A\u7F8E\u8A00\u8AD6\u7CBE\u95E2\u3001\u4E0D\u53EF\u66F4\u6539\u3002" },
-    { q: "3. \u300C\u5176\u4EBA\u5F17\u80FD\u61C9\u4E5F\u300D\u7684\u300C\u5F17\u300D\u5B57\u610F\u601D\u70BA\u4F55\uFF1F", opts: ["\u4E0D", "\u5F77\u5F7F", "\u7F8E\u5143"], ans: 0, exp: "\u300C\u5F17\u300D\u5728\u53E4\u6587\u4E2D\u70BA\u5426\u5B9A\u526F\u8A5E\u300C\u4E0D\u300D\u3002" }
-  ],
-  math: [
-    { q: "1. \u7532\u8ECA\u6BCF 15 \u5206\u3001\u4E59\u8ECA\u6BCF 20 \u5206\u767C\u8ECA\uFF0C8:00 \u540C\u6642\u767C\u8ECA\u5F8C\u5E7E\u9EDE\u518D\u76F8\u9047\uFF1F", opts: ["8:35", "9:00", "9:20"], ans: 1, exp: "[15, 20] = 60 \u5206\u9418 = 1 \u5C0F\u6642\uFF0C8:00 + 1 \u5C0F\u6642 = 9:00\u3002" },
-    { q: "2. \u4E00\u4EF6\u8863\u670D\u5148\u6F32 20% \u518D\u6253 8 \u6298\uFF0C\u6700\u5F8C\u552E\u50F9\u70BA\u539F\u50F9\u7684\u5E7E\u500D\uFF1F", opts: ["100%", "96%", "104%"], ans: 1, exp: "1.2 &times; 0.8 = 0.96 = 96%\u3002" },
-    { q: "3. \u7B49\u5DEE\u6578\u5217\u9996\u9805 3\u3001\u516C\u5DEE 4\uFF0C\u7B2C 10 \u9805\u662F\u591A\u5C11\uFF1F", opts: ["39", "43", "40"], ans: 0, exp: "3 + (10 - 1) &times; 4 = 39\u3002" }
-  ],
-  eng: [
-    { q: "1. Look! The boys ______ basketball on the court right now.", opts: ["play", "are playing", "played"], ans: 1, exp: "Look! \u8207 right now \u642D\u914D\u73FE\u5728\u9032\u884C\u5F0F are playing\u3002" },
-    { q: "2. We don't have ______ juice left in the bottle.", opts: ["many", "much", "a few"], ans: 1, exp: "juice \u70BA\u4E0D\u53EF\u6578\u540D\u8A5E\uFF0C\u61C9\u7528 much\u3002" },
-    { q: "3. If it ______ sunny tomorrow, we will go hiking.", opts: ["is", "will be", "was"], ans: 0, exp: "If \u689D\u4EF6\u5B50\u53E5\u4E3B\u5C07\u5F9E\u73FE\uFF0C\u7528 is\u3002" }
-  ]
-};
-
-// ============================================================================
-// 2. EXPANDED 30-QUESTION EXAM ENGINE (10 CHI + 10 MATH + 10 ENG)
-//    Each subject: 4 Basic + 4 Intermediate + 2 Challenge
-// ============================================================================
-
-const CHI_EXAM_BANK = [
-  // Basic (4)
-  { id: "CB01", sub: "CHI", diff: "\u57FA\u790E", type: "\u5B57\u97F3\u8FA8\u6790",
-    stem: "\u4E0B\u5217\u5404\u7D44\u300C \u300D\u5167\u5B57\u7684\u8B80\u97F3\uFF0C\u4F55\u8005\u5169\u5169\u76F8\u540C\uFF1F",
-    opts: ["\u300C\u6A21\u300D\u6A23\uFF0F\u300C\u6A21\u300D\u7BC4", "\u300C\u53EA\u300D\u8981\uFF0F\u300C\u53EA\u300D\u8EAB\u5B64\u5F71", "\u300C\u4F9B\u300D\u61C9\u93C8\uFF0F\u300C\u4F9B\u300D\u5949\u7956\u5148", "\u300C\u8F09\u300D\u6B4C\u8F09\u821E\uFF0F\u6EFF\u300C\u8F09\u300D\u800C\u6B78"],
-    ans: 1,
-    h1: "\u56DE\u60F3\u6559\u5B78\u5EAB\u300C\u53EA\u300D\u5728\u8868\u793A\u50C5\u50C5\u3001\u55AE\u7368\u6642\u7684\u8B80\u97F3\u3002",
-    h2: "\u300C\u53EA\u8981\u300D\u8207\u300C\u53EA\u8EAB\u5B64\u5F71\u300D\u7684\u300C\u53EA\u300D\u7686\u8B80 \u3113\u02C7\u3002",
-    exp: "\u6B63\u89E3\u70BA B\u3002\u300C\u53EA\u8981\u300D\u8207\u300C\u53EA\u8EAB\u5B64\u5F71\u300D\u7686\u8B80 \u3113\u02C7\uFF1B\u5176\u9918\u5404\u7D44\u8B80\u97F3\u7686\u4E0D\u540C\u3002" },
-  { id: "CB02", sub: "CHI", diff: "\u57FA\u790E", type: "\u5B57\u97F3\u8FA8\u6790",
-    stem: "\u4E0B\u5217\u54EA\u4E00\u500B\u8A5E\u8A9E\u7684\u300C\u8F09\u300D\u8B80\u97F3\u8207\u300C\u4E09\u5E74\u4E94\u8F09\u300D\u76F8\u540C\uFF1F",
-    opts: ["\u8F09\u6B4C\u8F09\u821E", "\u6EFF\u8F09\u800C\u6B78", "\u520A\u8F09\u65B0\u805E", "\u8F09\u8CA8\u5361\u8ECA"],
-    ans: 0,
-    h1: "\u300C\u4E09\u5E74\u4E94\u8F09\u300D\u7684\u8F09\u8B80\u4E09\u8072 \u3117\u311E\u02C7\u3002",
-    h2: "\u300C\u8F09\u6B4C\u8F09\u821E\u300D\u4EA6\u8B80\u4E09\u8072 \u3117\u311E\u02C7\uFF0C\u5176\u9918\u8B80\u56DB\u8072 \u3117\u311E\u02CB\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u300C\u8F09\u6B4C\u8F09\u821E\u300D\u8207\u300C\u4E09\u5E74\u4E94\u8F09\u300D\u7686\u8B80 \u3117\u311E\u02C7\u3002" },
-  { id: "CB03", sub: "CHI", diff: "\u57FA\u790E", type: "\u5B57\u5F62\u6AA2\u6838",
-    stem: "\u4E0B\u5217\u54EA\u4E00\u500B\u6210\u8A9E\u7528\u5B57\u300C\u5B8C\u5168\u6B63\u78BA\u300D\uFF1F",
-    opts: ["\u518D\u63A5\u518D\u53B2", "\u76EE\u4E0D\u7455\u7D66", "\u6ADB\u98A8\u6C90\u5B87", "\u9ED8\u5B88\u6210\u898F"],
-    ans: 0,
-    h1: "\u6AA2\u67E5\u5382\u90E8\u300C\u53B2\u300D\u3001\u65E5\u90E8\u300C\u6687\u300D\u3001\u571F\u90E8\u300C\u58A8\u300D\u3002",
-    h2: "\u300C\u518D\u63A5\u518D\u53B2\u300D\u5B8C\u5168\u6B63\u78BA\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002B\u61C9\u70BA\u6687\uFF1BC\u61C9\u70BA\u96E8\uFF1BD\u61C9\u70BA\u58A8\u3002" },
-  { id: "CB04", sub: "CHI", diff: "\u57FA\u790E", type: "\u5B57\u97F3\u8FA8\u6790",
-    stem: "\u4E0B\u5217\u5404\u7D44\u300C \u300D\u5167\u7684\u8B80\u97F3\uFF0C\u4F55\u8005\u5B8C\u5168\u4E0D\u540C\uFF1F",
-    opts: ["\u300C\u77AD\u300D\u671B\u9060\u65B9\uFF0F\u4E00\u76EE\u300C\u77AD\u300D\u7136", "\u300C\u7981\u300D\u6B62\u901A\u884C\uFF0F\u4EE4\u884C\u300C\u7981\u300D\u6B62", "\u300C\u5275\u300D\u9020\u5947\u8E5F\uFF0F\u958B\u300C\u5275\u300D\u672A\u4F86", "\u300C\u5C4F\u300D\u98A8\u5F8C\u9762\uFF0F\u5929\u7136\u300C\u5C4F\u300D\u969C"],
-    ans: 0,
-    h1: "\u6CE8\u610F\u300C\u77AD\u671B\u300D\u8207\u300C\u4E00\u76EE\u77AD\u7136\u300D\u7684\u8072\u8ABF\u5DEE\u7570\u3002",
-    h2: "\u77AD\u671B\u8B80 \u310C\u3127\u3120\u02CB\uFF0C\u4E00\u76EE\u77AD\u7136\u8B80 \u310C\u3127\u3120\u02C7\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u77AD\u671B\u8B80\u56DB\u8072\uFF0C\u4E00\u76EE\u77AD\u7136\u8B80\u4E09\u8072\u3002" },
-  { id: "CB05", sub: "CHI", diff: "\u57FA\u790E", type: "\u5B57\u5F62\u6AA2\u6838",
-    stem: "\u300C\u8001\u5E2B\u5011\uFF3F\uFF3F\u6C90\u96E8\u5730\u8F9B\u52E4\u6559\u5C0E\u6211\u5011\u3002\u300D\u7A7A\u683C\u61C9\u586B\u5165\u4F55\u8005\uFF1F",
-    opts: ["\u6ADB\u98A8", "\u6B78\u98A8", "\u68B3\u98A8", "\u6ADB\u8C50"],
-    ans: 0,
-    h1: "\u6728\u90E8\u7684\u300C\u6ADB\u300D\u662F\u68B3\u5B50\uFF0C\u6ADB\u98A8\u6C90\u96E8\u6307\u4EE5\u98A8\u68B3\u982D\u3001\u4EE5\u96E8\u6D17\u9AEE\u3002",
-    h2: "\u6B63\u78BA\u5BEB\u6CD5\u70BA\u300C\u6ADB\u98A8\u6C90\u96E8\u300D\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u6ADB\u98A8\u6C90\u96E8\u5F62\u5BB9\u5954\u6CE2\u52DE\u788C\u3002" },
-  // Intermediate (4)
-  { id: "CI01", sub: "CHI", diff: "\u9032\u968E", type: "\u6210\u8A9E\u8912\u8CB6",
-    stem: "\u4E0B\u5217\u5404\u53E5\u6210\u8A9E\u7684\u4F7F\u7528\uFF0C\u4F55\u8005\u6700\u70BA\u6070\u7576\uFF1F",
-    opts: ["\u9019\u7BC7\u4F5C\u6587\u69CB\u601D\u300C\u5225\u51FA\u5FC3\u88C1\u300D\uFF0C\u7372\u5F97\u8A55\u5BE9\u9AD8\u5EA6\u8B9A\u8CDE\u3002", "\u904B\u52D5\u6703\u4E0A\u540C\u5B78\u5011\u300C\u50BE\u5DE2\u800C\u51FA\u300D\uFF0C\u628A\u6559\u5BA4\u6253\u6383\u5F97\u4E00\u5875\u4E0D\u67D3\u3002", "\u4ED6\u7684\u6F14\u8B1B\u7A7A\u6D1E\u7121\u7269\uFF0C\u582A\u7A31\u300C\u4E0D\u520A\u4E4B\u8AD6\u300D\u3002", "\u5C0F\u660E\u5C0D\u97F3\u6A02\u300C\u4E00\u7AC5\u4E0D\u901A\u300D\uFF0C\u56E0\u6B64\u7372\u5F97\u92FC\u7434\u5927\u734E\u3002"],
-    ans: 0,
-    h1: "\u5340\u5206\u300C\u5225\u51FA\u5FC3\u88C1\u300D\uFF08\u8912\u7FA9\uFF09\u8207\u300C\u50BE\u5DE2\u800C\u51FA\u300D\uFF08\u591A\u542B\u8CB6\u7FA9\uFF09\u3002",
-    h2: "\u300C\u5225\u51FA\u5FC3\u88C1\u300D\u6307\u69CB\u601D\u7368\u5275\uFF0C\u4F7F\u7528\u6B63\u78BA\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u300C\u4E0D\u520A\u4E4B\u8AD6\u300D\u662F\u8B9A\u7F8E\u7CBE\u95E2\u8A00\u8AD6\uFF1B\u300C\u4E00\u7AC5\u4E0D\u901A\u300D\u662F\u5B8C\u5168\u4E0D\u61C2\u3002" },
-  { id: "CI02", sub: "CHI", diff: "\u9032\u968E", type: "\u4FEE\u8FAD\u5224\u8B58",
-    stem: "\u300C\u6625\u98A8\u6EAB\u67D4\u5730\u8F15\u64AB\u8457\u5927\u5730\uFF0C\u559A\u9192\u4E86\u6C89\u7761\u7684\u82B1\u8349\u3002\u300D\u9019\u53E5\u8A71\u904B\u7528\u4E86\u54EA\u7A2E\u4FEE\u8FAD\u6CD5\uFF1F",
-    opts: ["\u8F49\u5316\uFF08\u64EC\u4EBA\uFF09", "\u8A87\u98FE", "\u501F\u4EE3", "\u6392\u6BD4"],
-    ans: 0,
-    h1: "\u628A\u6625\u98A8\u8207\u82B1\u8349\u7576\u4F5C\u4EBA\u4F86\u5BEB\uFF08\u8F15\u64AB\u3001\u559A\u9192\u3001\u6C89\u7761\uFF09\u3002",
-    h2: "\u8CE6\u4E88\u7269\u54C1\u4EBA\u985E\u52D5\u4F5C\u60C5\u611F\u70BA\u300C\u64EC\u4EBA\u6CD5\u300D\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u5C07\u6625\u98A8\u8207\u82B1\u8349\u64EC\u4EBA\u5316\u3002" },
-  { id: "CI03", sub: "CHI", diff: "\u9032\u968E", type: "\u570B\u5B78\u5E38\u8B58",
-    stem: "\u53E4\u4EBA\u5E38\u4EE5\u7279\u5B9A\u8A5E\u5F59\u4EE3\u7A31\u5E74\u9F61\uFF0C\u4E0B\u5217\u54EA\u4E00\u7D44\u300C\u7531\u5C0F\u5230\u5927\u300D\u6392\u5217\u6B63\u78BA\uFF1F",
-    opts: ["\u5F31\u51A0 \u2192 \u800C\u7ACB \u2192 \u4E0D\u60D1 \u2192 \u77E5\u5929\u547D", "\u800C\u7ACB \u2192 \u5F31\u51A0 \u2192 \u77E5\u5929\u547D \u2192 \u4E0D\u60D1", "\u4E0D\u60D1 \u2192 \u800C\u7ACB \u2192 \u5F31\u51A0 \u2192 \u77E5\u5929\u547D", "\u5F31\u51A0 \u2192 \u4E0D\u60D1 \u2192 \u800C\u7ACB \u2192 \u77E5\u5929\u547D"],
-    ans: 0,
-    h1: "\u5F31\u51A0 20 \u6B72\uFF0C\u800C\u7ACB 30 \u6B72\uFF0C\u4E0D\u60D1 40 \u6B72\uFF0C\u77E5\u5929\u547D 50 \u6B72\u3002",
-    h2: "\u4F9D\u5E8F\u70BA 20 \u2192 30 \u2192 40 \u2192 50\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u51FA\u81EA\u300A\u8AD6\u8A9E\u300B\u8207\u53E4\u4EE3\u79AE\u5236\u3002" },
-  { id: "CI04", sub: "CHI", diff: "\u9032\u968E", type: "\u61C9\u7528\u6587\u79AE\u5100",
-    stem: "\u5BEB\u4FE1\u7D66\u5B78\u6821\u7684\u8001\u5E2B\u6642\uFF0C\u4FE1\u5C01\u4E0A\u7684\u6536\u4EF6\u4EBA\u555F\u5C01\u8A5E\u61C9\u4F7F\u7528\u4E0B\u5217\u4F55\u8005\uFF1F",
-    opts: ["\u921E\u555F", "\u656C\u555F", "\u5927\u555F", "\u60E0\u555F"],
-    ans: 0,
-    h1: "\u5C0D\u5E2B\u9577\u4E0D\u53EF\u7528\u300C\u656C\u555F\u300D\uFF0C\u5927\u555F\u3001\u60E0\u555F\u7528\u65BC\u5E73\u8F29\u3002",
-    h2: "\u5C0D\u5E2B\u9577\u61C9\u7528\u300C\u921E\u555F\u300D\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u921E\u555F\u7528\u65BC\u5E2B\u9577\u6216\u9577\u8F29\u3002" },
-  { id: "CI05", sub: "CHI", diff: "\u9032\u968E", type: "\u8907\u53E5\u908F\u8F2F",
-    stem: "\u300C\uFF3F\uFF3F\u4F60\u9858\u610F\u653E\u4E0B\u6210\u898B\uFF0C\uFF3F\uFF3F\u80FD\u770B\u898B\u5225\u4EBA\u7684\u512A\u9EDE\u3002\u300D\u7A7A\u683C\u5167\u61C9\u586B\u5165\u4F55\u8005\uFF1F",
-    opts: ["\u53EA\u6709\u2026\u624D\u2026", "\u96D6\u7136\u2026\u4F46\u662F\u2026", "\u8207\u5176\u2026\u4E0D\u5982\u2026", "\u65E2\u7136\u2026\u4F55\u5FC5\u2026"],
-    ans: 0,
-    h1: "\u524D\u53E5\u662F\u5F8C\u53E5\u7684\u5FC5\u8981\u689D\u4EF6\u3002",
-    h2: "\u300C\u53EA\u6709\u2026\u624D\u2026\u300D\u8868\u793A\u5FC5\u8981\u689D\u4EF6\u95DC\u4FC2\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u53EA\u6709\u653E\u4E0B\u6210\u898B\uFF0C\u624D\u80FD\u770B\u898B\u512A\u9EDE\u3002" },
-  // Challenge (2)
-  { id: "CC01", sub: "CHI", diff: "\u6311\u6230", type: "\u6587\u8A00\u95B1\u8B80",
-    stem: "\u95B1\u8B80\u4E0B\u6587\u4E26\u4F5C\u7B54\uFF1A\n\u300C\u695A\u4EBA\u6709\u6D89\u6C5F\u8005\uFF0C\u5176\u528D\u81EA\u821F\u4E2D\u589C\u65BC\u6C34\uFF0C\u907D\u5951\u5176\u821F\uFF0C\u66F0\uFF1A\u300E\u662F\u543E\u528D\u4E4B\u6240\u5F9E\u589C\u3002\u300F\u821F\u6B62\uFF0C\u5F9E\u5176\u6240\u5951\u8005\u5165\u6C34\u6C42\u4E4B\u3002\u300D\n\u6587\u4E2D\u300C\u907D\u5951\u5176\u821F\u300D\u7684\u300C\u5951\u300D\u5B57\u610F\u70BA\u4F55\uFF1F",
-    opts: ["\u7528\u5200\u523B\u8A18\u865F", "\u7C3D\u8A02\u5951\u7D04", "\u5FC3\u610F\u76F8\u901A", "\u4E1F\u68C4\u8239\u96BB"],
-    ans: 0,
-    h1: "\u56DE\u60F3\u6210\u8A9E\u300C\u523B\u821F\u6C42\u528D\u300D\u7684\u52D5\u4F5C\u3002",
-    h2: "\u300C\u5951\u300D\u5728\u6B64\u4F5C\u52D5\u8A5E\uFF0C\u6307\u7528\u5200\u96D5\u523B\u8A18\u865F\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u300C\u907D\u5951\u5176\u821F\u300D\u6307\u7ACB\u523B\u5728\u8239\u908A\u7528\u5200\u523B\u8A18\u865F\u3002" },
-  { id: "CC02", sub: "CHI", diff: "\u6311\u6230", type: "\u6587\u8A00\u95B1\u8B80",
-    stem: "\u95B1\u8B80\u4E0B\u6587\u4E26\u4F5C\u7B54\uFF1A\n\u300C\u912D\u4EBA\u6709\u6B32\u8CB7\u5C65\u8005\uFF0C\u5148\u81EA\u5EA6\u5176\u8DB3\uFF0C\u800C\u7F6E\u4E4B\u5176\u5750\u3002\u81F3\u4E4B\u5E02\uFF0C\u800C\u5FD8\u64CD\u4E4B\u3002\u5DF2\u5F97\u5C65\uFF0C\u4E43\u66F0\uFF1A\u300E\u543E\u5FD8\u6301\u5EA6\u3002\u300F\u53CD\u6B78\u53D6\u4E4B\u3002\u300D\n\u9019\u5247\u5BD3\u8A00\u4E3B\u8981\u5728\u8AF7\u523A\u54EA\u4E00\u7A2E\u4EBA\uFF1F",
-    opts: ["\u8FF7\u4FE1\u6559\u689D\u3001\u4E0D\u9867\u5BE6\u969B\u60C5\u6CC1\u7684\u4EBA", "\u51FA\u9580\u7E3D\u662F\u5FD8\u8A18\u5E36\u9322\u5305\u7684\u4EBA", "\u559C\u6B61\u6311\u5254\u978B\u5B50\u6B3E\u5F0F\u7684\u4EBA", "\u4E0D\u9858\u610F\u81EA\u5DF1\u52D5\u624B\u6E2C\u91CF\u7684\u4EBA"],
-    ans: 0,
-    h1: "\u912D\u570B\u4EBA\u5BE7\u53EF\u76F8\u4FE1\u91CF\u597D\u7684\u5C3A\u5BF8\uFF0C\u4E5F\u4E0D\u76F8\u4FE1\u81EA\u5DF1\u7684\u8173\u3002",
-    h2: "\u8AF7\u523A\u6B7B\u5B88\u6559\u689D\u800C\u5FFD\u7565\u773C\u524D\u5BE6\u969B\u7684\u611A\u8822\u884C\u70BA\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u300C\u912D\u4EBA\u8CB7\u5C65\u300D\u544A\u8AA1\u4EBA\u5011\u8981\u5F9E\u5BE6\u969B\u51FA\u767C\uFF0C\u4E0D\u53EF\u50F5\u5316\u6559\u689D\u3002" },
-  { id: "CC03", sub: "CHI", diff: "\u6311\u6230", type: "\u4E16\u8AAA\u65B0\u8A9E",
-    stem: "\u95B1\u8B80\u4E0B\u6587\u4E26\u4F5C\u7B54\uFF1A\n\u300C\u738B\u620E\u4E03\u6B72\uFF0C\u5617\u8207\u8AF8\u5C0F\u5152\u904A\u3002\u770B\u9053\u908A\u674E\u6A39\u591A\u5B50\u6298\u679D\uFF0C\u8AF8\u5152\u7AF6\u8D70\u53D6\u4E4B\uFF0C\u552F\u620E\u4E0D\u52D5\u3002\u4EBA\u554F\u4E4B\uFF0C\u7B54\u66F0\uFF1A\u300E\u6A39\u5728\u9053\u908A\u800C\u591A\u5B50\uFF0C\u6B64\u5FC5\u82E6\u674E\u3002\u300F\u300D\n\u738B\u620E\u5224\u65B7\u674E\u5B50\u662F\u82E6\u7684\u4F9D\u64DA\u70BA\u4F55\uFF1F",
-    opts: ["\u9577\u5728\u8DEF\u908A\u537B\u679C\u5BE6\u7D2F\u7D2F\u672A\u88AB\u8DEF\u4EBA\u6458\u53D6", "\u674E\u5B50\u7684\u984F\u8272\u770B\u8D77\u4F86\u592A\u9752\u6F80", "\u6A39\u8449\u90FD\u5DF2\u7D93\u67AF\u840E\u6389\u843D", "\u65C1\u908A\u6709\u544A\u793A\u724C\u5BEB\u8457\u82E6\u674E"],
-    ans: 0,
-    h1: "\u5982\u679C\u8DEF\u908A\u7684\u674E\u5B50\u662F\u751C\u7684\uFF0C\u65E9\u5C31\u88AB\u904E\u5F80\u884C\u4EBA\u6458\u5149\u4E86\u3002",
-    h2: "\u7D50\u6EFF\u679C\u5B50\u537B\u6C92\u4EBA\u6458\uFF0C\u908F\u8F2F\u63A8\u7406\u5FC5\u70BA\u82E6\u674E\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u900F\u904E\u751F\u6D3B\u89C0\u5BDF\u8207\u908F\u8F2F\u63A8\u7406\u5F97\u51FA\u7D50\u8AD6\u3002" }
-];
-
-const ENG_EXAM_BANK = [
-  // Basic (4)
-  { id: "EB01", sub: "ENG", diff: "\u57FA\u790E", type: "\u6587\u610F\u5B57\u5F59",
-    stem: "Taking the MRT from Tamsui to Taipei is very ______ and fast.",
-    opts: ["convenient", "difficult", "expensive", "dangerous"],
-    ans: 0,
-    h1: "\u642D\u6377\u904B\u5F9E\u6DE1\u6C5F\u5230\u53F0\u5317\u53C8\u5FEB\u53C8\u300C\u65B9\u4FBF\u300D\u3002",
-    h2: "convenient \u610F\u70BA\u300C\u65B9\u4FBF\u7684\u3001\u4FBF\u5229\u7684\u300D\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002convenient \u7B26\u5408\u6377\u904B\u4FBF\u5229\u7684\u6587\u610F\u3002" },
-  { id: "EB02", sub: "ENG", diff: "\u57FA\u790E", type: "\u73FE\u5728\u6642\u614B",
-    stem: "Look! The students ______ soccer on the playground right now.",
-    opts: ["are playing", "play", "played", "plays"],
-    ans: 0,
-    h1: "\u53E5\u9996 Look! \u8207 right now \u63D0\u793A\u52D5\u4F5C\u6B63\u5728\u767C\u751F\u3002",
-    h2: "\u73FE\u5728\u9032\u884C\u5F0F\uFF1Abe + V-ing\uFF0C\u8907\u6578\u4E3B\u8A9E\u7528 are playing\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002are playing \u8868\u793A\u6B64\u6642\u6B64\u523B\u6B63\u5728\u9032\u884C\u3002" },
-  { id: "EB03", sub: "ENG", diff: "\u57FA\u790E", type: "\u904E\u53BB\u6642\u614B",
-    stem: "Ms. Lin ______ us English three years ago.",
-    opts: ["taught", "teaches", "is teaching", "teach"],
-    ans: 0,
-    h1: "\u53E5\u5C3E three years ago\uFF08\u4E09\u5E74\u524D\uFF09\u70BA\u904E\u53BB\u6642\u9593\u3002",
-    h2: "teach \u7684\u4E0D\u898F\u5247\u904E\u53BB\u5F0F\u70BA taught\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002ago \u642D\u914D\u904E\u53BB\u5F0F taught\u3002" },
-  { id: "EB04", sub: "ENG", diff: "\u57FA\u790E", type: "\u6587\u610F\u5B57\u5F59",
-    stem: "If you don't know the new word, you can look it ______ in the dictionary.",
-    opts: ["up", "at", "for", "after"],
-    ans: 0,
-    h1: "\u5728\u5B57\u5178\u88E1\u300C\u67E5\u8A62\u300D\u55AE\u5B57\u7684\u7247\u8A9E\u3002",
-    h2: "look up \u610F\u70BA\u300C\u67E5\u8A62\uFF08\u55AE\u5B57/\u8CC7\u6599\uFF09\u300D\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002look up \u70BA\u67E5\u8A62\u4E4B\u610F\u3002" },
-  { id: "EB05", sub: "ENG", diff: "\u57FA\u790E", type: "\u6587\u610F\u5B57\u5F59",
-    stem: "Tamsui is famous ______ its beautiful sunset and delicious seafood.",
-    opts: ["for", "as", "with", "at"],
-    ans: 0,
-    h1: "\u8868\u793A\u300C\u4EE5\u2026\u7279\u8272\u800C\u805E\u540D\u300D\u7684\u4ECB\u7CFB\u8A5E\u3002",
-    h2: "be famous for + \u7279\u8272/\u540D\u7522\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002be famous for \u610F\u70BA\u300C\u4EE5\u2026\u805E\u540D\u300D\u3002" },
-  // Intermediate (4)
-  { id: "EI01", sub: "ENG", diff: "\u9032\u968E", type: "\u53EF\u6578\u4E0D\u53EF\u6578",
-    stem: "There is only ______ milk left in the bottle. Let's buy some more.",
-    opts: ["a little", "a few", "many", "few"],
-    ans: 0,
-    h1: "milk\uFF08\u725B\u5976\uFF09\u70BA\u4E0D\u53EF\u6578\u540D\u8A5E\u3002",
-    h2: "\u4FEE\u98FE\u4E0D\u53EF\u6578\u540D\u8A5E\u4E14\u8868\u793A\u300C\u4E00\u9EDE\u9EDE\u300D\u7528 a little\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002a little \u4FEE\u98FE\u4E0D\u53EF\u6578\u540D\u8A5E\u3002" },
-  { id: "EI02", sub: "ENG", diff: "\u9032\u968E", type: "\u5F62\u5BB9\u8A5E\u6BD4\u8F03",
-    stem: "The weather in Taipei is much hotter than ______ in Kaohsiung in summer.",
-    opts: ["that", "it", "those", "this"],
-    ans: 0,
-    h1: "\u540C\u985E\u6BD4\u8F03\u539F\u5247\uFF0C\u4EE3\u66FF\u524D\u9762\u7684\u55AE\u6578\u540D\u8A5E the weather\u3002",
-    h2: "\u6BD4\u8F03\u53E5\u4E2D\u4EE3\u66FF\u55AE\u6578\u540D\u8A5E\u7528 that\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002that \u4EE3\u6307 the weather\u3002" },
-  { id: "EI03", sub: "ENG", diff: "\u9032\u968E", type: "\u52D5\u540D\u8A5E\u642D\u914D",
-    stem: "My sister enjoys ______ English novels in her free time.",
-    opts: ["reading", "to read", "read", "reads"],
-    ans: 0,
-    h1: "\u52D5\u8A5E enjoy \u5F8C\u9762\u63A5\u52D5\u8A5E\u7684\u56FA\u5B9A\u5F62\u5F0F\u3002",
-    h2: "enjoy + V-ing\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002enjoy \u5F8C\u5FC5\u63A5\u52D5\u540D\u8A5E reading\u3002" },
-  { id: "EI04", sub: "ENG", diff: "\u9032\u968E", type: "\u689D\u4EF6\u53E5If",
-    stem: "If it ______ sunny tomorrow, we will go hiking in Yangmingshan.",
-    opts: ["is", "will be", "was", "are"],
-    ans: 0,
-    h1: "If \u689D\u4EF6\u5B50\u53E5\u9075\u5B88\u300C\u4E3B\u5C07\u5F9E\u73FE\u300D\u539F\u5247\u3002",
-    h2: "\u7528\u73FE\u5728\u5F0F is \u4EE3\u66FF\u672A\u4F86\u5F0F\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002it \u7528 is\u3002" },
-  { id: "EI05", sub: "ENG", diff: "\u9032\u968E", type: "\u82B1\u8CBB\u52D5\u8A5E",
-    stem: "It ______ me thirty minutes to walk to school every morning.",
-    opts: ["takes", "spends", "costs", "pays"],
-    ans: 0,
-    h1: "\u4EE5\u865B\u4E3B\u8A5E It \u958B\u982D\uFF0C\u8868\u793A\u82B1\u8CBB\u6642\u9593\u3002",
-    h2: "It takes + \u4EBA + \u6642\u9593 + to V\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u4E8B\u7269\u82B1\u8CBB\u6642\u9593\u7528 takes\u3002" },
-  // Challenge (2)
-  { id: "EC01", sub: "ENG", diff: "\u6311\u6230", type: "\u95B1\u8B80\u7406\u89E3",
-    stem: "Read the passage and answer:\n\"Many people think bats are blind. However, this is not true! All bats can see, and some large bats even have better eyesight than humans. At night, most bats use echolocation—listening to echoes—to find insects in the dark.\"\nWhich is TRUE about bats?",
-    opts: ["Some large bats see better than humans.", "All bats are completely blind.", "Bats only fly in the daytime.", "Bats never eat insects."],
-    ans: 0,
-    h1: "\u6CE8\u610F However \u5F8C\u9762\u7684\u53E5\u5B50\uFF1AAll bats can see, and some large bats even have better eyesight...",
-    h2: "\u90E8\u5206\u5927\u578B\u8759\u8760\u7684\u8996\u529B\u751A\u81F3\u6BD4\u4EBA\u985E\u66F4\u597D\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u8759\u8760\u4E26\u975E\u778E\u5B50\uFF0C\u5927\u578B\u8759\u8760\u8996\u529B\u512A\u65BC\u4EBA\u985E\u3002" },
-  { id: "EC02", sub: "ENG", diff: "\u6311\u6230", type: "\u95B1\u8B80\u7406\u89E3",
-    stem: "Read the notice and answer:\n\"Library Rules: Please keep quiet. No food or drinks are allowed inside. Turn off your cell phone before entering. Books can be borrowed for two weeks.\"\nWhat can students do in the library?",
-    opts: ["Borrow books for 14 days", "Eat snacks quietly", "Talk on the phone", "Drink juice while reading"],
-    ans: 0,
-    h1: "two weeks \u7B49\u65BC 14 days\u3002",
-    h2: "\u516C\u544A\u8AAA\u660E Books can be borrowed for two weeks\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002\u5716\u66F8\u9928\u53EF\u501F\u66F8\u5169\u9031\uFF0814 \u5929\uFF09\u3002" },
-  { id: "EC03", sub: "ENG", diff: "\u6311\u6230", type: "\u95DC\u4FC2\u4EE3\u540D\u8A5E",
-    stem: "The boy and his dog ______ are running in the park look very happy.",
-    opts: ["that", "who", "which", "whom"],
-    ans: 0,
-    h1: "\u5148\u884C\u8A5E\u540C\u6642\u5305\u542B\u300C\u4EBA\uFF08The boy\uFF09\u300D\u8207\u300C\u52D5\u7269\uFF08his dog\uFF09\u300D\u3002",
-    h2: "\u5148\u884C\u8A5E\u70BA\u300C\u4EBA\uFF0B\u52D5\u7269\u300D\u6642\uFF0C\u95DC\u4FC2\u4EE3\u540D\u8A5E\u53EA\u80FD\u7528 that\u3002",
-    exp: "\u6B63\u89E3\u70BA A\u3002that \u53EF\u540C\u6642\u4EE3\u6307\u4EBA\u8207\u52D5\u7269\u3002" }
-];
-
-// Dynamic Parametric Math Generator (Produces 10 Math Questions: 4 Basic + 4 Intermediate + 2 Challenge)
-function buildMath10Questions() {
-  const gcd = (a, b) => (!b ? a : gcd(b, a % b));
-  const rInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-  // 4 Basic Questions
-  const b1_a = [12, 15, 18, 20][rInt(0, 3)];
-  const b1_b = [16, 24, 30, 36][rInt(0, 3)];
-  const b1_lcm = (b1_a * b1_b) / gcd(b1_a, b1_b);
-  const b1_ans = `${8 + Math.floor(b1_lcm / 60)}:${String(b1_lcm % 60).padStart(2, "0")}`;
-
-  const b2_w = [24, 36, 48][rInt(0, 2)];
-  const b2_h = [36, 54, 60][rInt(0, 2)];
-  const b2_side = gcd(b2_w, b2_h);
-  const b2_cnt = (b2_w / b2_side) * (b2_h / b2_side);
-
-  const b3_tot = [80, 120, 160, 200][rInt(0, 3)];
-  const b3_left = (b3_tot * 5) / 8;
-
-  const b4_r1 = rInt(2, 5);
-  const b4_r2 = rInt(3, 7);
-  const b4_sum = (b4_r1 + b4_r2) * rInt(10, 20);
-  const b4_part1 = (b4_sum * b4_r1) / (b4_r1 + b4_r2);
-
-  const basics = [
-    {
-      id: `MB1_${b1_a}_${b1_b}`, sub: "MATH", diff: "\u57FA\u790E", type: "\u516C\u500D\u6578\u61C9\u7528",
-      stem: `\u7532\u8DEF\u516C\u8ECA\u6BCF ${b1_a} \u5206\u9418\u767C\u4E00\u73ED\u8ECA\uFF0C\u4E59\u8DEF\u516C\u8ECA\u6BCF ${b1_b} \u5206\u9418\u767C\u4E00\u73ED\u8ECA\u3002\u4E0A\u5348 8:00 \u540C\u6642\u767C\u8ECA\u5F8C\uFF0C\u4E0B\u4E00\u6B21\u518D\u540C\u6642\u767C\u8ECA\u662F\u5E7E\u9EDE\u5E7E\u5206\uFF1F`,
-      opts: [b1_ans, `${8 + Math.floor((b1_lcm + 15) / 60)}:${String((b1_lcm + 15) % 60).padStart(2, "0")}`, "09:05", `${8 + Math.floor((b1_lcm + 30) / 60)}:${String((b1_lcm + 30) % 60).padStart(2, "0")}`],
-      ans: 0,
-      h1: `\u5148\u6C42 ${b1_a} \u8207 ${b1_b} \u7684\u6700\u5C0F\u516C\u500D\u6578\u3002`,
-      h2: `[${b1_a}, ${b1_b}] = ${b1_lcm} \u5206\u9418\uFF0C\u52A0\u4E0A 8:00 \u5373\u70BA\u7B54\u6848\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${b1_ans}\u3002[${b1_a}, ${b1_b}] = ${b1_lcm} \u5206\u9418\u3002`
-    },
-    {
-      id: `MB2_${b2_w}_${b2_h}`, sub: "MATH", diff: "\u57FA\u790E", type: "\u6700\u5927\u516C\u56E0\u6578",
-      stem: `\u5C07\u9577 ${b2_h} \u516C\u5206\u3001\u5BEC ${b2_w} \u516C\u5206\u7684\u9577\u65B9\u5F62\u88C1\u5207\u6210\u82E5\u5E72\u500B\u5927\u5C0F\u76F8\u540C\u7684\u6700\u5927\u6B63\u65B9\u5F62\u4E14\u7121\u5269\u9918\uFF0C\u5171\u53EF\u88C1\u6210\u5E7E\u500B\uFF1F`,
-      opts: [`${b2_cnt} \u500B`, `${b2_side} \u500B`, `${b2_cnt + 2} \u500B`, `${b2_cnt - 1} \u500B`],
-      ans: 0,
-      h1: `\u5148\u6C42 (${b2_h}, ${b2_w}) \u7684\u6700\u5927\u516C\u56E0\u6578\u5F97\u5230\u6B63\u65B9\u5F62\u908A\u9577\u3002`,
-      h2: `\u908A\u9577 = ${b2_side}\uFF0C\u500B\u6578 = (${b2_h}/${b2_side}) &times; (${b2_w}/${b2_side}) = ${b2_cnt} \u500B\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${b2_cnt} \u500B\u3002`
-    },
-    {
-      id: `MB3_${b3_tot}`, sub: "MATH", diff: "\u57FA\u790E", type: "\u5206\u6578\u57FA\u6E96\u91CF",
-      stem: `\u4E00\u6876\u6C34\u7528\u6389\u5168\u90E8\u7684 3/8 \u5F8C\uFF0C\u9084\u5269\u4E0B ${b3_left} \u516C\u5347\uFF0C\u9019\u6876\u6C34\u539F\u4F86\u6709\u591A\u5C11\u516C\u5347\uFF1F`,
-      opts: [`${b3_tot} \u516C\u5347`, `${b3_left + 25} \u516C\u5347`, `${b3_tot + 40} \u516C\u5347`, `${b3_tot - 20} \u516C\u5347`],
-      ans: 0,
-      h1: `\u5269\u4E0B\u7684 ${b3_left} \u516C\u5347\u4F54\u5168\u6876\u7684 1 - 3/8 = 5/8\u3002`,
-      h2: `${b3_left} &divide; (5/8) = ${b3_tot} \u516C\u5347\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${b3_tot} \u516C\u5347\u3002`
-    },
-    {
-      id: `MB4_${b4_r1}_${b4_r2}_${b4_sum}`, sub: "MATH", diff: "\u57FA\u790E", type: "\u6BD4\u4F8B\u5206\u914D",
-      stem: `\u5C07 ${b4_sum} \u5143\u6309 ${b4_r1} : ${b4_r2} \u7684\u6BD4\u4F8B\u5206\u7D66\u7532\u3001\u4E59\u5169\u4EBA\uFF0C\u8ACB\u554F\u7532\u53EF\u4EE5\u5206\u5F97\u591A\u5C11\u5143\uFF1F`,
-      opts: [`${b4_part1} \u5143`, `${b4_sum - b4_part1} \u5143`, `${b4_part1 + 10} \u5143`, `${Math.round(b4_sum / 2)} \u5143`],
-      ans: 0,
-      h1: `\u7E3D\u4EFD\u6578\u70BA ${b4_r1} + ${b4_r2} = ${b4_r1 + b4_r2} \u4EFD\u3002`,
-      h2: `\u7532\u4F54 ${b4_r1}/${b4_r1 + b4_r2}\uFF0C${b4_sum} &times; ${b4_r1}/${b4_r1 + b4_r2} = ${b4_part1} \u5143\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${b4_part1} \u5143\u3002`
-    }
-  ];
-
-  // 4 Intermediate Questions
-  const i1_cost = [400, 500, 600, 800][rInt(0, 3)];
-  const i1_prof = i1_cost * 1.5 * 0.8 - i1_cost;
-
-  const i2_wc = rInt(3, 6);
-  const i2_rc = 25 - i2_wc;
-  const i2_sc = i2_rc * 4 - i2_wc * 2;
-
-  const i3_v1 = [50, 60][rInt(0, 1)];
-  const i3_v2 = [70, 80][rInt(0, 1)];
-  const i3_hrs = [2, 3][rInt(0, 1)];
-  const i3_dist = (i3_v1 + i3_v2) * i3_hrs;
-
-  const i4_w = [200, 300, 400][rInt(0, 2)];
-  const i4_salt = i4_w * 0.2;
-  const i4_newC = (i4_salt / (i4_w + 100)) * 100;
-
-  const inters = [
-    {
-      id: `MI1_${i1_cost}`, sub: "MATH", diff: "\u9032\u968E", type: "\u6210\u672C\u6298\u6263",
-      stem: `\u4E00\u4EF6\u6210\u672C ${i1_cost} \u5143\u7684\u5916\u5957\uFF0C\u7167\u6210\u672C\u52A0\u4E94\u6210\u4F5C\u70BA\u5B9A\u50F9\uFF0C\u518D\u7167\u5B9A\u50F9\u6253\u516B\u6298\u51FA\u552E\uFF0C\u8CE3\u51FA\u9019\u4EF6\u5916\u5957\u53EF\u8CFA\u5F97\u591A\u5C11\u5143\uFF1F`,
-      opts: [`${i1_prof} \u5143`, `${i1_prof + 40} \u5143`, `${i1_cost * 1.2} \u5143`, `${i1_prof - 20} \u5143`],
-      ans: 0,
-      h1: `\u5B9A\u50F9 = ${i1_cost} &times; 1.5\uFF0C\u552E\u50F9 = \u5B9A\u50F9 &times; 0.8\u3002`,
-      h2: `\u5229\u6F64 = \u552E\u50F9 - \u6210\u672C = ${i1_prof} \u5143\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${i1_prof} \u5143\u3002`
-    },
-    {
-      id: `MI2_${i2_wc}`, sub: "MATH", diff: "\u9032\u968E", type: "\u5012\u6263\u5047\u8A2D\u6CD5",
-      stem: `\u6578\u5B78\u7AF6\u8CFD\u5171 25 \u984C\uFF0C\u7B54\u5C0D\u4E00\u984C\u5F97 4 \u5206\uFF0C\u7B54\u932F\u4E00\u984C\u5012\u6263 2 \u5206\uFF08\u7686\u4F5C\u7B54\uFF09\u3002\u5C0F\u5B87\u5F97\u4E86 ${i2_sc} \u5206\uFF0C\u8ACB\u554F\u4ED6\u7B54\u5C0D\u4E86\u5E7E\u984C\uFF1F`,
-      opts: [`${i2_rc} \u984C`, `${i2_rc - 1} \u984C`, `${i2_rc + 1} \u984C`, `${i2_wc} \u984C`],
-      ans: 0,
-      h1: `\u5047\u8A2D 25 \u984C\u5168\u5C0D\u5F97 100 \u5206\uFF0C\u6BCF\u932F\u4E00\u984C\u6BD4\u6EFF\u5206\u5C11 4 + 2 = 6 \u5206\u3002`,
-      h2: `\u7B54\u932F = (100 - ${i2_sc}) &divide; 6 = ${i2_wc} \u984C\uFF0C\u7B54\u5C0D = 25 - ${i2_wc} = ${i2_rc} \u984C\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${i2_rc} \u984C\u3002`
-    },
-    {
-      id: `MI3_${i3_v1}_${i3_v2}_${i3_hrs}`, sub: "MATH", diff: "\u9032\u968E", type: "\u76F8\u9047\u901F\u7387",
-      stem: `\u7532\u3001\u4E59\u5169\u8ECA\u540C\u6642\u5F9E\u76F8\u8DDD ${i3_dist} \u516C\u91CC\u7684\u5169\u5730\u76F8\u5411\u800C\u884C\uFF0C\u7532\u8ECA\u6642\u901F ${i3_v1} \u516C\u91CC\uFF0C\u4E59\u8ECA\u6642\u901F ${i3_v2} \u516C\u91CC\uFF0C\u5E7E\u5C0F\u6642\u5F8C\u76F8\u9047\uFF1F`,
-      opts: [`${i3_hrs} \u5C0F\u6642`, `${i3_hrs + 1} \u5C0F\u6642`, `${i3_hrs + 0.5} \u5C0F\u6642`, `${i3_hrs - 0.5} \u5C0F\u6642`],
-      ans: 0,
-      h1: `\u76F8\u5411\u800C\u884C\u7528\u300C\u901F\u7387\u548C\u300D\uFF1A${i3_v1} + ${i3_v2} = ${i3_v1 + i3_v2}\u3002`,
-      h2: `${i3_dist} &divide; ${i3_v1 + i3_v2} = ${i3_hrs} \u5C0F\u6642\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${i3_hrs} \u5C0F\u6642\u3002`
-    },
-    {
-      id: `MI4_${i4_w}`, sub: "MATH", diff: "\u9032\u968E", type: "\u6FC3\u5EA6\u7A00\u91CB",
-      stem: `\u6709\u4E00\u676F\u6FC3\u5EA6 20% \u7684\u98DF\u9E7D\u6C34 ${i4_w} \u516C\u514B\uFF0C\u518D\u5012\u5165 100 \u516C\u514B\u7D14\u6C34\u7A00\u91CB\u5F8C\uFF0C\u65B0\u6FC3\u5EA6\u662F\u591A\u5C11\uFF1F`,
-      opts: [`${i4_newC}%`, "15%", "18%", "10%"],
-      ans: 0,
-      h1: `\u52A0\u6C34\u7A00\u91CB\u6642\u300C\u9E7D\u91CD\u4E0D\u8B8A\u300D\uFF0C\u9E7D\u91CD = ${i4_w} &times; 20% = ${i4_salt} \u516C\u514B\u3002`,
-      h2: `\u65B0\u6FC3\u5EA6 = ${i4_salt} &divide; (${i4_w} + 100) &times; 100% = ${i4_newC}%\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${i4_newC}%\u3002`
-    }
-  ];
-
-  // 2 Challenge Questions
-  const c1_pair = [[10, 15, 6], [12, 24, 8], [20, 30, 12]][rInt(0, 2)];
-  const c2_a1 = rInt(2, 6);
-  const c2_d = rInt(3, 5);
-  const c2_n = 10;
-  const c2_an = c2_a1 + (c2_n - 1) * c2_d;
-  const c2_sum = ((c2_a1 + c2_an) * c2_n) / 2;
-
-  const challenges = [
-    {
-      id: `MC1_${c1_pair[0]}_${c1_pair[1]}`, sub: "MATH", diff: "\u6311\u6230", type: "\u5DE5\u7A0B\u5408\u4F5C",
-      stem: `\u4E00\u9805\u5DE5\u7A0B\u7531\u7532\u7368\u505A\u9700 ${c1_pair[0]} \u5929\u5B8C\u5DE5\uFF0C\u7531\u4E59\u7368\u505A\u9700 ${c1_pair[1]} \u5929\u5B8C\u5DE5\u3002\u82E5\u7532\u3001\u4E59\u5169\u4EBA\u5408\u4F5C\uFF0C\u9700\u8981\u5E7E\u5929\u624D\u80FD\u5B8C\u5DE5\uFF1F`,
-      opts: [`${c1_pair[2]} \u5929`, `${c1_pair[2] + 2} \u5929`, `${Math.round((c1_pair[0] + c1_pair[1]) / 2)} \u5929`, `${c1_pair[2] - 1} \u5929`],
-      ans: 0,
-      h1: `\u5C07\u5168\u90E8\u5DE5\u7A0B\u8A2D\u70BA 1\uFF0C\u7532\u6BCF\u5929\u505A 1/${c1_pair[0]}\uFF0C\u4E59\u6BCF\u5929\u505A 1/${c1_pair[1]}\u3002`,
-      h2: `\u5408\u4F5C\u6BCF\u5929\u5B8C\u6210 1/${c1_pair[0]} + 1/${c1_pair[1]} = 1/${c1_pair[2]}\uFF0C\u6545\u9700 ${c1_pair[2]} \u5929\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${c1_pair[2]} \u5929\u3002`
-    },
-    {
-      id: `MC2_${c2_a1}_${c2_d}`, sub: "MATH", diff: "\u6311\u6230", type: "\u7B49\u5DEE\u6578\u5217\u7E3D\u548C",
-      stem: `\u6709\u4E00\u7B49\u5DEE\u6578\u5217\uFF0C\u9996\u9805\u70BA ${c2_a1}\uFF0C\u516C\u5DEE\u70BA ${c2_d}\uFF0C\u8ACB\u554F\u9019\u500B\u6578\u5217\u524D 10 \u9805\u7684\u7E3D\u548C\u662F\u591A\u5C11\uFF1F`,
-      opts: [`${c2_sum}`, `${c2_an}`, `${c2_sum + 10}`, `${c2_sum - 5}`],
-      ans: 0,
-      h1: `\u5148\u6C42\u7B2C 10 \u9805 = ${c2_a1} + (10 - 1) &times; ${c2_d} = ${c2_an}\u3002`,
-      h2: `\u7E3D\u548C = (${c2_a1} + ${c2_an}) &times; 10 &divide; 2 = ${c2_sum}\u3002`,
-      exp: `\u6B63\u89E3\u70BA ${c2_sum}\u3002\u7B2C 10 \u9805\u70BA ${c2_an}\uFF0C\u68AF\u5F62\u516C\u5F0F\u7E3D\u548C\u70BA ${c2_sum}\u3002`
-    }
-  ];
-
-  return [...basics, ...inters, ...challenges];
-}
-
-// ============================================================================
-// 3. STATE MANAGEMENT & PERSISTENCE
-// ============================================================================
-let state = {
-  currentWeek: 1,
-  currentStep: 1,
-  passedWeeks: [],
-  solvedIds: [],
-  wrongBook: [],
-  readProgress: {}
-};
-
-let activeLibSub = "chi";
-let studySec = 0;
-let studyInterval = null;
-
-let examQuestions = [];
-let examAnswers = {};
-let examSubmitted = false;
-let examFilter = "ALL";
-let examSec = 1800;
-let examTimerHandle = null;
-let examTimerRunning = false;
-
-function loadState() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) state = Object.assign(state, JSON.parse(raw));
-  } catch (e) {}
-}
-
-function saveState() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch (e) {}
-  updatePortalSummary();
-}
-
-function getWeekRead(w) {
-  if (!state.readProgress[w]) {
-    state.readProgress[w] = { chi: false, math: false, eng: false, warmups: {} };
-  }
-  return state.readProgress[w];
-}
-
-function showToast(msg, icon = "\u2728") {
-  const box = document.getElementById("toast-box");
-  document.getElementById("toast-text").textContent = msg;
-  document.getElementById("toast-icon").textContent = icon;
-  box.classList.remove("opacity-0", "-translate-y-3");
-  box.classList.add("opacity-100", "translate-y-0");
-  clearTimeout(window._tHandle);
-  window._tHandle = setTimeout(() => {
-    box.classList.add("opacity-0", "-translate-y-3");
-    box.classList.remove("opacity-100", "translate-y-0");
-  }, 2600);
-}
-
-// ============================================================================
-// 4. PORTAL & DASHBOARD NAVIGATION
-// ============================================================================
-function updatePortalSummary() {
-  document.getElementById("portal-week-label").textContent = `\u7B2C ${state.currentWeek} \u9031`;
-  document.getElementById("portal-passed-label").textContent = `${state.passedWeeks.length} / 15 \u9031`;
-  document.getElementById("portal-solved-label").textContent = `${state.solvedIds.length} \u984C`;
-  document.getElementById("portal-wrong-label").textContent = `${state.wrongBook.length} \u984C`;
-}
-
-function enterStudyStation() {
-  document.getElementById("portal-view").classList.add("hidden");
-  document.getElementById("app-view").classList.remove("hidden");
-  renderDashboard();
-  switchStep(state.currentStep || 1);
-}
-
-function returnToPortal() {
-  stopExamTimer();
-  stopStudyTimer();
-  updatePortalSummary();
-  document.getElementById("app-view").classList.add("hidden");
-  document.getElementById("portal-view").classList.remove("hidden");
-}
-
-function calcDaysToExam() {
-  const target = new Date("2027-02-27T08:00:00+08:00");
-  const diff = Math.ceil((target - new Date()) / (1000 * 60 * 60 * 24));
-  return diff > 0 ? diff : 0;
-}
-
-function renderDashboard() {
-  document.getElementById("stat-countdown").textContent = `${calcDaysToExam()} \u5929`;
-  document.getElementById("stat-passed").textContent = `${state.passedWeeks.length} / 15`;
-  document.getElementById("stat-solved").textContent = `${state.solvedIds.length} \u984C`;
-
-  const wObj = WEEK_SYLLABUS[state.currentWeek - 1] || WEEK_SYLLABUS[0];
-  document.getElementById("header-date-range").textContent = `${wObj.range} \uFF5C ${wObj.stage}`;
-  document.getElementById("week-stage-pill").textContent = `\u7B2C ${wObj.w} \u9031 \u2022 ${wObj.stage}`;
-  document.getElementById("week-title-text").textContent = wObj.title;
-
-  const isPassed = state.passedWeeks.includes(wObj.w);
-  const badge = document.getElementById("week-pass-badge");
-  badge.textContent = isPassed ? "\u2705 \u672C\u9031\u5DF2\u9054\u6A19\u901A\u95DC" : "\u23F3 \u5C1A\u672A\u9054 80 \u5206\u901A\u95DC";
-  badge.className = isPassed
-    ? "text-xs sm:text-sm font-black px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200"
-    : "text-xs sm:text-sm font-black px-3.5 py-1.5 rounded-xl bg-white/90 text-slate-600 border border-slate-200";
-
-  // Week Strip
-  const strip = document.getElementById("week-strip");
-  strip.innerHTML = WEEK_SYLLABUS.map(item => {
-    const active = item.w === state.currentWeek;
-    const passed = state.passedWeeks.includes(item.w);
-    return `
-      <button onclick="selectWeek(${item.w})" class="shrink-0 px-3.5 py-2 rounded-2xl border text-left transition cursor-pointer min-w-[82px] ${
-        active
-          ? "bg-teal-700 text-white border-teal-700 shadow-md"
-          : passed
-            ? "bg-emerald-50/90 text-emerald-900 border-emerald-300"
-            : "bg-white/85 text-slate-600 border-slate-200 hover:bg-white"
-      }">
-        <div class="flex items-center justify-between gap-1 text-xs font-black">
-          <span>W${item.w}</span>
-          ${passed ? `<span>${active ? "\u2713" : "\u2705"}</span>` : ""}
-        </div>
-        <div class="text-[10px] opacity-80 mt-0.5">${item.range.split(" - ")[0].slice(5)}</div>
-      </button>
-    `;
-  }).join("");
-
-  renderTeachingLibrary();
-  if (examQuestions.length === 0) buildFull30Exam();
-  renderWrongBook();
-}
-
-function selectWeek(w) {
-  state.currentWeek = w;
-  state.currentStep = 1;
-  studySec = 0;
-  saveState();
-  buildFull30Exam();
-  renderDashboard();
-  switchStep(1);
-}
-
-function switchStep(step) {
-  state.currentStep = step;
-  saveState();
-  [1, 2, 3].forEach(i => {
-    const tab = document.getElementById(`step-tab-${i}`);
-    const panel = document.getElementById(`step-panel-${i}`);
-    if (i === step) {
-      tab.className = "p-3 sm:p-4 rounded-2xl border-2 border-teal-700 bg-white text-xs sm:text-sm font-black text-teal-800 shadow-sm transition cursor-pointer";
-      panel.classList.remove("hidden");
-    } else {
-      tab.className = "p-3 sm:p-4 rounded-2xl border border-slate-300/70 bg-white/75 text-xs sm:text-sm font-extrabold text-slate-600 hover:bg-white transition cursor-pointer";
-      panel.classList.add("hidden");
-    }
-  });
-
-  if (step === 1) {
-    startStudyTimer();
-    renderTeachingLibrary();
-  } else {
-    stopStudyTimer();
-  }
-
-  if (step === 2) {
-    if (!examSubmitted && !examTimerRunning) startExamTimer();
-  } else {
-    stopExamTimer();
-  }
-
-  if (step === 3) renderWrongBook();
-}
-
-// ============================================================================
-// 5. STEP 1: 90-ITEM STRUCTURED TEACHING LIBRARY (30 ITEMS / SUBJECT)
-// ============================================================================
-function startStudyTimer() {
-  stopStudyTimer();
-  studyInterval = setInterval(() => {
-    studySec++;
-    const mm = String(Math.floor(studySec / 60)).padStart(2, "0");
-    const ss = String(studySec % 60).padStart(2, "0");
-    const el = document.getElementById("study-timer-pill");
-    if (el) el.textContent = `\u23F1\uFE0F \u7CBE\u8B80 ${mm}:${ss}`;
-  }, 1000);
-}
-
-function stopStudyTimer() {
-  clearInterval(studyInterval);
-}
-
-function switchLibSubject(sub) {
-  activeLibSub = sub;
-  renderTeachingLibrary();
-}
-
-function toggleSubjectRead(sub) {
-  const r = getWeekRead(state.currentWeek);
-  r[sub] = !r[sub];
-  saveState();
-  renderTeachingLibrary();
-  if (r[sub]) showToast("\u5DF2\u5B8C\u6210\u672C\u79D1 30 \u9805\u8B1B\u7FA9\u7CBE\u8B80\u6AA2\u6838\uFF01", "\u2705");
-}
-
-function answerWarmup(sub, wIdx, oIdx) {
-  const r = getWeekRead(state.currentWeek);
-  r.warmups[`${sub}_${wIdx}`] = oIdx;
-  saveState();
-  renderTeachingLibrary();
-}
-
-function handleEnterExam() {
-  const r = getWeekRead(state.currentWeek);
-  const doneCount = [r.chi, r.math, r.eng].filter(Boolean).length;
-  if (doneCount < 3) {
-    showToast(`\u9084\u6709 ${3 - doneCount} \u79D1 30 \u9805\u8B1B\u7FA9\u5C1A\u672A\u52FE\u9078\u7CBE\u8B80\u5B8C\u6210\u5594\uFF01`, "\uD83D\uDCD6");
-    return;
-  }
-  switchStep(2);
-}
-
-function renderTeachingLibrary() {
-  const r = getWeekRead(state.currentWeek);
-  const doneCount = [r.chi, r.math, r.eng].filter(Boolean).length;
-
-  document.getElementById("study-done-pill").textContent = `${doneCount} / 3 \u79D1\u5DF2\u8B80`;
-  document.getElementById("lib-check-chi").textContent = r.chi ? "\u2705" : "";
-  document.getElementById("lib-check-math").textContent = r.math ? "\u2705" : "";
-  document.getElementById("lib-check-eng").textContent = r.eng ? "\u2705" : "";
-
-  document.getElementById("chk-read-chi").checked = !!r.chi;
-  document.getElementById("chk-read-math").checked = !!r.math;
-  document.getElementById("chk-read-eng").checked = !!r.eng;
-
-  ["chi", "math", "eng"].forEach(s => {
-    const b = document.getElementById(`lib-tab-${s}`);
-    b.className = s === activeLibSub
-      ? "py-3 px-2 sm:px-4 rounded-2xl border-2 border-teal-700 bg-white text-teal-800 text-xs sm:text-sm font-black shadow-sm transition cursor-pointer flex items-center justify-center gap-1.5"
-      : "py-3 px-2 sm:px-4 rounded-2xl border border-slate-300/70 bg-white/80 text-slate-600 text-xs sm:text-sm font-extrabold hover:bg-white transition cursor-pointer flex items-center justify-center gap-1.5";
-  });
-
-  const box = document.getElementById("library-body-container");
-
-  if (activeLibSub === "chi") {
-    box.innerHTML = `
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-teal-700">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; A&#xFF1A;&#x9AD8;&#x983B;&#x5F62;&#x4F3C;&#x5B57;&#x8207;&#x591A;&#x97F3;&#x5B57;&#x5C0D;&#x7167;&#x8868;&#xFF08;&#x7B2C; 1&ndash;12 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-teal-700">12 &#x9805;&#x8003;&#x9EDE;</span>
-        </div>
-        <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white/95">
-          <table class="w-full text-left text-xs sm:text-sm border-collapse">
-            <thead>
-              <tr class="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
-                <th class="py-2.5 px-3">#</th>
-                <th class="py-2.5 px-3">&#x5B57;&#x8A5E;</th>
-                <th class="py-2.5 px-3">&#x8B80;&#x97F3;&#x8207;&#x5B57;&#x5F62;&#x89E3;&#x6790;</th>
-                <th class="py-2.5 px-3">&#x5C0D;&#x6BD4;&#x8207;&#x6613;&#x932F;&#x63D0;&#x9192;</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${CHI_30_ITEMS.modA.map((row, i) => `
-                <tr class="border-b border-slate-100">
-                  <td class="py-2 px-3 font-mono text-xs text-slate-400">${i + 1}</td>
-                  <td class="py-2 px-3 font-black text-teal-800 whitespace-nowrap">${row[0]}</td>
-                  <td class="py-2 px-3 text-slate-800 font-semibold">${row[1]}</td>
-                  <td class="py-2 px-3 text-slate-600">${row[2]}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-rose-500">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; B&#xFF1A;&#x6210;&#x8A9E;&#x6B63;&#x8AA4;&#x8FA8;&#x6790;&#x3001;&#x4FEE;&#x8FAD;&#x8207;&#x570B;&#x5B78;&#x5E38;&#x8B58;&#xFF08;&#x7B2C; 13&ndash;24 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-rose-700">12 &#x9805;&#x8003;&#x9EDE;</span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          ${CHI_30_ITEMS.modB.map((item, i) => `
-            <div class="p-3.5 rounded-2xl bg-white/95 border border-slate-200">
-              <div class="text-xs sm:text-sm font-black text-rose-800 mb-1">${i + 13}. ${item[0]}</div>
-              <div class="text-xs text-slate-700 leading-relaxed">${item[1]}</div>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-amber-500">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; C&#xFF1A;&#x6587;&#x8A00;&#x6838;&#x5FC3;&#x5BE6;&#x8A5E;&#x865B;&#x8A5E;&#x8207;&#x5BD3;&#x8A00;&#x7CBE;&#x89E3;&#xFF08;&#x7B2C; 25&ndash;30 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-amber-800">6 &#x9805;&#x8003;&#x9EDE;</span>
-        </div>
-        <div class="space-y-2.5">
-          ${CHI_30_ITEMS.modC.map((item, i) => `
-            <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs sm:text-sm">
-              <span class="font-black text-amber-950">${i + 25}. ${item[0]}&#xFF1A;</span>
-              <span class="text-slate-800 font-medium">${item[1]}</span>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-
-      ${renderSubjectWarmupSection("chi", r)}
-    `;
-  } else if (activeLibSub === "math") {
-    box.innerHTML = `
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-blue-600">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; A&#xFF1A;&#x6838;&#x5FC3;&#x516C;&#x5F0F;&#x8207;&#x5B9A;&#x7406;&#x63A8;&#x5C0E;&#xFF08;&#x7B2C; 1&ndash;8 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-blue-700">8 &#x9805;&#x516C;&#x5F0F;</span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          ${MATH_30_ITEMS.modA.map(item => `
-            <div class="p-3.5 rounded-2xl bg-blue-50/75 border border-blue-200">
-              <div class="text-xs font-black text-blue-900 mb-1">${item[0]}</div>
-              <div class="text-xs sm:text-sm font-bold text-slate-800">${item[1]}</div>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-indigo-600">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; B&#xFF1A;&#x5341;&#x5927;&#x5E38;&#x8003;&#x8B8A;&#x5F62;&#x61C9;&#x7528;&#x6A21;&#x578B;&#x8207;&#x6B65;&#x9A5F;&#x793A;&#x7BC4;&#xFF08;&#x7B2C; 9&ndash;18 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-indigo-700">10 &#x9805;&#x6A21;&#x578B;</span>
-        </div>
-        <div class="space-y-2.5">
-          ${MATH_30_ITEMS.modB.map((m, i) => `
-            <div class="p-3.5 rounded-2xl bg-white/95 border border-slate-200 text-xs sm:text-sm text-slate-800 font-semibold">
-              <span class="text-indigo-700 font-black mr-1">#${i + 9}</span>${m}
-            </div>
-          `).join("")}
-        </div>
-      </div>
-
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-teal-600">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; C &amp; D&#xFF1A;&#x5E7E;&#x4F55;&#x6578;&#x5217;&#x53E3;&#x8A23;&#x8207;&#x8003;&#x5834;&#x9677;&#x9631;&#xFF08;&#x7B2C; 19&ndash;30 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-teal-700">12 &#x9805;&#x5FC3;&#x6CD5;</span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          ${MATH_30_ITEMS.modC.map((c, i) => `
-            <div class="p-3.5 rounded-2xl bg-teal-50/70 border border-teal-200 text-xs text-teal-950 font-semibold">
-              <span class="font-black mr-1">#${i + 19}</span>${c}
-            </div>
-          `).join("")}
-          ${MATH_30_ITEMS.modD.map((d, i) => `
-            <div class="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 font-semibold">
-              <span class="font-black mr-1">#${i + 25}</span>${d}
-            </div>
-          `).join("")}
-        </div>
-      </div>
-
-      ${renderSubjectWarmupSection("math", r)}
-    `;
-  } else {
-    box.innerHTML = `
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-emerald-600">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; A&#xFF1A;&#x9AD8;&#x983B;&#x6838;&#x5FC3;&#x55AE;&#x5B57;&#x8207;&#x7247;&#x8A9E;&#x5EAB;&#xFF08;&#x7B2C; 1&ndash;15 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-emerald-700">15 &#x9805;&#x5B57;&#x5F59;</span>
-        </div>
-        <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white/95">
-          <table class="w-full text-left text-xs sm:text-sm border-collapse">
-            <thead>
-              <tr class="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
-                <th class="py-2.5 px-3">&#x55AE;&#x5B57; / &#x7247;&#x8A9E;</th>
-                <th class="py-2.5 px-3">&#x4E2D;&#x6587;&#x91CB;&#x7FA9;</th>
-                <th class="py-2.5 px-3">&#x5BE6;&#x6230;&#x4F8B;&#x53E5;</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${ENG_30_ITEMS.modA.map(row => `
-                <tr class="border-b border-slate-100">
-                  <td class="py-2 px-3 font-black text-emerald-800 whitespace-nowrap">${row[0]}</td>
-                  <td class="py-2 px-3 text-slate-800 font-bold whitespace-nowrap">${row[1]}</td>
-                  <td class="py-2 px-3 text-slate-600">${row[2]}</td>
-                </tr>
-              `).join("")}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-sky-600">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; B&#xFF1A;&#x5341;&#x5927;&#x6838;&#x5FC3;&#x6587;&#x6CD5;&#x53E5;&#x578B;&#x516C;&#x5F0F;&#xFF08;&#x7B2C; 16&ndash;25 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-sky-700">10 &#x9805;&#x6587;&#x6CD5;</span>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          ${ENG_30_ITEMS.modB.map((item, i) => `
-            <div class="p-3.5 rounded-2xl bg-sky-50/75 border border-sky-200">
-              <div class="text-xs font-black text-sky-900 mb-1">#${i + 16} ${item[0]}</div>
-              <div class="text-xs sm:text-sm text-slate-800 font-semibold">${item[1]}</div>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 border-t-4 border-t-purple-600">
-        <div class="flex items-center justify-between">
-          <h3 class="text-base sm:text-lg font-black text-slate-900">&#x6A21;&#x7D44; C&#xFF1A;&#x95B1;&#x8B80;&#x8207;&#x514B;&#x6F0F;&#x5B57;&#x89E3;&#x984C;&#x6307;&#x5357;&#xFF08;&#x7B2C; 26&ndash;30 &#x9805;&#xFF09;</h3>
-          <span class="text-xs font-extrabold text-purple-700">5 &#x9805;&#x6280;&#x5DE7;</span>
-        </div>
-        <div class="space-y-2.5">
-          ${ENG_30_ITEMS.modC.map((c, i) => `
-            <div class="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-200 text-xs sm:text-sm text-slate-800 font-semibold">
-              <span class="font-black text-purple-900 mr-1">#${i + 26}</span>${c}
-            </div>
-          `).join("")}
-        </div>
-      </div>
-
-      ${renderSubjectWarmupSection("eng", r)}
-    `;
-  }
-}
-
-function renderSubjectWarmupSection(sub, rState) {
-  const list = WARMUP_BANK[sub];
-  return `
-    <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-4 bg-slate-50/90 border border-slate-200">
-      <div class="text-sm sm:text-base font-black text-slate-900">
-        &#x270D;&#xFE0F; &#x672C;&#x79D1; 30 &#x9805;&#x8B1B;&#x7FA9;&#x96A8;&#x5802;&#x6696;&#x8EAB;&#x6AA2;&#x6838;&#xFF08;&#x5171; 3 &#x984C;&#xFF09;
-      </div>
-      <div class="space-y-4">
-        ${list.map((w, wIdx) => {
-          const userAns = rState.warmups[`${sub}_${wIdx}`];
-          return `
-            <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-2.5">
-              <div class="text-xs sm:text-sm font-bold text-slate-900">${w.q}</div>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                ${w.opts.map((opt, oIdx) => {
-                  let cls = "bg-slate-50 hover:bg-teal-50 border-slate-200 text-slate-800";
-                  if (userAns !== undefined) {
-                    if (oIdx === w.ans) cls = "bg-emerald-100 border-emerald-500 text-emerald-950 font-black";
-                    else if (userAns === oIdx) cls = "bg-rose-100 border-rose-500 text-rose-900";
-                  }
-                  return `<button onclick="answerWarmup('${sub}', ${wIdx}, ${oIdx})" class="p-2.5 rounded-xl border text-left text-xs font-bold transition cursor-pointer ${cls}">${String.fromCharCode(65 + oIdx)}. ${opt}</button>`;
-                }).join("")}
-              </div>
-              ${userAns !== undefined ? `<div class="text-xs text-emerald-800 font-bold pt-1">&#x89E3;&#x6790;&#xFF1A;${w.exp}</div>` : ""}
-            </div>
-          `;
-        }).join("")}
-      </div>
-    </div>
-  `;
-}
-
-// ============================================================================
-// 6. STEP 2: FULL 30-QUESTION EXAM ENGINE (10 CHI + 10 MATH + 10 ENG)
-// ============================================================================
-function shuffleArray(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function pickTieredStatic(bank, diffLabel, count) {
-  const subPool = bank.filter(q => q.diff === diffLabel);
-  const unseen = subPool.filter(q => !state.solvedIds.includes(q.id));
-  const seen = subPool.filter(q => state.solvedIds.includes(q.id));
-  const ordered = [...shuffleArray(unseen), ...shuffleArray(seen)];
-  return ordered.slice(0, count).map(q => {
-    const rightText = q.opts[q.ans];
-    const sOpts = shuffleArray(q.opts);
-    return Object.assign({}, q, { opts: sOpts, ans: sOpts.indexOf(rightText) });
-  });
-}
-
-function buildFull30Exam() {
-  // 10 Chinese (4 Basic + 4 Intermediate + 2 Challenge)
-  const chi10 = [
-    ...pickTieredStatic(CHI_EXAM_BANK, "\u57FA\u790E", 4),
-    ...pickTieredStatic(CHI_EXAM_BANK, "\u9032\u968E", 4),
-    ...pickTieredStatic(CHI_EXAM_BANK, "\u6311\u6230", 2)
-  ];
-
-  // 10 Math (4 Basic + 4 Intermediate + 2 Challenge)
-  const math10 = buildMath10Questions().map(q => {
-    const rightText = q.opts[q.ans];
-    const sOpts = shuffleArray(q.opts);
-    return Object.assign({}, q, { opts: sOpts, ans: sOpts.indexOf(rightText) });
-  });
-
-  // 10 English (4 Basic + 4 Intermediate + 2 Challenge)
-  const eng10 = [
-    ...pickTieredStatic(ENG_EXAM_BANK, "\u57FA\u790E", 4),
-    ...pickTieredStatic(ENG_EXAM_BANK, "\u9032\u968E", 4),
-    ...pickTieredStatic(ENG_EXAM_BANK, "\u6311\u6230", 2)
-  ];
-
-  examQuestions = [...chi10, ...math10, ...eng10];
-  examAnswers = {};
-  examSubmitted = false;
-  examFilter = "ALL";
-  document.getElementById("exam-submit-box").classList.remove("hidden");
-  document.getElementById("exam-result-card").classList.add("hidden");
-  renderExamQuestions();
-}
-
-function refreshExamQuestions() {
-  buildFull30Exam();
-  resetExamTimer();
-  startExamTimer();
-  showToast("\u5DF2\u5F9E 90 \u9805\u6559\u5B78\u5EAB\u91CD\u65B0\u62BD\u751F\u5168\u65B0 30 \u984C\u8003\u5377\uFF01", "\uD83D\uDD04");
-}
-
-function setExamFilter(sub) {
-  examFilter = sub;
-  ["ALL", "CHI", "MATH", "ENG"].forEach(k => {
-    const b = document.getElementById(`flt-${k}`);
-    if (!b) return;
-    b.className = k === sub
-      ? "px-3 py-1.5 rounded-xl text-xs font-black bg-teal-700 text-white cursor-pointer"
-      : "px-3 py-1.5 rounded-xl text-xs font-bold bg-white/90 text-slate-700 border border-slate-200 cursor-pointer";
-  });
-  renderExamQuestions();
-}
-
-function renderExamQuestions() {
-  const answeredCount = Object.keys(examAnswers).length;
-  document.getElementById("exam-answered-counter").textContent = `\u5DF2\u4F5C\u7B54 ${answeredCount} / 30 \u984C`;
-
-  const subLabels = {
-    CHI: { text: "\u570B\u6587", cls: "bg-rose-100 text-rose-800" },
-    MATH: { text: "\u6578\u5B78", cls: "bg-blue-100 text-blue-800" },
-    ENG: { text: "\u82F1\u6587", cls: "bg-emerald-100 text-emerald-800" }
-  };
-
-  const diffColors = {
-    "\u57FA\u790E": "bg-slate-100 text-slate-700",
-    "\u9032\u968E": "bg-amber-100 text-amber-800",
-    "\u6311\u6230": "bg-purple-100 text-purple-800"
-  };
-
-  const container = document.getElementById("exam-questions-list");
-  container.innerHTML = examQuestions.map((q, idx) => {
-    if (examFilter !== "ALL" && q.sub !== examFilter) return "";
-
-    const userAns = examAnswers[idx];
-    const optsHtml = q.opts.map((opt, oIdx) => {
-      let cls = "bg-white/95 hover:bg-slate-50 border-slate-200 text-slate-800";
-      if (examSubmitted) {
-        if (oIdx === q.ans) cls = "bg-emerald-100 border-emerald-500 text-emerald-950 font-black";
-        else if (userAns === oIdx) cls = "bg-rose-100 border-rose-500 text-rose-900";
-      } else if (userAns === oIdx) {
-        cls = "bg-blue-50 border-blue-600 text-blue-950 font-extrabold";
+  <script>
+    // =========================================================================
+    // 1. CLOUD CONFIGURATION & OFFLINE FALLBACK DATA
+    // =========================================================================
+    const SHEET_ID = '1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA';
+    const STORAGE_KEY = 'private_school_sprint_v3_state';
+
+    const FALLBACK_LECTURES = [
+      {
+        id: '國文_字音字形與成語辨析核心考點',
+        subject: '國文',
+        category: '字音字形與成語',
+        title: '字音字形與成語辨析核心考點',
+        content: '私中入學考常考「一字多音」與「形近字辨析」。例如：「供」給（ㄍㄨㄥ）與「供」奉（ㄍㄨㄥˋ）；「載」歌「載」舞（ㄗㄞˋ）與一年半「載」（ㄗㄞˇ）。成語題則常考褒貶誤用，如「罄竹難書」專指罪惡極多，不可用於善行；「美輪美奐」專指建築物高大華美，不可形容食物或風景。',
+        imageUrl: ''
+      },
+      {
+        id: '數學_雞兔同籠與速率追及問題速解',
+        subject: '數學',
+        category: '應用問題速解',
+        title: '雞兔同籠與速率追及問題速解',
+        content: '1. 雞兔同籠假設法：假設全部都是腳數較少的動物，用「總腳數差 ÷ 單隻腳數差」即可快速求出腳數較多的動物數量。\n2. 追及問題：追及時間 ＝ 初始距離差 ÷ 速度差。相向而行（相遇問題）：相遇時間 ＝ 總距離 ÷ 速度和。',
+        imageUrl: ''
+      },
+      {
+        id: '英文_五大基本時態與疑問詞精準判斷',
+        subject: '英文',
+        category: '核心文法與時態',
+        title: '五大基本時態與疑問詞精準判斷',
+        content: '看到時間副詞立刻鎖定時態：\n• every day / usually → 現在簡單式（注意第三人稱單數動詞加 s/es）\n• now / Look! / Listen! → 現在進行式（be + V-ing）\n• yesterday / ago / last night → 過去簡單式\n• tomorrow / next week → 未來式（will + 原形V / be going to + 原形V）',
+        imageUrl: ''
       }
-      return `
-        <button onclick="selectExamOption(${idx}, ${oIdx})" ${examSubmitted ? "disabled" : ""} class="w-full text-left p-3.5 rounded-2xl border-2 text-xs sm:text-sm font-semibold transition cursor-pointer flex items-center gap-2.5 ${cls}">
-          <span class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center text-xs font-black shrink-0">${String.fromCharCode(65 + oIdx)}</span>
-          <span>${opt}</span>
-        </button>
-      `;
-    }).join("");
+    ];
 
-    return `
-      <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-3.5 ${examSubmitted ? (userAns === q.ans ? "border-emerald-300" : "border-rose-300") : ""}">
-        <div class="flex flex-wrap justify-between items-center gap-2">
-          <div class="flex flex-wrap items-center gap-1.5">
-            <span class="px-2.5 py-1 rounded-xl text-xs font-black ${subLabels[q.sub].cls}">${subLabels[q.sub].text}</span>
-            <span class="px-2.5 py-1 rounded-xl text-xs font-black ${diffColors[q.diff]}">${q.diff}</span>
-            <span class="text-xs text-slate-500 font-bold">&middot; ${q.type}</span>
-            <strong class="ml-1 text-sm sm:text-base text-slate-900">\u7B2C ${idx + 1} \u984C</strong>
+    const FALLBACK_QUESTIONS = [
+      {
+        id: '國文_下列哪一個成語的使用完全正確',
+        subject: '國文',
+        category: '成語應用',
+        stem: '下列哪一個成語的使用完全正確？',
+        options: ['這家餐廳的牛排真是美輪美奐，令人回味無窮。', '他平日樂善好施，善行真是罄竹難書。', '經過老師的點撥，他終於茅塞頓開，想通了這道難題。', '這場音樂會演奏得如此精彩，觀眾無不趨之若鶩地鼓掌。'],
+        answerIndex: 2,
+        explanation: '「茅塞頓開」形容原本閉塞的心思忽然打開，領悟明白。「美輪美奐」形容建築；「罄竹難書」形容罪惡多；「趨之若鶩」含貶義，指爭相追逐不正當的事物。',
+        imageUrl: ''
+      },
+      {
+        id: '國文_「學而不思則罔，思而不學則殆」',
+        subject: '國文',
+        category: '國學常識',
+        stem: '孔子說：「學而不思則罔，思而不學則殆。」這句話主要在勉勵我們什麼？',
+        options: ['學習只要多背誦自然就會理解', '讀書學習與深入思考必須並重，缺一不可', '遇到不懂的問題應該立刻放棄', '思考比閱讀書籍更加重要'],
+        answerIndex: 1,
+        explanation: '「罔」是迷惑無所得，「殆」是精神疲倦而無所得。孔子強調學習與思考必須相輔相成。',
+        imageUrl: ''
+      },
+      {
+        id: '國文_閱讀短文：古人云：「工欲善其事',
+        subject: '國文',
+        category: '閱讀理解',
+        stem: '閱讀下文並回答問題：\n「古人云：『工欲善其事，必先利其器。』在資訊爆炸的時代，知識更新的速度極快，唯有養成良好的閱讀習慣與筆記整理方法，才能在面對複雜問題時抽絲剝繭，找到關鍵線索。許多同學花費大量時間熬夜刷題，卻忽略了訂正錯題的重要性，結果同樣的錯誤一再重演，事倍功半。」\n\n根據本文，作者認為避免「事倍功半」的最關鍵做法為何？',
+        options: ['每天熬夜做大量題目', '重視錯題訂正並建立良好的整理方法', '完全依賴補習班老師猜題', '只讀課外讀物不做練習'],
+        answerIndex: 1,
+        explanation: '文中明確指出「唯有養成良好的閱讀習慣與筆記整理方法」並重視「訂正錯題的重要性」，才能避免同樣錯誤重演。',
+        imageUrl: ''
+      },
+      {
+        id: '數學_將一條長 120 公分的繩子圍成',
+        subject: '數學',
+        category: '幾何周長與面積',
+        stem: '將一條長 120 公分的繩子圍成一個長方形，已知長比寬多 10 公分，請問這個長方形的面積是多少平方公分？',
+        options: ['800 平方公分', '875 平方公分', '900 平方公分', '3500 平方公分'],
+        answerIndex: 1,
+        explanation: '長方形周長 120 公分，所以「長＋寬 ＝ 120 ÷ 2 ＝ 60」公分。和差問題：長 ＝ (60 + 10) ÷ 2 ＝ 35 公分，寬 ＝ 35 - 10 ＝ 25 公分。面積 ＝ 35 × 25 ＝ 875 平方公分。',
+        imageUrl: ''
+      },
+      {
+        id: '數學_某班有 40 位學生，數學及格的',
+        subject: '數學',
+        category: '集合與容斥原理',
+        stem: '某班有 40 位學生，段考數學及格的有 28 人，英文及格的有 24 人，兩科都不及格的有 4 人，請問兩科都及格的有多少人？',
+        options: ['12 人', '14 人', '16 人', '18 人'],
+        answerIndex: 2,
+        explanation: '至少一科及格的人數 ＝ 40 - 4 ＝ 36 人。兩科都及格 ＝ 28 + 24 - 36 ＝ 16 人。',
+        imageUrl: ''
+      },
+      {
+        id: '數學_甲、乙兩地相距 240 公里，一輛',
+        subject: '數學',
+        category: '速率問題',
+        stem: '甲、乙兩地相距 240 公里，一輛汽車從甲地開往乙地時速 60 公里，回程時速 40 公里，請問這輛汽車往返一趟的平均時速是多少公里？',
+        options: ['48 公里/時', '50 公里/時', '52 公里/時', '45 公里/時'],
+        answerIndex: 0,
+        explanation: '平均速率 ＝ 總距離 ÷ 總時間。去程時間 ＝ 240 ÷ 60 ＝ 4 小時，回程時間 ＝ 240 ÷ 40 ＝ 6 小時。總距離 480 ÷ 總時間 10 ＝ 48 公里/時。',
+        imageUrl: ''
+      },
+      {
+        id: '英文_Look! The boys ______',
+        subject: '英文',
+        category: '動詞時態',
+        stem: 'Look! The boys ______ basketball happily on the playground right now.',
+        options: ['play', 'plays', 'are playing', 'played'],
+        answerIndex: 2,
+        explanation: '句首有 Look! 且句尾有 right now（現在），表示動作正在進行，主詞 The boys 為複數，故選現在進行式 are playing。',
+        imageUrl: ''
+      },
+      {
+        id: '英文_______ does your father',
+        subject: '英文',
+        category: '疑問詞用法',
+        stem: 'A: ______ does your father go to work every morning?\nB: He goes to work by MRT.',
+        options: ['What', 'Where', 'How', 'When'],
+        answerIndex: 2,
+        explanation: '答句回答「by MRT（搭捷運）」，詢問交通方式應使用疑問詞 How。',
+        imageUrl: ''
+      },
+      {
+        id: '英文_Read the passage: "Mia is',
+        subject: '英文',
+        category: '閱讀測驗',
+        stem: 'Read the passage and answer the question:\n"Mia is a sixth-grade student who loves animals. Every Saturday morning, she volunteers at an animal shelter near her home. She helps clean the cages, feeds the puppies, and walks the older dogs in the park. Mia says taking care of animals teaches her patience and responsibility. In the future, she hopes to become a veterinarian so she can help even more sick animals."\n\nWhy does Mia want to become a veterinarian in the future?',
+        options: ['Because she wants to work in a big park.', 'Because she hopes to help more sick animals.', 'Because she wants to sell puppies.', 'Because her parents are doctors.'],
+        answerIndex: 1,
+        explanation: '文章最後一句提到 "she hopes to become a veterinarian so she can help even more sick animals"（她希望成為獸醫以幫助更多生病的動物）。',
+        imageUrl: ''
+      }
+    ];
+
+    // =========================================================================
+    // 2. STATE MANAGEMENT
+    // =========================================================================
+    let appState = {
+      passedWeeks: 0,
+      solvedIds: [],
+      wrongQuestions: [], // array of question objects
+      lastSyncText: '尚未同步',
+      isOfflineFallback: false
+    };
+
+    let cloudLectures = [];
+    let cloudQuestions = [];
+    let currentLectureSubject = '國文';
+    let currentWrongFilter = 'ALL';
+
+    // Exam Session State
+    let examSession = {
+      questions: [],
+      answers: {},       // index -> selectedOptionIndex (0..3)
+      eliminated: {},    // index -> Set/Array of eliminated option indices
+      flags: {},         // index -> boolean
+      currentIndex: 0,
+      remainingSeconds: 1800,
+      timerId: null,
+      isPaused: false,
+      isSubmitted: false,
+      passageCollapsed: false
+    };
+
+    let resetConfirmStep = false;
+    let resetTimeoutId = null;
+
+    // =========================================================================
+    // 3. UTILITIES: CONTENT-HASH ID, GOOGLE DRIVE URL, RFC 4180 CSV PARSER
+    // =========================================================================
+    function makeFingerprintId(subject, text) {
+      const cleanSubj = (subject || '綜合').trim();
+      const cleanStem = (text || '').replace(/\s+/g, '').slice(0, 24);
+      return `${cleanSubj}_${cleanStem}`;
+    }
+
+    function normalizeGoogleDriveImage(url) {
+      if (!url || typeof url !== 'string') return '';
+      const trimmed = url.trim();
+      if (!trimmed) return '';
+      // Match /file/d/FILE_ID/ or ?id=FILE_ID or open?id=FILE_ID
+      const fileDMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (fileDMatch && fileDMatch[1]) {
+        return `https://lh3.googleusercontent.com/d/${fileDMatch[1]}`;
+      }
+      const idParamMatch = trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      if (idParamMatch && idParamMatch[1]) {
+        return `https://lh3.googleusercontent.com/d/${idParamMatch[1]}`;
+      }
+      return trimmed;
+    }
+
+    // Full RFC 4180 CSV Parser (handles commas & multi-line newlines inside quotes)
+    function parseRFC4180CSV(csvText) {
+      const rows = [];
+      let currentRow = [];
+      let currentField = '';
+      let insideQuotes = false;
+
+      for (let i = 0; i < csvText.length; i++) {
+        const char = csvText[i];
+        const nextChar = csvText[i + 1];
+
+        if (insideQuotes) {
+          if (char === '"' && nextChar === '"') {
+            currentField += '"';
+            i++; // skip escaped quote
+          } else if (char === '"') {
+            insideQuotes = false;
+          } else {
+            currentField += char;
+          }
+        } else {
+          if (char === '"') {
+            insideQuotes = true;
+          } else if (char === ',') {
+            currentRow.push(currentField);
+            currentField = '';
+          } else if (char === '\r' && nextChar === '\n') {
+            currentRow.push(currentField);
+            rows.push(currentRow);
+            currentRow = [];
+            currentField = '';
+            i++;
+          } else if (char === '\n' || char === '\r') {
+            currentRow.push(currentField);
+            rows.push(currentRow);
+            currentRow = [];
+            currentField = '';
+          } else {
+            currentField += char;
+          }
+        }
+      }
+      if (currentField.length > 0 || currentRow.length > 0) {
+        currentRow.push(currentField);
+        rows.push(currentRow);
+      }
+      return rows;
+    }
+
+    function normalizeSubject(raw) {
+      const s = (raw || '').trim();
+      if (s.includes('國')) return '國文';
+      if (s.includes('數')) return '數學';
+      if (s.includes('英')) return '英文';
+      return '國文';
+    }
+
+    function parseAnswerIndex(rawAns, options) {
+      const clean = (rawAns || '').trim().toUpperCase();
+      if (clean === 'A' || clean === '1' || clean === '(A)') return 0;
+      if (clean === 'B' || clean === '2' || clean === '(B)') return 1;
+      if (clean === 'C' || clean === '3' || clean === '(C)') return 2;
+      if (clean === 'D' || clean === '4' || clean === '(D)') return 3;
+      const idx = options.findIndex(opt => opt.trim() === (rawAns || '').trim());
+      return idx >= 0 ? idx : 0;
+    }
+
+    // =========================================================================
+    // 4. CLOUD-FIRST DUAL-SHEET CSV SYNC (Method 3)
+    // =========================================================================
+    async function syncCloudData(showToastFeedback = false) {
+      const statusEl = document.getElementById('statSyncStatus');
+      const subEl = document.getElementById('statSyncSub');
+      const syncBtn = document.getElementById('syncNowBtn');
+
+      if (statusEl) statusEl.textContent = '正在連線雲端題庫...';
+      if (syncBtn) syncBtn.disabled = true;
+
+      const ts = Date.now();
+      const lecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('講義DLC')}&_t=${ts}`;
+      const qUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent('題庫DLC')}&_t=${ts}`;
+
+      try {
+        const [lecRes, qRes] = await Promise.all([
+          fetch(lecUrl, { cache: 'no-store' }),
+          fetch(qUrl, { cache: 'no-store' })
+        ]);
+
+        if (!lecRes.ok || !qRes.ok) throw new Error('HTTP Fetch Failed');
+
+        const [lecCsv, qCsv] = await Promise.all([lecRes.text(), qRes.text()]);
+
+        const lecRows = parseRFC4180CSV(lecCsv);
+        const qRows = parseRFC4180CSV(qCsv);
+
+        const parsedLectures = mapLectureRows(lecRows);
+        const parsedQuestions = mapQuestionRows(qRows);
+
+        if (parsedLectures.length === 0 && parsedQuestions.length === 0) {
+          throw new Error('Empty Cloud Sheet');
+        }
+
+        cloudLectures = parsedLectures.length > 0 ? parsedLectures : [...FALLBACK_LECTURES];
+        cloudQuestions = parsedQuestions.length > 0 ? parsedQuestions : [...FALLBACK_QUESTIONS];
+        appState.isOfflineFallback = false;
+
+        const syncLabel = `已同步 ${cloudLectures.length} 講義 / ${cloudQuestions.length} 題`;
+        appState.lastSyncText = syncLabel;
+        if (statusEl) statusEl.textContent = syncLabel;
+        if (subEl) subEl.textContent = `更新時間：${new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}`;
+        const miniBadge = document.getElementById('miniSyncBadge');
+        if (miniBadge) miniBadge.textContent = `☁️ ${syncLabel}`;
+
+        saveState();
+        if (showToastFeedback) showToast(`✅ 雲端題庫同步成功（${syncLabel}）`);
+      } catch (err) {
+        console.warn('Cloud sync failed, using offline fallback pool:', err);
+        cloudLectures = [...FALLBACK_LECTURES];
+        cloudQuestions = [...FALLBACK_QUESTIONS];
+        appState.isOfflineFallback = true;
+
+        const offlineLabel = `離線備援 (${cloudLectures.length} 講義 / ${cloudQuestions.length}+ 題)`;
+        if (statusEl) statusEl.textContent = offlineLabel;
+        if (subEl) subEl.textContent = '目前為離線備援題庫（含動態數學題）';
+        const miniBadge = document.getElementById('miniSyncBadge');
+        if (miniBadge) miniBadge.textContent = `⚡ ${offlineLabel}`;
+
+        if (showToastFeedback) showToast('⚠️ 無法連線雲端，已啟用離線備援題庫');
+      } finally {
+        if (syncBtn) syncBtn.disabled = false;
+        renderLectures();
+        renderWarmupQuestions(false);
+      }
+    }
+
+    function findColIdx(headers, keywords, fallbackIdx) {
+      const idx = headers.findIndex(h => keywords.some(k => (h || '').includes(k)));
+      return idx >= 0 ? idx : fallbackIdx;
+    }
+
+    function mapLectureRows(rows) {
+      if (!rows || rows.length < 2) return [];
+      const headers = rows[0].map(h => (h || '').trim());
+      const subjIdx = findColIdx(headers, ['科目', '學科'], 0);
+      const catIdx = findColIdx(headers, ['分類', '單元', '主題', '類別'], 1);
+      const titleIdx = findColIdx(headers, ['標題', '講題', '名稱'], 2);
+      const contentIdx = findColIdx(headers, ['內容', '重點', '講義', '說明'], 3);
+      const imgIdx = findColIdx(headers, ['圖片', '圖示', '連結', 'URL', 'image'], 4);
+
+      const list = [];
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || r.every(cell => !(cell || '').trim())) continue;
+        const subject = normalizeSubject(r[subjIdx]);
+        const category = (r[catIdx] || '核心重點').trim();
+        const title = (r[titleIdx] || `${subject}重點精講 #${i}`).trim();
+        const content = (r[contentIdx] || '').trim();
+        if (!content && !title) continue;
+        const imageUrl = normalizeGoogleDriveImage(r[imgIdx] || '');
+        list.push({
+          id: makeFingerprintId(subject, title + content),
+          subject,
+          category,
+          title,
+          content,
+          imageUrl
+        });
+      }
+      return list;
+    }
+
+    function mapQuestionRows(rows) {
+      if (!rows || rows.length < 2) return [];
+      const headers = rows[0].map(h => (h || '').trim());
+      const subjIdx = findColIdx(headers, ['科目', '學科'], 0);
+      const catIdx = findColIdx(headers, ['分類', '單元', '題型'], 1);
+      const stemIdx = findColIdx(headers, ['題目', '題幹', '問題'], 2);
+      const optAIdx = findColIdx(headers, ['選項A', 'A', '(A)'], 3);
+      const optBIdx = findColIdx(headers, ['選項B', 'B', '(B)'], 4);
+      const optCIdx = findColIdx(headers, ['選項C', 'C', '(C)'], 5);
+      const optDIdx = findColIdx(headers, ['選項D', 'D', '(D)'], 6);
+      const ansIdx = findColIdx(headers, ['答案', '正解'], 7);
+      const expIdx = findColIdx(headers, ['解析', '詳解', '說明'], 8);
+      const imgIdx = findColIdx(headers, ['圖片', '圖示', '連結', 'URL', 'image'], 9);
+
+      const list = [];
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        if (!r || r.every(cell => !(cell || '').trim())) continue;
+        const subject = normalizeSubject(r[subjIdx]);
+        const category = (r[catIdx] || '綜合演練').trim();
+        const stem = (r[stemIdx] || '').trim();
+        const options = [
+          (r[optAIdx] || '').trim(),
+          (r[optBIdx] || '').trim(),
+          (r[optCIdx] || '').trim(),
+          (r[optDIdx] || '').trim()
+        ];
+        if (!stem || options.filter(Boolean).length < 2) continue;
+        const answerIndex = parseAnswerIndex(r[ansIdx], options);
+        const explanation = (r[expIdx] || '請仔細核對題意與關鍵條件。').trim();
+        const imageUrl = normalizeGoogleDriveImage(r[imgIdx] || '');
+
+        list.push({
+          id: makeFingerprintId(subject, stem),
+          subject,
+          category,
+          stem,
+          options,
+          answerIndex,
+          explanation,
+          imageUrl
+        });
+      }
+      return list;
+    }
+
+    // =========================================================================
+    // 5. COLLISION-FREE DYNAMIC MATH GENERATORS
+    // =========================================================================
+    function generateDynamicMathQuestions(count, existingIds = new Set()) {
+      const generated = [];
+      let safety = 0;
+
+      const templates = [
+        // 1. 雞兔同籠
+        () => {
+          const totalHeads = randInt(18, 38);
+          const rabbits = randInt(6, totalHeads - 5);
+          const chickens = totalHeads - rabbits;
+          const totalLegs = chickens * 2 + rabbits * 4;
+          const stem = `農場裡共有雞和兔子 ${totalHeads} 隻，數一數牠們的腳共有 ${totalLegs} 隻，請問農場裡有幾隻兔子？`;
+          const ans = `${rabbits} 隻`;
+          const distractors = [`${chickens} 隻`, `${rabbits + 2} 隻`, `${Math.max(1, rabbits - 2)} 隻`];
+          return buildMathObj('雞兔同籠', stem, ans, distractors,
+            `假設 ${totalHeads} 隻全是雞，共有 ${totalHeads * 2} 隻腳，少了 ${totalLegs - totalHeads * 2} 隻腳。每將 1 隻雞換成兔子會多 2 隻腳，所以兔子有 (${totalLegs} - ${totalHeads * 2}) ÷ 2 = ${rabbits} 隻。`);
+        },
+        // 2. 年齡差不變問題
+        () => {
+          const sonNow = randInt(9, 14);
+          const diff = randInt(24, 34);
+          const dadNow = sonNow + diff;
+          const yearsLater = randInt(3, 8);
+          const stem = `今年小華 ${sonNow} 歲，爸爸 ${dadNow} 歲，請問 ${yearsLater} 年後，爸爸和小華相差幾歲？`;
+          const ans = `${diff} 歲`;
+          const distractors = [`${diff + yearsLater} 歲`, `${Math.max(10, diff - yearsLater)} 歲`, `${dadNow + yearsLater} 歲`];
+          return buildMathObj('年齡問題', stem, ans, distractors,
+            `兩人的年齡差永遠不會改變！今年相差 ${dadNow} - ${sonNow} = ${diff} 歲，${yearsLater} 年後依然相差 ${diff} 歲。`);
+        },
+        // 3. 植樹問題（兩端都種）
+        () => {
+          const interval = [5, 8, 10, 12, 15][randInt(0, 4)];
+          const gaps = randInt(12, 25);
+          const roadLen = interval * gaps;
+          const trees = gaps + 1;
+          const stem = `在一條長 ${roadLen} 公尺的筆直道路一旁種樹，每隔 ${interval} 公尺種一棵，如果道路的頭尾兩端都要種樹，一共需要種幾棵樹？`;
+          const ans = `${trees} 棵`;
+          const distractors = [`${gaps} 棵`, `${gaps - 1} 棵`, `${trees * 2} 棵`];
+          return buildMathObj('植樹問題', stem, ans, distractors,
+            `間隔數 = ${roadLen} ÷ ${interval} = ${gaps} 個。兩端都種時，棵數 = 間隔數 + 1 = ${gaps} + 1 = ${trees} 棵。`);
+        },
+        // 4. 濃度與比例混合
+        () => {
+          const water = [160, 180, 220, 270][randInt(0, 3)];
+          const salt = [40, 20, 30, 30][randInt(0, 3)];
+          const total = water + salt;
+          const pct = Math.round((salt / total) * 100);
+          const stem = `將 ${salt} 公克的食鹽完全溶解在 ${water} 公克的純水中，請問這杯食鹽水的重量百分濃度是多少？`;
+          const ans = `${pct}%`;
+          const distractors = [`${Math.round((salt / water) * 100)}%`, `${pct + 5}%`, `${Math.max(2, pct - 3)}%`];
+          return buildMathObj('百分率與濃度', stem, ans, distractors,
+            `食鹽水總重量 = 食鹽 + 水 = ${salt} + ${water} = ${total} 公克。濃度 = (${salt} ÷ ${total}) × 100% = ${pct}%。`);
+        },
+        // 5. 最小公倍數週期相遇
+        () => {
+          const pairs = [[6, 8, 24], [4, 6, 12], [6, 9, 18], [8, 12, 24], [10, 15, 30]];
+          const [a, b, lcm] = pairs[randInt(0, pairs.length - 1)];
+          const stem = `公車甲線每 ${a} 分鐘發一班車，乙線每 ${b} 分鐘發一班車。早上 8:00 兩線公車同時從總站發車，請問下一次兩線公車同時發車是幾點幾分？`;
+          const ans = `8:${String(lcm).padStart(2, '0')}`;
+          const distractors = [`8:${String(a + b).padStart(2, '0')}`, `8:${String(lcm + 6).padStart(2, '0')}`, `9:00`];
+          return buildMathObj('因數與倍數', stem, ans, distractors,
+            `求 ${a} 和 ${b} 的最小公倍數，[${a}, ${b}] = ${lcm} 分鐘。8:00 過 ${lcm} 分鐘後為 8:${String(lcm).padStart(2, '0')}。`);
+        },
+        // 6. 分配律巧算
+        () => {
+          const factor = [125, 25, 37, 99][randInt(0, 3)];
+          const a = randInt(32, 68);
+          const b = 100 - a;
+          const total = factor * 100;
+          const stem = `巧算下列算式的值：${factor} × ${a} + ${factor} × ${b} = ？`;
+          const ans = `${total.toLocaleString()}`;
+          const distractors = [`${(total - factor).toLocaleString()}`, `${(factor * 10).toLocaleString()}`, `${(total + 100).toLocaleString()}`];
+          return buildMathObj('四則巧算', stem, ans, distractors,
+            `利用乘法對加法的分配律：${factor} × (${a} + ${b}) = ${factor} × 100 = ${total.toLocaleString()}。`);
+        }
+      ];
+
+      while (generated.length < count && safety < count * 15) {
+        safety++;
+        const fn = templates[safety % templates.length];
+        const q = fn();
+        if (!existingIds.has(q.id)) {
+          existingIds.add(q.id);
+          generated.push(q);
+        }
+      }
+      return generated;
+    }
+
+    function buildMathObj(category, stem, correctAns, distractors, explanation) {
+      const rawOptions = [correctAns, ...distractors];
+      // Shuffle options deterministically-free
+      const indexed = rawOptions.map((text, idx) => ({ text, isCorrect: idx === 0 }));
+      for (let i = indexed.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+      }
+      const answerIndex = indexed.findIndex(o => o.isCorrect);
+      return {
+        id: makeFingerprintId('數學', stem),
+        subject: '數學',
+        category,
+        stem,
+        options: indexed.map(o => o.text),
+        answerIndex,
+        explanation,
+        imageUrl: ''
+      };
+    }
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // =========================================================================
+    // 6. PERSISTENCE & LOBBY STATUS
+    // =========================================================================
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          appState = { ...appState, ...parsed };
+        }
+      } catch (e) {
+        console.warn('Could not load localStorage state', e);
+      }
+      updateLobbyStats();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (e) {
+        console.warn('Could not save localStorage state', e);
+      }
+      updateLobbyStats();
+    }
+
+    function updateLobbyStats() {
+      const currentWeek = Math.min(15, appState.passedWeeks + 1);
+      const cwEl = document.getElementById('statCurrentWeek');
+      const pwEl = document.getElementById('statPassedWeeks');
+      const wcEl = document.getElementById('statWrongCount');
+      const badgeEl = document.getElementById('navWrongBadge');
+
+      if (cwEl) cwEl.textContent = `第 ${currentWeek} 週 / 共 15 週`;
+      if (pwEl) pwEl.textContent = `${appState.passedWeeks} / 15 週`;
+      if (wcEl) wcEl.textContent = `${appState.wrongQuestions.length} 題`;
+      if (badgeEl) badgeEl.textContent = appState.wrongQuestions.length;
+    }
+
+    // =========================================================================
+    // 7. NAVIGATION & STEP 1 (LECTURES + WARMUP)
+    // =========================================================================
+    function enterWorkspace(stepName) {
+      document.getElementById('lobbyView').classList.add('hidden');
+      document.getElementById('workspaceView').classList.remove('hidden');
+      switchStep(stepName);
+    }
+
+    function returnToLobby() {
+      pauseExamTimerOnly();
+      document.getElementById('workspaceView').classList.add('hidden');
+      document.getElementById('lobbyView').classList.remove('hidden');
+      updateLobbyStats();
+    }
+
+    function switchStep(stepName) {
+      ['step1', 'step2', 'step3'].forEach(s => {
+        const contentEl = document.getElementById(`${s}Content`);
+        const navEl = document.getElementById(`nav${s.charAt(0).toUpperCase() + s.slice(1)}`);
+        if (s === stepName) {
+          contentEl.classList.remove('hidden');
+          navEl.classList.add('bg-white', 'text-indigo-700', 'shadow-sm');
+          navEl.classList.remove('text-slate-600');
+        } else {
+          contentEl.classList.add('hidden');
+          navEl.classList.remove('bg-white', 'text-indigo-700', 'shadow-sm');
+          navEl.classList.add('text-slate-600');
+        }
+      });
+
+      if (stepName === 'step1') {
+        selectLectureSubject(currentLectureSubject);
+      } else if (stepName === 'step2') {
+        if (examSession.questions.length === 0) {
+          startNewExam(false);
+        } else if (!examSession.isSubmitted && !examSession.isPaused) {
+          resumeExamTimerOnly();
+        }
+      } else if (stepName === 'step3') {
+        pauseExamTimerOnly();
+        renderWrongNotebook();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectLectureSubject(subject) {
+      currentLectureSubject = subject;
+      ['國文', '數學', '英文'].forEach(s => {
+        const btn = document.getElementById(`lecTab_${s}`);
+        if (!btn) return;
+        if (s === subject) {
+          btn.className = 'px-4 py-2 rounded-xl text-sm font-extrabold bg-indigo-600 text-white shadow-sm transition-all';
+        } else {
+          btn.className = 'px-4 py-2 rounded-xl text-sm font-extrabold text-slate-600 hover:bg-white/70 transition-all';
+        }
+      });
+      renderLectures();
+      renderWarmupQuestions(false);
+    }
+
+    function renderLectures() {
+      const container = document.getElementById('lectureListContainer');
+      if (!container) return;
+      const filtered = cloudLectures.filter(l => l.subject === currentLectureSubject);
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center rounded-2xl bg-slate-50 text-slate-500 text-sm">目前「${currentLectureSubject}」尚無雲端講義資料，請點擊大廳的「立即同步最新題庫」。</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map((lec, idx) => `
+        <article class="bg-white/90 rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-sm hover:border-indigo-200 transition-all">
+          <div class="flex flex-wrap items-center gap-2 mb-2.5">
+            <span class="px-2.5 py-0.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-extrabold">#${idx + 1}</span>
+            <span class="px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-900 text-xs font-bold">${escapeHtml(lec.category)}</span>
           </div>
-          <button onclick="revealExamHint(${idx})" class="px-3 py-1.5 rounded-xl border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold cursor-pointer">
-            &#x1F4A1; &#x63D0;&#x793A;
+          <h3 class="text-base sm:text-lg font-extrabold text-slate-900 mb-2.5">${escapeHtml(lec.title)}</h3>
+          <div class="text-sm sm:text-[15px] text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(lec.content)}</div>
+          ${renderImageBlock(lec.imageUrl)}
+        </article>
+      `).join('');
+    }
+
+    let currentWarmupList = [];
+    function renderWarmupQuestions(forceRefresh) {
+      const container = document.getElementById('warmupContainer');
+      if (!container) return;
+
+      if (forceRefresh || currentWarmupList.length === 0 || currentWarmupList[0]?.subject !== currentLectureSubject) {
+        let pool = cloudQuestions.filter(q => q.subject === currentLectureSubject);
+        if (currentLectureSubject === '數學' && pool.length < 3) {
+          const existing = new Set(pool.map(p => p.id));
+          pool = [...pool, ...generateDynamicMathQuestions(3 - pool.length, existing)];
+        }
+        currentWarmupList = shuffleArray([...pool]).slice(0, 3);
+      }
+
+      const labels = ['A', 'B', 'C', 'D'];
+      container.innerHTML = currentWarmupList.map((q, qIdx) => `
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm" id="warmupCard_${qIdx}">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-2.5 py-0.5 rounded-md bg-sky-100 text-sky-800 text-xs font-extrabold">暖身題 ${qIdx + 1}</span>
+            <span class="text-xs font-semibold text-slate-400">${escapeHtml(q.category)}</span>
+          </div>
+          <p class="text-sm sm:text-base font-bold text-slate-900 whitespace-pre-line leading-relaxed mb-3.5">${escapeHtml(q.stem)}</p>
+          ${renderImageBlock(q.imageUrl)}
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${q.options.map((opt, oIdx) => `
+              <button onclick="answerWarmup(${qIdx}, ${oIdx})" id="wOpt_${qIdx}_${oIdx}"
+                class="option-btn text-left px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-indigo-50 hover:border-indigo-300 text-sm font-medium text-slate-800 flex items-start gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-xs font-extrabold flex items-center justify-center shrink-0 mt-0.5">${labels[oIdx]}</span>
+                <span>${escapeHtml(opt)}</span>
+              </button>
+            `).join('')}
+          </div>
+          <div id="wExp_${qIdx}" class="hidden mt-3.5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm text-emerald-950 leading-relaxed"></div>
+        </div>
+      `).join('');
+    }
+
+    function answerWarmup(qIdx, selectedIdx) {
+      const q = currentWarmupList[qIdx];
+      if (!q) return;
+      q.options.forEach((_, oIdx) => {
+        const btn = document.getElementById(`wOpt_${qIdx}_${oIdx}`);
+        if (!btn) return;
+        btn.disabled = true;
+        btn.classList.remove('bg-slate-50/70', 'hover:bg-indigo-50');
+        if (oIdx === q.answerIndex) {
+          btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-950', 'font-bold');
+        } else if (oIdx === selectedIdx) {
+          btn.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-950');
+        } else {
+          btn.classList.add('opacity-60');
+        }
+      });
+      const expEl = document.getElementById(`wExp_${qIdx}`);
+      if (expEl) {
+        const isRight = selectedIdx === q.answerIndex;
+        expEl.classList.remove('hidden');
+        expEl.innerHTML = `<div class="font-extrabold mb-1">${isRight ? '🎉 答對了！' : '💡 再想一下喔！'}</div><div>${escapeHtml(q.explanation)}</div>`;
+      }
+    }
+
+    // =========================================================================
+    // 8. STEP 2: 30-QUESTION MOCK EXAM ENGINE
+    // =========================================================================
+    function build30QuestionExamSet() {
+      const pickSubject = (subj, needed) => {
+        const allSubj = cloudQuestions.filter(q => q.subject === subj);
+        const unseen = shuffleArray(allSubj.filter(q => !appState.solvedIds.includes(q.id)));
+        const seen = shuffleArray(allSubj.filter(q => appState.solvedIds.includes(q.id)));
+        const picked = [];
+        const usedIds = new Set();
+
+        for (const item of [...unseen, ...seen]) {
+          if (picked.length >= needed) break;
+          if (!usedIds.has(item.id)) {
+            usedIds.add(item.id);
+            picked.push(item);
+          }
+        }
+
+        // For Math, supplement with collision-free dynamic Math generators
+        if (subj === '數學' && picked.length < needed) {
+          const gen = generateDynamicMathQuestions(needed - picked.length, usedIds);
+          picked.push(...gen);
+        }
+
+        // If Chinese/English cloud pool has fewer than 10 items, pad safely with fallback/shuffled items
+        if (picked.length < needed) {
+          const fallbackPool = FALLBACK_QUESTIONS.filter(q => q.subject === subj);
+          let idx = 0;
+          while (picked.length < needed && fallbackPool.length > 0) {
+            const base = fallbackPool[idx % fallbackPool.length];
+            picked.push({ ...base, id: `${base.id}_dup${picked.length}` });
+            idx++;
+          }
+        }
+        return picked.slice(0, needed);
+      };
+
+      const chi = pickSubject('國文', 10);
+      const math = pickSubject('數學', 10);
+      const eng = pickSubject('英文', 10);
+      return [...chi, ...math, ...eng];
+    }
+
+    function startNewExam(confirmResetToast) {
+      pauseExamTimerOnly();
+      const set = build30QuestionExamSet();
+      examSession = {
+        questions: set,
+        answers: {},
+        eliminated: {},
+        flags: {},
+        currentIndex: 0,
+        remainingSeconds: 30 * 60,
+        timerId: null,
+        isPaused: false,
+        isSubmitted: false,
+        passageCollapsed: false
+      };
+
+      document.getElementById('examHud').classList.remove('hidden');
+      document.getElementById('examPausedBanner').classList.add('hidden');
+      document.getElementById('examQuestionArea').classList.remove('hidden');
+      document.getElementById('examResultArea').classList.add('hidden');
+      document.getElementById('pauseBtn').textContent = '⏸️ 暫停';
+
+      renderMiniGrid();
+      renderCurrentExamQuestion();
+      startExamTimer();
+
+      if (confirmResetToast) {
+        showToast('🔄 已為您重新抽出 30 題全新模擬試卷！');
+      }
+    }
+
+    function startExamTimer() {
+      pauseExamTimerOnly();
+      updateTimerDisplay();
+      examSession.timerId = setInterval(() => {
+        if (examSession.isPaused || examSession.isSubmitted) return;
+        examSession.remainingSeconds--;
+        updateTimerDisplay();
+        if (examSession.remainingSeconds <= 0) {
+          pauseExamTimerOnly();
+          showToast('⏰ 30 分鐘作答時間到，系統自動交卷批改！');
+          finalizeExam();
+        }
+      }, 1000);
+    }
+
+    function pauseExamTimerOnly() {
+      if (examSession.timerId) {
+        clearInterval(examSession.timerId);
+        examSession.timerId = null;
+      }
+    }
+
+    function resumeExamTimerOnly() {
+      if (!examSession.timerId && !examSession.isSubmitted && !examSession.isPaused) {
+        startExamTimer();
+      }
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(Math.max(0, examSession.remainingSeconds) / 60);
+      const s = Math.max(0, examSession.remainingSeconds) % 60;
+      const el = document.getElementById('examTimerDisplay');
+      if (el) {
+        el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (examSession.remainingSeconds <= 180) {
+          el.classList.add('text-rose-400');
+        } else {
+          el.classList.remove('text-rose-400');
+        }
+      }
+    }
+
+    function toggleExamPause() {
+      if (examSession.isSubmitted) return;
+      examSession.isPaused = !examSession.isPaused;
+      const btn = document.getElementById('pauseBtn');
+      const banner = document.getElementById('examPausedBanner');
+      const qArea = document.getElementById('examQuestionArea');
+
+      if (examSession.isPaused) {
+        btn.textContent = '▶️ 繼續';
+        banner.classList.remove('hidden');
+        qArea.classList.add('hidden');
+      } else {
+        btn.textContent = '⏸️ 暫停';
+        banner.classList.add('hidden');
+        qArea.classList.remove('hidden');
+      }
+    }
+
+    function renderMiniGrid() {
+      const grid = document.getElementById('miniAnswerGrid');
+      const progText = document.getElementById('answeredProgressText');
+      if (!grid) return;
+
+      const answeredCount = Object.keys(examSession.answers).length;
+      if (progText) progText.textContent = `已答 ${answeredCount} / ${examSession.questions.length} 題`;
+
+      grid.innerHTML = examSession.questions.map((_, idx) => {
+        const isAnswered = examSession.answers[idx] !== undefined;
+        const isFlagged = !!examSession.flags[idx];
+        const isCurrent = idx === examSession.currentIndex;
+
+        let classes = 'h-7 sm:h-8 rounded-lg text-xs font-extrabold flex items-center justify-center transition-all cursor-pointer select-none ';
+        if (isAnswered) {
+          classes += 'bg-emerald-500 text-white ';
+        } else {
+          classes += 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 ';
+        }
+        if (isFlagged) {
+          classes += 'ring-2 ring-orange-500 ';
+        }
+        if (isCurrent) {
+          classes += 'outline outline-2 outline-indigo-600 outline-offset-1 scale-105 ';
+        }
+        return `<button onclick="jumpToQuestion(${idx})" class="${classes}" title="第 ${idx + 1} 題">${idx + 1}</button>`;
+      }).join('');
+    }
+
+    function jumpToQuestion(idx) {
+      if (idx < 0 || idx >= examSession.questions.length) return;
+      examSession.currentIndex = idx;
+      renderMiniGrid();
+      renderCurrentExamQuestion();
+    }
+
+    // Detect long reading passage vs question stem
+    function extractReadingPassage(stem) {
+      if (!stem || stem.length < 130) return { passage: '', questionPart: stem };
+      // Check quoted block or multi-paragraph split
+      const lines = stem.split(/\n+/).map(l => l.trim()).filter(Boolean);
+      if (lines.length >= 2) {
+        // Usually the last line is the actual question, and preceding lines form the reading passage
+        const lastLine = lines[lines.length - 1];
+        const body = lines.slice(0, -1).join('\n');
+        if (body.length >= 85) {
+          return { passage: body, questionPart: lastLine };
+        }
+      }
+      // Fallback: if single long paragraph with quotes
+      const quoteMatch = stem.match(/[「"]([\s\S]{80,}?)[」"]/);
+      if (quoteMatch) {
+        const passage = quoteMatch[0];
+        const rest = stem.replace(passage, '').trim();
+        return { passage, questionPart: rest || '請根據上方文章內容選出最適當的答案：' };
+      }
+      return { passage: '', questionPart: stem };
+    }
+
+    function toggleReadingPassage() {
+      examSession.passageCollapsed = !examSession.passageCollapsed;
+      const bodyEl = document.getElementById('readingPassageBody');
+      const btnEl = document.getElementById('togglePassageBtn');
+      if (examSession.passageCollapsed) {
+        bodyEl.classList.add('hidden');
+        btnEl.textContent = '展開全文';
+      } else {
+        bodyEl.classList.remove('hidden');
+        btnEl.textContent = '收合文章';
+      }
+    }
+
+    function renderCurrentExamQuestion() {
+      const idx = examSession.currentIndex;
+      const q = examSession.questions[idx];
+      if (!q) return;
+
+      // Handle Sticky/Collapsible Reading Box
+      const { passage, questionPart } = extractReadingPassage(q.stem);
+      const passageBox = document.getElementById('readingPassageBox');
+      const passageBody = document.getElementById('readingPassageBody');
+      const toggleBtn = document.getElementById('togglePassageBtn');
+
+      if (passage) {
+        passageBox.classList.remove('hidden');
+        passageBody.textContent = passage;
+        if (examSession.passageCollapsed) {
+          passageBody.classList.add('hidden');
+          toggleBtn.textContent = '展開全文';
+        } else {
+          passageBody.classList.remove('hidden');
+          toggleBtn.textContent = '收合文章';
+        }
+      } else {
+        passageBox.classList.add('hidden');
+      }
+
+      const selectedOpt = examSession.answers[idx];
+      const eliminatedSet = new Set(examSession.eliminated[idx] || []);
+      const isFlagged = !!examSession.flags[idx];
+      const labels = ['A', 'B', 'C', 'D'];
+
+      const subjBadgeColor = q.subject === '國文'
+        ? 'bg-rose-100 text-rose-800'
+        : q.subject === '數學'
+          ? 'bg-sky-100 text-sky-800'
+          : 'bg-violet-100 text-violet-800';
+
+      const card = document.getElementById('currentQuestionCard');
+      card.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-200/80">
+          <div class="flex items-center gap-2">
+            <span class="px-3 py-1 rounded-xl bg-slate-900 text-white text-xs sm:text-sm font-black">第 ${idx + 1} / ${examSession.questions.length} 題</span>
+            <span class="px-3 py-1 rounded-xl ${subjBadgeColor} text-xs font-extrabold">${escapeHtml(q.subject)}</span>
+            <span class="text-xs font-semibold text-slate-500">${escapeHtml(q.category)}</span>
+          </div>
+          <button onclick="toggleQuestionFlag(${idx})"
+            class="px-3.5 py-2 rounded-xl border text-xs sm:text-sm font-extrabold transition-all ${isFlagged ? 'bg-orange-100 border-orange-400 text-orange-900' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}">
+            ${isFlagged ? '🚩 已標記待檢查' : '🏳️ 標記此題'}
           </button>
         </div>
 
-        <div class="text-sm sm:text-base font-bold text-slate-900 whitespace-pre-line leading-relaxed">${q.stem}</div>
+        <div class="mt-5 text-base sm:text-lg font-bold text-slate-900 leading-relaxed whitespace-pre-line">
+          ${escapeHtml(questionPart)}
+        </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">${optsHtml}</div>
+        ${renderImageBlock(q.imageUrl)}
 
-        <div id="ex-hint-${idx}" data-lvl="0" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs sm:text-sm text-amber-950"></div>
+        <!-- Options with Elimination Toggle (🚫) -->
+        <div class="mt-6 space-y-3">
+          ${q.options.map((opt, oIdx) => {
+            const isSelected = selectedOpt === oIdx;
+            const isElim = eliminatedSet.has(oIdx);
+            const btnStyle = isSelected
+              ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200'
+              : 'bg-white hover:bg-indigo-50/70 border-slate-200 text-slate-800';
+            const badgeStyle = isSelected
+              ? 'bg-white text-indigo-700'
+              : 'bg-slate-100 text-slate-700';
 
-        ${examSubmitted ? `
-          <div class="p-4 rounded-2xl bg-slate-50 border-l-4 border-teal-700 text-xs sm:text-sm text-slate-700">
-            <strong>&#x767D;&#x8A71;&#x89E3;&#x6790;&#xFF1A;</strong>${q.exp}
+            return `
+              <div class="flex items-stretch gap-2">
+                <button onclick="selectExamOption(${idx}, ${oIdx})"
+                  class="option-btn flex-1 text-left px-4 py-3.5 rounded-2xl border-2 font-semibold text-sm sm:text-base flex items-center gap-3 ${btnStyle} ${isElim ? 'option-eliminated' : ''}">
+                  <span class="w-7 h-7 rounded-xl ${badgeStyle} text-xs sm:text-sm font-black flex items-center justify-center shrink-0">${labels[oIdx]}</span>
+                  <span class="leading-snug">${escapeHtml(opt)}</span>
+                </button>
+                <button onclick="toggleEliminateOption(${idx}, ${oIdx})" title="刪去法劃掉此選項"
+                  class="px-3.5 rounded-2xl border transition-all flex items-center justify-center text-base ${isElim ? 'bg-slate-800 border-slate-800 text-white' : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-500'}">
+                  🚫
+                </button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- Prev / Next Navigation -->
+        <div class="mt-8 pt-5 border-t border-slate-200/80 flex items-center justify-between gap-3">
+          <button onclick="jumpToQuestion(${idx - 1})" ${idx === 0 ? 'disabled' : ''}
+            class="px-5 py-3.5 rounded-2xl bg-white hover:bg-slate-100 disabled:opacity-40 border border-slate-200 text-slate-700 font-extrabold text-sm">
+            ← 上一題
+          </button>
+
+          ${idx < examSession.questions.length - 1 ? `
+            <button onclick="jumpToQuestion(${idx + 1})"
+              class="px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-md shadow-indigo-200">
+              下一題 →
+            </button>
+          ` : `
+            <button onclick="promptSubmitExam()"
+              class="px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-md shadow-emerald-200">
+              ✅ 完成作答，交卷批改
+            </button>
+          `}
+        </div>
+      `;
+    }
+
+    function selectExamOption(qIdx, oIdx) {
+      examSession.answers[qIdx] = oIdx;
+      // Un-eliminate if user explicitly selects it
+      if (examSession.eliminated[qIdx]) {
+        examSession.eliminated[qIdx] = examSession.eliminated[qIdx].filter(i => i !== oIdx);
+      }
+      renderMiniGrid();
+      renderCurrentExamQuestion();
+    }
+
+    function toggleEliminateOption(qIdx, oIdx) {
+      const arr = examSession.eliminated[qIdx] || [];
+      if (arr.includes(oIdx)) {
+        examSession.eliminated[qIdx] = arr.filter(i => i !== oIdx);
+      } else {
+        examSession.eliminated[qIdx] = [...arr, oIdx];
+        if (examSession.answers[qIdx] === oIdx) {
+          delete examSession.answers[qIdx];
+          renderMiniGrid();
+        }
+      }
+      renderCurrentExamQuestion();
+    }
+
+    function toggleQuestionFlag(qIdx) {
+      examSession.flags[qIdx] = !examSession.flags[qIdx];
+      renderMiniGrid();
+      renderCurrentExamQuestion();
+    }
+
+    // Two-Step Submission Confirmation
+    function promptSubmitExam() {
+      const total = examSession.questions.length;
+      const answered = Object.keys(examSession.answers).length;
+      const unanswered = total - answered;
+      const textEl = document.getElementById('submitConfirmText');
+
+      if (unanswered > 0) {
+        textEl.innerHTML = `<span class="inline-block px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 font-extrabold mb-2">⚠️ 注意：還有 ${unanswered} 題尚未作答！</span><br/>目前已完成 ${answered} / ${total} 題，未作答的題目將會計為答錯並收入錯題本。確定要現在交卷嗎？`;
+      } else {
+        textEl.textContent = `太棒了！你已經完成全部 ${total} 道題目。點擊「確認交卷批改」立即查看成績與詳細解析！`;
+      }
+      document.getElementById('submitConfirmModal').classList.remove('hidden');
+    }
+
+    function closeSubmitModal() {
+      document.getElementById('submitConfirmModal').classList.add('hidden');
+    }
+
+    function finalizeExam() {
+      closeSubmitModal();
+      pauseExamTimerOnly();
+      examSession.isSubmitted = true;
+
+      let correctTotal = 0;
+      const subjScores = { '國文': 0, '數學': 0, '英文': 0 };
+      const solvedSet = new Set(appState.solvedIds);
+      const wrongMap = new Map(appState.wrongQuestions.map(w => [w.id, w]));
+
+      examSession.questions.forEach((q, idx) => {
+        const userAns = examSession.answers[idx];
+        const isCorrect = userAns === q.answerIndex;
+        solvedSet.add(q.id);
+
+        if (isCorrect) {
+          correctTotal++;
+          if (subjScores[q.subject] !== undefined) subjScores[q.subject]++;
+        } else {
+          wrongMap.set(q.id, {
+            ...q,
+            lastUserAnswerIndex: userAns !== undefined ? userAns : -1,
+            missedAt: new Date().toLocaleDateString('zh-TW')
+          });
+        }
+      });
+
+      appState.solvedIds = Array.from(solvedSet);
+      appState.wrongQuestions = Array.from(wrongMap.values());
+      if (appState.passedWeeks < 15) {
+        appState.passedWeeks += 1;
+      }
+      saveState();
+
+      renderExamResults(correctTotal, subjScores);
+    }
+
+    function renderExamResults(correctTotal, subjScores) {
+      document.getElementById('examHud').classList.add('hidden');
+      document.getElementById('examQuestionArea').classList.add('hidden');
+      const resultArea = document.getElementById('examResultArea');
+      resultArea.classList.remove('hidden');
+
+      const total = examSession.questions.length;
+      const pct = Math.round((correctTotal / total) * 100);
+      const labels = ['A', 'B', 'C', 'D'];
+
+      resultArea.innerHTML = `
+        <div class="liquid-glass rounded-3xl p-6 sm:p-8 border-2 border-indigo-200">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">🎉 模考批改完成 · 累積通關進度 +1 週</span>
+              <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">本次模擬考成績：${correctTotal} / ${total} 題（${pct} 分）</h2>
+              <p class="text-sm text-slate-600 mt-1">所有答錯與未作答題目已自動收錄至「Step 3 錯題複習本」。</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2.5 shrink-0">
+              <div class="bg-white rounded-2xl p-3.5 text-center border border-slate-200">
+                <div class="text-xs font-bold text-rose-600">國文</div>
+                <div class="text-lg font-black text-slate-900 mt-0.5">${subjScores['國文']} / 10</div>
+              </div>
+              <div class="bg-white rounded-2xl p-3.5 text-center border border-slate-200">
+                <div class="text-xs font-bold text-sky-600">數學</div>
+                <div class="text-lg font-black text-slate-900 mt-0.5">${subjScores['數學']} / 10</div>
+              </div>
+              <div class="bg-white rounded-2xl p-3.5 text-center border border-slate-200">
+                <div class="text-xs font-bold text-violet-600">英文</div>
+                <div class="text-lg font-black text-slate-900 mt-0.5">${subjScores['英文']} / 10</div>
+              </div>
+            </div>
           </div>
-        ` : ""}
-      </div>
-    `;
-  }).join("");
-}
 
-function selectExamOption(qIdx, oIdx) {
-  if (examSubmitted) return;
-  examAnswers[qIdx] = oIdx;
-  renderExamQuestions();
-}
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button onclick="switchStep('step3')" class="px-5 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm shadow-md">
+              📌 前往錯題本複習（${appState.wrongQuestions.length} 題）
+            </button>
+            <button onclick="startNewExam(true)" class="px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm shadow-md">
+              🔄 再測一回（抽取新題）
+            </button>
+          </div>
+        </div>
 
-function revealExamHint(idx) {
-  const box = document.getElementById(`ex-hint-${idx}`);
-  const q = examQuestions[idx];
-  const lvl = parseInt(box.getAttribute("data-lvl") || "0", 10);
-  box.classList.remove("hidden");
-  if (lvl === 0) {
-    box.innerHTML = `<strong>\u63D0;&#x793A; 1\uFF08\u601D;&#x8DEF;&#x65B9;&#x5411;&#xFF09;&#xFF1A;</strong>${q.h1}`;
-    box.setAttribute("data-lvl", "1");
-  } else {
-    box.innerHTML = `<strong>\u63D0;&#x793A; 1&#xFF1A;</strong>${q.h1}<br><strong>\u63D0;&#x793A; 2\uFF08\u95DC;&#x9375;&#x516C;&#x5F0F;/&#x7DDA;&#x7D22;&#xFF09;&#xFF1A;</strong>${q.h2}`;
-    box.setAttribute("data-lvl", "2");
-  }
-}
+        <!-- Detailed Side-by-Side Comparison List -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-black text-slate-900 px-1">📋 逐題作答對照與白話詳解</h3>
+          ${examSession.questions.map((q, idx) => {
+            const userAns = examSession.answers[idx];
+            const isCorrect = userAns === q.answerIndex;
+            const userText = userAns !== undefined
+              ? `(${labels[userAns]}) ${q.options[userAns]}`
+              : '未作答';
+            const rightText = `(${labels[q.answerIndex]}) ${q.options[q.answerIndex]}`;
 
-function submitFullExam() {
-  const answered = Object.keys(examAnswers).length;
-  if (answered < examQuestions.length) {
-    showToast(`\u9084\u6709 ${examQuestions.length - answered} \u984C\u5C1A\u672A\u4F5C\u7B54\u5594\uFF01\u8ACB\u5B8C\u6210\u5168\u90E8 30 \u984C\u518D\u4EA4\u5377\u3002`, "\u26A0\uFE0F");
-    return;
-  }
+            return `
+              <div class="bg-white rounded-2xl p-5 sm:p-6 border ${isCorrect ? 'border-emerald-200' : 'border-rose-200'} shadow-sm">
+                <div class="flex items-center justify-between gap-2 mb-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-800 text-xs font-extrabold">第 ${idx + 1} 題 · ${escapeHtml(q.subject)}</span>
+                    <span class="text-xs text-slate-400">${escapeHtml(q.category)}</span>
+                  </div>
+                  <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold ${isCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                    ${isCorrect ? '✅ 答對' : '❌ 答錯'}
+                  </span>
+                </div>
 
-  stopExamTimer();
-  examSubmitted = true;
+                <p class="text-sm sm:text-base font-bold text-slate-900 whitespace-pre-line leading-relaxed mb-4">${escapeHtml(q.stem)}</p>
 
-  let totalRight = 0;
-  const subScore = { CHI: 0, MATH: 0, ENG: 0 };
+                <!-- Side-by-Side Comparison -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3.5">
+                  <div class="p-3.5 rounded-xl border ${isCorrect ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-rose-50 border-rose-300 text-rose-950'}">
+                    <div class="text-xs font-extrabold mb-1">${isCorrect ? '你的作答（答對）' : '你的作答（紅底標示）'}</div>
+                    <div class="text-sm font-bold">${escapeHtml(userText)}</div>
+                  </div>
+                  <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-950">
+                    <div class="text-xs font-extrabold mb-1">正確答案（綠底標示）</div>
+                    <div class="text-sm font-bold">${escapeHtml(rightText)}</div>
+                  </div>
+                </div>
 
-  examQuestions.forEach((q, idx) => {
-    if (!state.solvedIds.includes(q.id)) state.solvedIds.push(q.id);
-    if (examAnswers[idx] === q.ans) {
-      totalRight++;
-      subScore[q.sub]++;
-    } else {
-      if (!state.wrongBook.some(w => w.id === q.id)) {
-        state.wrongBook.unshift(q);
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                  <span class="font-extrabold text-slate-900">💡 解析：</span>${escapeHtml(q.explanation)}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================================
+    // 9. STEP 3: WRONG-ANSWER NOTEBOOK & TWO-CLICK SAFE RESET
+    // =========================================================================
+    function setWrongFilter(subj) {
+      currentWrongFilter = subj;
+      ['ALL', '國文', '數學', '英文'].forEach(key => {
+        const btn = document.getElementById(`wf_${key}`);
+        if (!btn) return;
+        if (key === subj) {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-white text-slate-900 shadow-sm';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-extrabold text-slate-600 hover:text-slate-900';
+        }
+      });
+      renderWrongNotebook();
+    }
+
+    function renderWrongNotebook() {
+      const container = document.getElementById('wrongNotebookList');
+      if (!container) return;
+
+      const list = currentWrongFilter === 'ALL'
+        ? appState.wrongQuestions
+        : appState.wrongQuestions.filter(q => q.subject === currentWrongFilter);
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 text-center rounded-2xl bg-slate-50 border border-slate-200/70">
+            <div class="text-4xl mb-2">🌟</div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-800">目前沒有待複習的錯題！</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">繼續保持每天一場 30 題模擬考，穩步邁向私中錄取目標！</p>
+          </div>
+        `;
+        return;
+      }
+
+      const labels = ['A', 'B', 'C', 'D'];
+      container.innerHTML = list.map(q => {
+        const uIdx = q.lastUserAnswerIndex;
+        const userAnsText = (uIdx !== undefined && uIdx >= 0 && q.options[uIdx])
+          ? `(${labels[uIdx]}) ${q.options[uIdx]}`
+          : '未作答';
+        const rightAnsText = `(${labels[q.answerIndex]}) ${q.options[q.answerIndex]}`;
+
+        return `
+          <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 text-xs font-extrabold">${escapeHtml(q.subject)}</span>
+                <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs font-bold">${escapeHtml(q.category)}</span>
+              </div>
+              <button onclick="removeWrongQuestion('${escapeAttr(q.id)}')"
+                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-all">
+                ✅ 我已完全搞懂（移除）
+              </button>
+            </div>
+
+            <p class="text-sm sm:text-base font-bold text-slate-900 whitespace-pre-line leading-relaxed mb-4">${escapeHtml(q.stem)}</p>
+            ${renderImageBlock(q.imageUrl)}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3.5">
+              <div class="p-3.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-950">
+                <div class="text-xs font-extrabold mb-1">你的作答（紅底標示）</div>
+                <div class="text-sm font-bold">${escapeHtml(userAnsText)}</div>
+              </div>
+              <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-950">
+                <div class="text-xs font-extrabold mb-1">正確答案（綠底標示）</div>
+                <div class="text-sm font-bold">${escapeHtml(rightAnsText)}</div>
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 text-xs sm:text-sm text-slate-800 leading-relaxed">
+              <span class="font-extrabold text-amber-900">💡 觀念詳解：</span>${escapeHtml(q.explanation)}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function removeWrongQuestion(qId) {
+      appState.wrongQuestions = appState.wrongQuestions.filter(q => q.id !== qId);
+      saveState();
+      renderWrongNotebook();
+      showToast('✅ 太棒了！已將該題移出錯題本');
+    }
+
+    // Two-Click Safe Reset
+    function handleSafeReset() {
+      const btn = document.getElementById('safeResetBtn');
+      if (!resetConfirmStep) {
+        resetConfirmStep = true;
+        btn.textContent = '⚠️ 確定清空全部進度與錯題？請再點一次確認';
+        btn.className = 'px-3.5 py-2 rounded-xl bg-rose-600 text-white font-extrabold transition-all shadow-md';
+        clearTimeout(resetTimeoutId);
+        resetTimeoutId = setTimeout(() => {
+          resetConfirmStep = false;
+          btn.textContent = '🗑️ 重置所有作答與錯題紀錄';
+          btn.className = 'px-3.5 py-2 rounded-xl bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-slate-600 hover:text-rose-700 font-bold transition-all';
+        }, 4500);
+      } else {
+        clearTimeout(resetTimeoutId);
+        resetConfirmStep = false;
+        appState.passedWeeks = 0;
+        appState.solvedIds = [];
+        appState.wrongQuestions = [];
+        saveState();
+        btn.textContent = '🗑️ 重置所有作答與錯題紀錄';
+        btn.className = 'px-3.5 py-2 rounded-xl bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-200 text-slate-600 hover:text-rose-700 font-bold transition-all';
+        renderWrongNotebook();
+        showToast('🗑️ 已重置所有通關進度、已做題庫與錯題紀錄！');
       }
     }
-  });
 
-  const pctScore = Math.round((totalRight / examQuestions.length) * 100);
-  if (pctScore >= 80 && !state.passedWeeks.includes(state.currentWeek)) {
-    state.passedWeeks.push(state.currentWeek);
-    if (state.currentWeek < 15) state.currentWeek += 1;
-  }
+    // =========================================================================
+    // 10. SCRATCHPAD (隨手計算草稿紙) & IMAGE LIGHTBOX
+    // =========================================================================
+    let scratchCtx = null;
+    let isDrawing = false;
+    let scratchColor = '#0f172a';
 
-  saveState();
-  renderDashboard();
-  renderExamQuestions();
+    function initScratchpad() {
+      const canvas = document.getElementById('scratchCanvas');
+      const wrap = document.getElementById('scratchCanvasWrap');
+      if (!canvas || !wrap) return;
 
-  document.getElementById("exam-submit-box").classList.add("hidden");
-  const card = document.getElementById("exam-result-card");
-  card.classList.remove("hidden");
+      const resizeCanvas = () => {
+        const rect = wrap.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        scratchCtx = canvas.getContext('2d');
+        scratchCtx.scale(dpr, dpr);
+        scratchCtx.lineCap = 'round';
+        scratchCtx.lineJoin = 'round';
+        scratchCtx.lineWidth = 2.8;
+        scratchCtx.strokeStyle = scratchColor;
+      };
 
-  document.getElementById("res-total-score").textContent = `\u7E3D\u5206\uFF1A${pctScore} \u5206\uFF08\u7B54\u5C0D ${totalRight} / 30 \u984C\uFF09`;
-  document.getElementById("res-feedback-msg").textContent = pctScore >= 80
-    ? "\u592A\u512A\u79C0\u4E86\uFF01\u9054\u6210 80 \u5206\u901A\u95DC\u6A19\u6E96\uFF0C\u5DF2\u81EA\u52D5\u63A8\u9032\u81F3\u4E0B\u4E00\u9031\u9032\u5EA6\u3002"
-    : "\u5C1A\u672A\u9054 80 \u5206\u901A\u95DC\u9580\u6ABB\uFF0C\u5EFA\u8B70\u5148\u5230\u300C\u6B65\u9A5F\u4E09\uFF1A\u932F\u984C\u8907\u7FD2\u672C\u300D\u641E\u61C2\u89E3\u6790\uFF0C\u518D\u63DB\u65B0\u984C\u6311\u6230\u4E00\u6B21\uFF01";
+      window.addEventListener('resize', () => {
+        if (!document.getElementById('scratchpadModal').classList.contains('hidden')) {
+          resizeCanvas();
+        }
+      });
 
-  document.getElementById("res-subject-breakdown").innerHTML = [
-    { name: "\u570B\u8A9E\u6587", right: subScore.CHI, cls: "bg-rose-50 border-rose-200 text-rose-900" },
-    { name: "\u6578\u5B78\u79D1", right: subScore.MATH, cls: "bg-blue-50 border-blue-200 text-blue-900" },
-    { name: "\u82F1\u8A9E\u6587", right: subScore.ENG, cls: "bg-emerald-50 border-emerald-200 text-emerald-900" }
-  ].map(s => `
-    <div class="p-4 rounded-2xl border text-center ${s.cls}">
-      <div class="text-xs font-bold opacity-80">${s.name}</div>
-      <div class="text-xl font-black mt-1">${s.right} / 10 &#x984C;</div>
-    </div>
-  `).join("");
+      const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      };
 
-  card.scrollIntoView({ behavior: "smooth", block: "center" });
-}
+      const startDraw = (e) => {
+        e.preventDefault();
+        isDrawing = true;
+        const pos = getPos(e);
+        if (!scratchCtx) resizeCanvas();
+        scratchCtx.beginPath();
+        scratchCtx.moveTo(pos.x, pos.y);
+      };
 
-// ============================================================================
-// 7. STEP 3: WRONG-QUESTION BOOK
-// ============================================================================
-function renderWrongBook() {
-  const box = document.getElementById("wrong-book-list");
-  if (state.wrongBook.length === 0) {
-    box.innerHTML = `
-      <div class="liquid-glass rounded-3xl p-10 text-center text-slate-500">
-        <div class="text-4xl mb-3">&#x1F389;</div>
-        <div class="text-base font-black text-slate-800">\u76EE\u524D\u6C92\u6709\u5F85\u8907\u7FD2\u7684\u932F\u984C\uFF01</div>
-        <div class="text-xs sm:text-sm mt-1">\u7E7C\u7E8C\u4FDD\u6301\uFF0C\u524D\u5F80\u6B65\u9A5F\u4E8C\u6311\u6230\u66F4\u591A 30 \u984C\u5168;&#x771F;&#x6A21;&#x64EC;&#x5377;&#x5427;&#x3002;</div>
-      </div>
-    `;
-    return;
-  }
+      const moveDraw = (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        scratchCtx.strokeStyle = scratchColor;
+        scratchCtx.lineTo(pos.x, pos.y);
+        scratchCtx.stroke();
+      };
 
-  const subName = { CHI: "\u570B\u6587", MATH: "\u6578\u5B78", ENG: "\u82F1\u6587" };
+      const endDraw = () => {
+        isDrawing = false;
+      };
 
-  box.innerHTML = state.wrongBook.map((q, idx) => `
-    <div class="liquid-glass rounded-3xl p-5 sm:p-6 space-y-3">
-      <div class="flex flex-wrap justify-between items-center gap-2">
-        <div class="flex items-center gap-1.5">
-          <span class="px-3 py-1 rounded-xl bg-rose-100 text-rose-800 text-xs font-black">${subName[q.sub] || q.sub} &middot; ${q.diff}</span>
-          <span class="text-xs text-slate-500 font-bold">${q.type}</span>
-        </div>
-        <button onclick="removeWrongItem(${idx})" class="px-3.5 py-1.5 rounded-xl border border-emerald-500 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-black cursor-pointer">
-          &#x2705; &#x6211;&#x5DF2;&#x5B8C;&#x5168;&#x641E;&#x61C2;&#xFF08;&#x79FB;&#x9664;&#xFF09;
-        </button>
-      </div>
-      <div class="text-sm sm:text-base font-bold text-slate-900 whitespace-pre-line">${q.stem}</div>
-      <div class="text-xs sm:text-sm font-black text-emerald-700">&#x6B63;&#x78BA;&#x7B54;&#x6848;&#xFF1A;${q.opts[q.ans]}</div>
-      <div class="p-4 rounded-2xl bg-slate-50 border-l-4 border-teal-700 text-xs sm:text-sm text-slate-700">
-        <strong>&#x767D;&#x8A71;&#x89E3;&#x6790;&#xFF1A;</strong>${q.exp}
-      </div>
-    </div>
-  `).join("");
-}
+      canvas.addEventListener('mousedown', startDraw);
+      canvas.addEventListener('mousemove', moveDraw);
+      window.addEventListener('mouseup', endDraw);
 
-function removeWrongItem(idx) {
-  state.wrongBook.splice(idx, 1);
-  saveState();
-  renderDashboard();
-  showToast("\u5DF2\u5F9E\u932F\u984C\u672C\u79FB\u9664\u6B64\u984C\uFF01", "\u2705");
-}
+      canvas.addEventListener('touchstart', startDraw, { passive: false });
+      canvas.addEventListener('touchmove', moveDraw, { passive: false });
+      canvas.addEventListener('touchend', endDraw);
 
-// ============================================================================
-// 8. 30-MINUTE EXAM TIMER
-// ============================================================================
-function formatClock(sec) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-
-function startExamTimer() {
-  if (examTimerRunning) return;
-  examTimerRunning = true;
-  document.getElementById("exam-timer-btn").textContent = "\u66AB\u505C\u8A08\u6642";
-  examTimerHandle = setInterval(() => {
-    if (examSec > 0) {
-      examSec--;
-      const el = document.getElementById("exam-timer-clock");
-      el.textContent = formatClock(examSec);
-      if (examSec <= 180) el.classList.add("timer-urgent");
-    } else {
-      stopExamTimer();
-      showToast("\u6E2C;&#x9A57;&#x6642;&#x9593;&#x5230;&#xFF01\u8ACB\u9EDE;&#x64CA;&#x4EA4;&#x5377;&#x6279;&#x6539;&#x3002;", "\u23F0");
+      canvas._resize = resizeCanvas;
     }
-  }, 1000);
-}
 
-function stopExamTimer() {
-  examTimerRunning = false;
-  clearInterval(examTimerHandle);
-  const btn = document.getElementById("exam-timer-btn");
-  if (btn) btn.textContent = "\u7E7C\u7E8C\u8A08\u6642";
-}
+    function toggleScratchpad(show) {
+      const modal = document.getElementById('scratchpadModal');
+      const canvas = document.getElementById('scratchCanvas');
+      if (show) {
+        modal.classList.remove('hidden');
+        if (canvas && canvas._resize && !scratchCtx) {
+          canvas._resize();
+        }
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
 
-function toggleExamTimer() {
-  if (examTimerRunning) stopExamTimer();
-  else startExamTimer();
-}
+    function setScratchColor(color) {
+      scratchColor = color;
+    }
 
-function resetExamTimer() {
-  stopExamTimer();
-  examSec = 1800;
-  const el = document.getElementById("exam-timer-clock");
-  el.textContent = formatClock(examSec);
-  el.classList.remove("timer-urgent");
-}
+    function clearScratchpad() {
+      const canvas = document.getElementById('scratchCanvas');
+      if (canvas && scratchCtx) {
+        scratchCtx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
 
-// Bootstrap
-loadState();
-updatePortalSummary();
-</script>
+    function renderImageBlock(url) {
+      if (!url) return '';
+      return `
+        <div class="my-3.5">
+          <img src="${escapeAttr(url)}" alt="題目附圖（點擊放大）"
+            onclick="openLightbox('${escapeAttr(url)}')"
+            onerror="this.parentElement.style.display='none'"
+            class="max-h-56 w-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm cursor-zoom-in hover:opacity-95 transition-opacity" />
+          <div class="text-[11px] text-slate-400 mt-1">🔍 點擊圖片可放大檢視</div>
+        </div>
+      `;
+    }
+
+    function openLightbox(url) {
+      const modal = document.getElementById('lightboxModal');
+      const img = document.getElementById('lightboxImg');
+      img.src = url;
+      modal.classList.remove('hidden');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxModal').classList.add('hidden');
+    }
+
+    // =========================================================================
+    // 11. HELPERS & BOOTSTRAP
+    // =========================================================================
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return String(str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      if (!el) return;
+      el.textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        el.classList.add('hidden');
+      }, 3000);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      initScratchpad();
+      syncCloudData(false);
+    });
+  </script>
 </body>
 </html>
