@@ -768,12 +768,12 @@
     <div class="liquid-card portal-box">
       <div class="portal-badge">&#x52DD;</div>
       <h1 class="portal-title">&#x79C1;&#x4E2D;&#x885D;&#x523A;&#x6A21;&#x64EC;&#x7AD9;</h1>
-      <p class="portal-sub">&#x6DE1;&#x6C5F; &times; &#x8587;&#x95A3; 15&#x9031;&#x5165;&#x5B78;&#x8003;&#x5099;&#x8003;&#x7CFB;&#x7D71;&#xFF08;2026/11/16 &ndash; 2027/02/27&#xFF09;</p>
+      <p class="portal-sub">&#x6DE1;&#x6C5F; &times; &#x8587;&#x95A3;&#x5165;&#x5B78;&#x5099;&#x8003;&#x7CFB;&#x7D71;&#xFF08;2026/11/16 &ndash; 2027/02/27&#xFF09;</p>
 
       <!-- Source Repository Selector (Network vs Zhixin) -->
       <div class="source-selector-box">
         <button class="source-pill-btn active" id="src-btn-web" onclick="switchQuestionSource('web')">&#x1F310; &#x7DB2;&#x8DEF;&#x79C1;&#x4E2D;&#x984C;&#x5Eab;</button>
-        <button class="source-pill-btn" id="src-btn-zhixin" onclick="switchQuestionSource('zhixin')">&#x1F3EB; &#x77E5;&#x6B65;&#x52A0;&#x5F37;&#x73ED;</button>
+        <button class="source-pill-btn" id="src-btn-zhixin" onclick="switchQuestionSource('zhixin')">&#x1F3EB; &#x77E5;&#x6B23;&#x52A0;&#x5F37;&#x73ED;</button>
       </div>
 
       <div class="portal-status-card">
@@ -814,8 +814,8 @@
         <div class="brand-mini-icon">&#x52DD;</div>
         <div>
           <div style="font-weight:800;font-size:16px;">
-            <span id="active-source-badge" class="badge dlc" style="font-size:12px;margin-right:6px;">網路私中題庫</span>
-            <span id="app-title-text">&#x6DE1;&#x6C5F; &times; &#x8587;&#x95A3; 15&#x9031;&#x5165;&#x5B78;&#x8003;&#x5099;&#x8003;&#x7CFB;&#x7D71;</span>
+            <span id="active-source-badge" class="badge dlc" style="font-size:12px;margin-right:6px;">&#x7DB2;&#x8DEF;&#x79C1;&#x4E2D;&#x984C;&#x5Eab;</span>
+            <span id="app-title-text">&#x6DE1;&#x6C5F; &times; &#x8587;&#x95A3;&#x5165;&#x5B78;&#x5099;&#x8003;&#x7CFB;&#x7D71;</span>
           </div>
           <div id="week-date-range" style="font-size:12px;color:var(--text-sub);"></div>
         </div>
@@ -974,7 +974,7 @@
   </div>
 
 <script>
-  const STORAGE_KEY = "private_school_sprint_flagship_v18";
+  const STORAGE_KEY = "private_school_sprint_flagship_v19";
   const SHEET_ID = "1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA";
 
   const WEEKS_META = [
@@ -1109,10 +1109,11 @@
     const label = document.getElementById("dlc-status-label");
     if (label) label.textContent = "\u540C\u6B65\u4E2D...";
     const ts = Date.now();
+    // 講義DLC / 題庫DLC / 知欣講義DLC / 知欣題庫DLC
     const lecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u8B1B\u7FA9DLC")}&_t=${ts}`;
     const qUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u984C\u5EABDLC")}&_t=${ts}`;
-    const zLecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u77E5\u6B65\u8B1B\u7FA9DLC")}&_t=${ts}`;
-    const zQUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u77E5\u6B65\u984C\u5EABDLC")}&_t=${ts}`;
+    const zLecUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u77E5\u6B23\u8B1B\u7FA9DLC")}&_t=${ts}`;
+    const zQUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent("\u77E5\u6B23\u984C\u5EABDLC")}&_t=${ts}`;
 
     try {
       const [lecRes, qRes, zLecRes, zQRes] = await Promise.all([
@@ -1122,19 +1123,20 @@
       const [lecCsv, qCsv] = await Promise.all([lecRes.text(), qRes.text()]);
 
       const parseLecs = (csvText) => {
-        const rows = parseCSV(csvText).slice(1).filter(r => r.length >= 4 && r[0] && r[2]);
+        const rows = parseCSV(csvText).slice(1).filter(r => r.length >= 3 && r[0] && r[2]);
         return rows.map(r => ({
           sub: r[0],
           cat: r[1] || "\u96F2\u7AEF\u64F4\u5145\u7CBE\u83EF",
           title: r[2],
-          body: r[3],
+          body: r[3] || "",
           img: normalizeImageUrl(r[4] || ""),
           isDLC: true
         }));
       };
 
       const parseQs = (csvText) => {
-        const rows = parseCSV(csvText).slice(1).filter(r => r.length >= 10 && r[0] && r[3]);
+        // 放寬為 r.length >= 6，避免最後幾欄空白時整列被過濾掉（解決少 20 題的問題）
+        const rows = parseCSV(csvText).slice(1).filter(r => r.length >= 6 && r[0] && r[3]);
         const ansMap = { A: 0, B: 1, C: 2, D: 3 };
         return rows.map(r => {
           const ansIdx = ansMap[(r[9] || "A").toUpperCase()] ?? 0;
@@ -1180,12 +1182,12 @@
       saveState();
 
       if (manual) {
-        alert(`\u540C\u6B65\u5B8C\u6210\uff01\u8F09\u5165\u7DB2\u8DEF\u984C\u5EAB ${state.dlcLectures.length} 講/${state.dlcQuestions.length} 題，知欣班 ${state.zhixinLectures.length} 講/${state.zhixinQuestions.length} 題。`);
+        alert(`\u540C\u6B65\u5B8C\u6210\uff01\u8F09\u5165\u7DB2\u8DEF\u984C\u5EAB ${state.dlcLectures.length} \u8B1B/${state.dlcQuestions.length} \u984C\uff0C\u77E5\u6B23\u73ED ${state.zhixinLectures.length} \u8B1B/${state.zhixinQuestions.length} \u984C\u3002`);
       }
     } catch (err) {
       updatePortalSummary(true);
       if (manual) {
-        alert("\u96F2\u7AEF\u8A66\u7B97\u8868\u540C\u6B65\u66AB\u6642\u7121\u6CD5\u9023\u7DDA\uff0c\u7CFB\u7D71\u5DF2\u81EA\u52D5\u555F\u7528\u7DE8\u865F\u4FDD\u5E95\u6A54\uff01");
+        alert("\u96F2\u7AEF\u8A66\u7B97\u8868\u540C\u6B65\u66AB\u6642\u7121\u6CD5\u9023\u7DDA\uff0c\u7CFB\u7D71\u5DF2\u81EA\u52D5\u555F\u7528\u672C\u6A5F\u5FEB\u53D6\u984C\u5EAB\uff01");
       }
     }
   }
@@ -1205,14 +1207,14 @@
     
     const activeLecs = currentSource === "web" ? state.dlcLectures : state.zhixinLectures;
     const activeQs = currentSource === "web" ? state.dlcQuestions : state.zhixinQuestions;
-    const totalLec = activeLecs.length > 0 ? activeLecs.length : (currentSource === "web" ? 180 : 21);
-    const totalQ = activeQs.length > 0 ? activeQs.length : (currentSource === "web" ? 206 : 134);
+    const totalLec = activeLecs.length;
+    const totalQ = activeQs.length;
     const timeStr = state.lastSyncTime ? ` (\u66F4\u65B0 ${state.lastSyncTime})` : "";
 
     if (offline && activeQs.length === 0) {
       dlcLabel.textContent = "\u793A\u7BC4\u6A21\u5F0F";
     } else {
-      dlcLabel.textContent = `已同步 ${totalLec} 講義 / ${totalQ} 題${timeStr}`;
+      dlcLabel.textContent = `\u5DF2\u540C\u6B65 ${totalLec} \u8B1B\u7FA9 / ${totalQ} \u984C${timeStr}`;
     }
   }
 
@@ -1222,11 +1224,11 @@
     
     const badge = document.getElementById("active-source-badge");
     if (currentSource === "zhixin") {
-      badge.textContent = "知欣加強班題庫";
+      badge.textContent = "\u77E5\u6B23\u52A0\u5F37\u73ED\u984C\u5EAB";
       badge.style.background = "rgba(124, 58, 237, 0.15)";
       badge.style.color = "#7c3aed";
     } else {
-      badge.textContent = "網路私中題庫";
+      badge.textContent = "\u7DB2\x8DEF\u79C1\u4E2D\u984C\u5EAB";
       badge.style.background = "rgba(15, 118, 110, 0.15)";
       badge.style.color = "#0f766e";
     }
@@ -1319,11 +1321,11 @@
     const list = sourceList.filter(l => l.sub === targetSub);
 
     document.getElementById("lecture-count-badge").textContent = `\u672C\u79D1\u5171 ${list.length} \u9805`;
-    document.getElementById("lecture-summary-header").textContent = `\u1F4DA; ${currentSource === "zhixin" ? "知欣加強班專屬講義庫" : "台灣教育部辭典校對、淡江偵憾教材"}（總講義 ${sourceList.length} 項）`;
+    document.getElementById("lecture-summary-header").textContent = `\u1F4DA; ${currentSource === "zhixin" ? "\u77E5\u6B23\u52A0\u5F37\u73ED\u5C08\u5C6C\u8B1B\u7FA9\u5EAB" : "\u53F0\u7063\u6559\u80B2\u90E8\u8fad\u5178\u6821\u5C0D\u3001\u6DE1\u6C5F\u5075\u61BA\u6559\u6750"}\uFF08\u7E3D\u8B1B\u7FA9 ${sourceList.length} \u9805\uFF09`;
 
     const container = document.getElementById("lecture-list-container");
     if (list.length === 0) {
-      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">\u66AB\u7121${currentSource === "zhixin" ? "知欣加強班" : "網路"}講義內容，請於試算表「${currentSource === "zhixin" ? "知欣講義DLC" : "講義DLC"}」分頁新增。</div>`;
+      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">\u66AB\u7121${currentSource === "zhixin" ? "\u77E5\u6B23\u52A0\u5F37\u73ED" : "\u7DB2\u8DEF"}\u8B1B\u7FA9\u5167\u5BB9\uFF0C\u8ACB\u65BC\u8A66\u7B97\u8868\u300C${currentSource === "zhixin" ? "\u77E5\u6B23\u8B1B\u7FA9DLC" : "\u8B1B\u7FA9DLC"}\u300D\u5206\u9801\u65B0\u589E\u3002</div>`;
       document.getElementById("warmup-container").innerHTML = "";
       return;
     }
@@ -1331,7 +1333,7 @@
     container.innerHTML = list.map(item => `
       <div class="liquid-card lecture-item dlc">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <span class="badge dlc">&#x2601;&#xFE0F; ${currentSource === "zhixin" ? "知欣加強班" : "網路私中"} &middot; ${item.cat}</span>
+          <span class="badge dlc">&#x2601;&#xFE0F; ${currentSource === "zhixin" ? "\u77E5\u6B23\u52A0\u5F37\u73ED" : "\u7DB2\u8DEF\u79C1\u4E2D"} &middot; ${item.cat}</span>
         </div>
         <div style="font-weight:800;font-size:15px;margin-bottom:4px;">${item.title}</div>
         <div style="font-size:14px;color:var(--text-sub);white-space:pre-line;">${item.body}</div>
@@ -1343,9 +1345,9 @@
     const sampleLecs = list.slice(0, 3);
     wBox.innerHTML = sampleLecs.map((l, idx) => `
       <div style="padding:12px;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:10px;background:#fff;">
-        <div style="font-weight:700;font-size:14px;margin-bottom:6px;">&#x1F4D1; \u91CD\u9EDE\u6838\u5B58 ${idx+1}：${l.title}</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;">&#x1F4D1; \u91CD\u9EDE\u6838\u5B58 ${idx+1}\uFF1A${l.title}</div>
         <div style="font-size:13px;color:var(--text-sub);margin-bottom:8px;">${l.body.slice(0, 45)}...</div>
-        <div style="font-size:12px;color:var(--primary);font-weight:700;">&#x2705; \u5DF2\u5B8C\u6210\u672C\u9805\u77AD\u89E3與重點複習</div>
+        <div style="font-size:12px;color:var(--primary);font-weight:700;">&#x2705; \u5DF2\u5B8C\u6210\u672C\u9805\u77AD\u89E3\u8207\u91CD\u9EDE\u8907\u7FD2</div>
       </div>
     `).join("");
   }
@@ -1449,7 +1451,7 @@
 
   function speakText(text) {
     if (!('speechSynthesis' in window)) {
-      alert("您的瀏覽器不支援語音朗讀功能");
+      alert("\u60A8\u7684\u700F\u89BD\u5668\u4E0D\u652F\u63F4\u8A9E\u97F3\u6717\u8B80\u529F\u80FD");
       return;
     }
     window.speechSynthesis.cancel();
@@ -1463,7 +1465,7 @@
     const container = document.getElementById("quiz-questions-container");
     container.innerHTML = "";
     if (activeQuestions.length === 0) {
-      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;">尚無測驗題目，請先點擊首頁「立即同步最新題庫」。</div>`;
+      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;">\u5C1A\u7121\u6E2C\u9A57\u984C\u76EE\uFF0C\u8ACB\u5148\u9EDE\u64CA\u9996\u9801\u300C\u7ACB\u5373\u540C\u6B65\u6700\u65B0\u984C\u5EAB\u300D\u3002</div>`;
       return;
     }
 
@@ -1490,17 +1492,17 @@
             <div class="listening-box">
               <div>
                 <div style="font-weight:800;font-size:14px;color:#166534;">&#x1F50A; \u82F1\u6587\u807D\u529B\u6E2C\u9593\u95B1\u8B80</div>
-                <div style="font-size:12px;color:#15803d;">\u807D\u529B\u7A3F\u5DF2\u81EA\u52D5\u96B1\u85CF\uff0c\u8ACB\u9EDE\u64CA\u6309\u9215\u6538\u807D\u6A19\u6E96\u7F8E\u97F3</div>
+                <div style="font-size:12px;color:#15803d;">\u807D\u529B\u7A3F\u5DF2\u81EA\u52D5\u96B1\u85CF\uff0C\u8ACB\u9EDE\u64CA\u6309\u9215\u6538\u807D\u6A19\u6E96\u7F8E\u97F3</div>
               </div>
               <button class="btn-primary" style="width:auto;padding:10px 16px;font-size:14px;" onclick="speakText(${JSON.stringify(q.passage)})">
-                &#x1F50A; \u64AD\u653E\u807D\u529B\u6B0C\u97f3
+                &#x1F50A; \u64AD\u653E\u807D\u529B\u6B0C\u97F3
               </button>
             </div>
           `;
           if (quizSubmitted) {
             passageHtml = `
               <div class="reading-passage-box" style="position:static;background:#f0fdf4;border-color:#bbf7d0;">
-                <div class="reading-passage-header" style="color:#166534;">&#x1F4D6; \u807D\u529B\u7A3F\u539f\u6587\u5C0D\u7167</div>
+                <div class="reading-passage-header" style="color:#166534;">&#x1F4D6; \u807D\u529B\u7A3F\u539F\u6587\u5C0D\u7167</div>
                 <div class="reading-passage-text">${q.passage}</div>
               </div>
             `;
@@ -1579,7 +1581,7 @@
     });
 
     if (visibleCount === 0) {
-      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">此科目目前沒有題目。</div>`;
+      container.innerHTML = `<div class="liquid-card" style="padding:24px;text-align:center;color:var(--text-sub);">\u6B64\u79D1\u76EE\u76EE\u524D\u6C92\u6709\u984C\u76EE\u3002</div>`;
     }
   }
 
