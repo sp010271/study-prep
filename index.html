@@ -227,19 +227,32 @@
       color: var(--primary);
     }
 
-    /* 15 Weeks Strip (Fully touch-scrollable, hidden ugly scrollbar) */
+    /* 15 Weeks Strip (Restored visible, sleek custom scrollbar for horizontal sliding) */
     .week-strip {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding: 4px 2px 10px;
+      padding: 4px 2px 14px;
       margin-bottom: 12px;
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;     /* Firefox */
+      -webkit-overflow-scrolling: touch;
     }
 
     .week-strip::-webkit-scrollbar {
-      display: none;             /* Chrome, Safari and Opera */
+      height: 6px;
+    }
+
+    .week-strip::-webkit-scrollbar-track {
+      background: rgba(203, 213, 225, 0.25);
+      border-radius: 10px;
+    }
+
+    .week-strip::-webkit-scrollbar-thumb {
+      background: rgba(15, 118, 110, 0.4);
+      border-radius: 10px;
+    }
+
+    .week-strip::-webkit-scrollbar-thumb:hover {
+      background: rgba(15, 118, 110, 0.7);
     }
 
     .week-pill {
@@ -393,21 +406,23 @@
     }
 
     .exam-sub-pill {
-      padding: 8px 4px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
+      padding: 10px 6px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
       background: #f8fafc;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--text-sub);
       cursor: pointer;
       text-align: center;
+      transition: all 0.15s ease;
     }
 
     .exam-sub-pill.active {
       background: var(--primary);
-      color: #fff;
+      color: #ffffff;
       border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(15, 118, 110, 0.25);
     }
 
     .mini-grid {
@@ -788,7 +803,7 @@
       </div>
     </div>
 
-    <!-- 15 Weeks Strip (Clean scrollbar hidden) -->
+    <!-- 15 Weeks Strip (With visible custom scrollbar) -->
     <div class="week-strip" id="week-strip"></div>
 
     <!-- Current Week Header -->
@@ -856,7 +871,7 @@
           </div>
         </div>
 
-        <!-- Subject Priority Filter Bar (Allows testing subjects in preferred order) -->
+        <!-- Subject Priority Filter Bar (Fully fixed active state toggling) -->
         <div class="exam-sub-filter">
           <button class="exam-sub-pill active" id="exam-sub-all" onclick="filterExamSub('all')">&#x5168;&#x5377; 30 &#x984C;</button>
           <button class="exam-sub-pill" id="exam-sub-chi" onclick="filterExamSub('\u570B\u6587')">&#x570B;&#x6587; 10 &#x984C;</button>
@@ -922,7 +937,7 @@
   </div>
 
 <script>
-  const STORAGE_KEY = "private_school_sprint_flagship_v9";
+  const STORAGE_KEY = "private_school_sprint_flagship_v10";
   const SHEET_ID = "1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA";
 
   const WEEKS_META = [
@@ -1289,9 +1304,7 @@
     quizSubmitted = false;
     activeExamSubFilter = "all";
 
-    ["all", "chi", "math", "eng"].forEach(k => {
-      document.getElementById(`exam-sub-${k}`).classList.toggle("active", k === "all");
-    });
+    updateExamSubFilterUI("all");
 
     document.getElementById("quiz-submit-area").classList.remove("hidden");
     document.getElementById("quiz-result-banner").classList.add("hidden");
@@ -1299,12 +1312,20 @@
     renderQuizQuestions();
   }
 
+  function updateExamSubFilterUI(sub) {
+    const mapKeys = { "all": "all", "\u570B\u6587": "chi", "\u6578\u5B78": "math", "\u82F1\u6587": "eng" };
+    ["all", "chi", "math", "eng"].forEach(k => {
+      const btn = document.getElementById(`exam-sub-${k}`);
+      if (btn) {
+        const targetVal = Object.keys(mapKeys).find(pk => mapKeys[pk] === k);
+        btn.classList.toggle("active", targetVal === sub);
+      }
+    });
+  }
+
   function filterExamSub(sub) {
     activeExamSubFilter = sub;
-    ["all", "chi", "math", "eng"].forEach(k => {
-      const keyMap = { all: "all", "\u570B\u6587": "chi", "\u6578\u5B78": "math", "\u82F1\u6587": "eng" };
-      document.getElementById(`exam-sub-${keyMap[k] || k}`).classList.toggle("active", (k === sub));
-    });
+    updateExamSubFilterUI(sub);
     renderQuizQuestions();
   }
 
@@ -1518,9 +1539,7 @@
     stopTimer();
     quizSubmitted = true;
     activeExamSubFilter = "all";
-    ["all", "chi", "math", "eng"].forEach(k => {
-      document.getElementById(`exam-sub-${k}`).classList.toggle("active", k === "all");
-    });
+    updateExamSubFilterUI("all");
 
     let correctCount = 0;
     activeQuestions.forEach((q, idx) => {
@@ -1571,7 +1590,7 @@
       <div class="liquid-card q-card">
         <div class="q-header">
           <span class="badge">${q.sub} &middot; ${q.type}</span>
-          <button class="btn-secondary" style="padding:6px 12px;font-size:12px;color:#059669;border-color:#10b981;" onclick="markMastered(${idx})">&#x2705; \u6211\u5DF2\u5B8C\u5168\u641E\u61C2\uff08\u79FB\u9664\uff09</button>
+          <button class="btn-secondary" style="padding:6px 12px;font-size:12px;color:#059669;border-color:#10b981;" onclick="markMastered(${idx})">&#x2705; \u6211\u5DF2\u5B8C\u6210\u641E\u61C2\uff08\u79FB\u9664\uff09</button>
         </div>
         ${q.passage ? `<div class="reading-passage-box" style="position:static;"><div class="reading-passage-text">${q.passage}</div></div>` : ""}
         <div class="q-stem">${q.stem}</div>
@@ -1613,7 +1632,7 @@
       resetConfirmStep = 0;
       buildExam30();
       renderAll();
-      alert("\u5DF2\u6E05\u7A7A\u5237\u984C\u7D00\u9304\uff0C\u53EF\u91CD\u65B0\u958B\u59CB\u7E3D\u8907\u7FD2\uff01");
+      alert("\u5DF2\u6E05\u7A7A\u5237\u984C\u7D00\u9304\uff0c\u53EF\u91CD\u65B0\u958B\u59CB\u7E3D\u8907\u7FD2\uff01");
     }
   }
 
