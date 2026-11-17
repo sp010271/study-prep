@@ -937,7 +937,7 @@
   </div>
 
 <script>
-  const STORAGE_KEY = "private_school_sprint_flagship_v12";
+  const STORAGE_KEY = "private_school_sprint_flagship_v13";
   const SHEET_ID = "1_wW9taKYjWm0TZPgzGWZsAJ8xbgF-p-ly-IZWaf7MCA";
 
   const WEEKS_META = [
@@ -1137,9 +1137,9 @@
     document.getElementById("portal-wrong-label").textContent = `${state.wrongBook.length} \u984C`;
     const dlcLabel = document.getElementById("dlc-status-label");
     
-    // Dynamic query of actual total counts from Google Sheets
-    const totalLec = state.dlcLectures.length || 180;
-    const totalQ = state.dlcQuestions.length || 206;
+    // Dynamic query of actual total counts from state (fallback to 180 / 206 if not yet fetched)
+    const totalLec = state.dlcLectures.length > 0 ? state.dlcLectures.length : 180;
+    const totalQ = state.dlcQuestions.length > 0 ? state.dlcQuestions.length : 206;
     const timeStr = state.lastSyncTime ? ` (\u66F4\u65B0 ${state.lastSyncTime})` : "";
 
     if (offline && state.dlcQuestions.length === 0) {
@@ -1573,7 +1573,7 @@
     document.getElementById("quiz-submit-area").classList.add("hidden");
     const banner = document.getElementById("quiz-result-banner");
     banner.classList.remove("hidden");
-    document.getElementById("result-score-text").textContent = `\u672C\u6B21\u5F97\u5206\uFF1A${score} \u5206\uff08\u7B54\u5C0D ${correctCount} / 30 \u984C\uff09`;
+    document.getElementById("result-score-text", `\u672C\u6B21\u5F97\u5206\uFF1A${score} \u5206\uff08\u7B54\u5C0D ${correctCount} / 30 \u984C\uff09`);
     document.getElementById("result-feedback-text").textContent = score >= 80
       ? "\u592A\u68D2\u4E86\uFF01\u9054\u6210 80 \u5206\u901A\u95DC\u6A19\u6E96\uFF0C\u5DF2\u81EA\u52D5\u89E3\u9396\u4E26\u63A8\u9032\u9032\u5EA6\u3002"
       : "\u5C1A\u672A\u9054 80 \u5206\u901A\u95DC\u9580\u6ABB\uFF0C\u5EFA\u8B70\u5148\u5230\u300C\u6B65\u9A5F\u4E09\uFF1A\u932F\u984C\u672C\u300D\u641E\u61C2\u89E3\u6790\uFF0C\u518D\u63DB\u65B0\u984C\u6311\u6230\u4E00\u6B21\uFF01";
